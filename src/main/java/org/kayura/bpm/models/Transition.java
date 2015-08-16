@@ -4,7 +4,7 @@ public class Transition extends WfElement {
     
     private Node fromNode;
     private Node toNode;
-    private String condition;
+    private String conditions;
     
     public Transition(WorkflowProcess parent, Node fromNode, Node toNode) {
 	super(parent, null);
@@ -28,12 +28,12 @@ public class Transition extends WfElement {
 	this.toNode = toNode;
     }
     
-    public String getCondition() {
-	return condition;
+    public String getConditions() {
+	return conditions;
     }
     
-    public void setCondition(String condition) {
-	this.condition = condition;
+    public void setConditions(String conditions) {
+	this.conditions = conditions;
     }
     
 }

@@ -87,6 +87,24 @@ public class WorkflowProcess extends WfElement {
 	return route;
     }
     
+    public Transition createTransition(String fromId, String toId) {
+	
+	Node fromNode = findNodeById(fromId);
+	if (fromNode == null) {
+	    throw new WorkflowException(String.format("来源环节Id %s 不存在。", fromId));
+	}
+	
+	Node toNode = findNodeById(toId);
+	if (toNode == null) {
+	    throw new WorkflowException(String.format("到达环节Id %s 不存在。", toId));
+	}
+	
+	Transition transition = new Transition(this, fromNode, toNode);
+	transition.setId(KeyUtils.newId());
+	this.transitions.add(transition);
+	return transition;
+    }
+    
     public Node findNodeById(String nodeId) {
 	List<Node> list = this.getNodes();
 	for (Node node : list) {

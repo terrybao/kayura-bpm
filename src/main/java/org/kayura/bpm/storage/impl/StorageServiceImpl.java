@@ -16,7 +16,7 @@ public class StorageServiceImpl implements IStorageService {
 	Map<String, Object> args = new HashMap<String, Object>();
 	args.put("id", id);
 	
-	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcessByMap(args);
+	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcess(args);
 	return workflowProcess;
     }
     
@@ -24,12 +24,16 @@ public class StorageServiceImpl implements IStorageService {
 	
 	Map<String, Object> args = new HashMap<String, Object>();
 	args.put("flowCode", flowCode);
+	args.put("status", 1);
 	if (version != null) {
 	    args.put("version", version);
 	}
 	
-	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcessByMap(args);
+	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcess(args);
 	return workflowProcess;
     }
     
+    public void saveOrUpdateWorkflowProcess(WorkflowProcess workflowProcess) {
+	
+    }
 }

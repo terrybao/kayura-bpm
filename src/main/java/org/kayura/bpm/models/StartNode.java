@@ -1,6 +1,5 @@
 package org.kayura.bpm.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,12 +15,8 @@ public class StartNode extends Node {
     }
     
     @Override
-    public List<Transition> getFromTransitions() {
-	return new ArrayList<Transition>();
+    public List<Transition> getToTransitions() {
+        return super.getToTransitions();
     }
-    
-    @Override
-    public void setFromTransitions(List<Transition> fromTransitions) {
-	// 什么也不做.
-    }
+
 }

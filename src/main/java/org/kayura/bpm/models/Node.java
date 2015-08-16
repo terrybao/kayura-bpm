@@ -18,19 +18,19 @@ public class Node extends WfElement {
 	return nodeType;
     }
     
-    public List<Transition> getFromTransitions() {
+    protected List<Transition> getFromTransitions() {
 	return fromTransitions;
     }
     
-    public void setFromTransitions(List<Transition> fromTransitions) {
+    protected void setFromTransitions(List<Transition> fromTransitions) {
 	this.fromTransitions = fromTransitions;
     }
     
-    public List<Transition> getToTransitions() {
+    protected List<Transition> getToTransitions() {
 	return toTransitions;
     }
     
-    public void setToTransitions(List<Transition> toTransitions) {
+    protected void setToTransitions(List<Transition> toTransitions) {
 	this.toTransitions = toTransitions;
     }
 }

@@ -11,19 +11,87 @@
         <result column="DisplayName" property="displayName" />
         <result column="Sn" property="sn" />
         <result column="Description" property="description" />
-        <result column="Attributes" property="attributes" />
-        <result column="Status" property="status" />
+        <result column="Attributes" property="attributes" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
+        <result column="Status" property="status" /
     </resultMap>
     
+    <sql id="bizFormColumns">
+        ${alias}.BizForm_Id, 
+        ${alias}.Code, 
+        ${alias}.DisplayName, 
+        ${alias}.Sn, 
+        ${alias}.Description, 
+        ${alias}.Attributes, 
+        ${alias}.Status
+    </sql>
+    
     <select id="getBizFormById" parameterType="string" resultMap="bizFormMap">
-        SELECT
-        	BizForm_Id, Code, DisplayName, Sn, Description, Attributes, Status
-		FROM
-			Bpm_BizForm
-		WHERE 
-			BizForm_Id = #{id}
+        SELECT 
+        	<include refid="bizFormColumns">
+        	    <property name="alias" value="t"/>
+        	</include>
+		FROM Bpm_BizForm t
+		WHERE t.BizForm_Id = #{id}
     </select>
-
+    
+    <select id="findBizForms" parameterType="map" resultMap="bizFormMap">
+		SELECT 
+        	<include refid="bizFormColumns">
+        	    <property name="alias" value="t"/>
+        	</include>
+		FROM Bpm_BizForm t
+		<where>
+		    <if test="keyword != null">
+				( t.Code like #{keyword} OR t.DisplayName like #{keyword} OR t.Description like #{keyword} )
+		    </if>
+		    <if test="status != null">
+		        ( t.Status = #{status} )
+		    </if>
+		</where>
+    </select>
+    
+    <insert id="insertBizForm" parameterType="org.kayura.bpm.models.BizForm">
+        INSERT Bpm_BizForm (
+	        BizForm_Id,
+			Code,
+			DisplayName,
+			Sn,
+			Description,
+			Attributes,
+			Status     
+		) Values (
+			#{id},
+			#{code},
+			#{displayName},
+			#{sn},
+			#{description},
+			#{attributes},
+			#{status}
+		)
+    </insert>
+    
+    <update id="updateBizForm" parameterType="org.kayura.bpm.models.BizForm">
+        UPDATE Bpm_BizForm
+        SET	Code = #{code},
+        	DisplayName = #{displayName},
+        	Sn = #{sn},
+        	Description = #{description},
+        	Attributes = #{attributes},
+        	Status = #{status}
+        WHERE BizForm_Id = #{id}
+    </update>
+    
+    <update id="updateBizFormForStatus" parameterType="string">
+        UPDATE Bpm_BizForm
+        SET	Status = #{status}
+        WHERE BizForm_Id = #{id}
+    </update>
+    
+    <delete id="deleteBizFormById" parameterType="string">
+		DELETE Bpm_BizForm
+        WHERE BizForm_Id = #{id}
+    </delete>
+    
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流过程定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 	
 	<resultMap id="workflowPorcessMap" type="org.kayura.bpm.models.WorkflowProcess">
@@ -35,8 +103,8 @@
 		<result column="CreateTime" property="createTime" />
 		<result column="ModifiedTime" property="modifiedTime" />
 		<result column="Modifier" property="modifier" />
-		<result column="Listeners" property="listeners" />
-		<result column="Attributes" property="attributes" />
+		<result column="Listeners" property="listeners" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
+		<result column="Attributes" property="attributes" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
 		<result column="Status" property="status" />
 		<association column="BizForm_Id" property="bizForm" fetchType="lazy" select="getBizFormById" />
 		<association column="Parent_Id" property="parent" fetchType="lazy" select="getWorkflowProcessById" />
@@ -44,39 +112,116 @@
 	</resultMap>
 	
 	<sql id="workflowPorcessColumns">
-	    t.Process_Id, t.Parent_Id, t.BizForm_Id, t.Code, t.Name, t.Description, t.Version,
-	    t.ModifiedTime, t.Modifier, t.Listeners, t.Attributes, t.Status
+	    ${alias}.Process_Id, 
+	    ${alias}.Parent_Id, 
+	    ${alias}.BizForm_Id, 
+	    ${alias}.Code, 
+	    ${alias}.Name, 
+	    ${alias}.Description, 
+	    ${alias}.Version,
+	    ${alias}.ModifiedTime, 
+	    ${alias}.Modifier, 
+	    ${alias}.Listeners, 
+	    ${alias}.Attributes, 
+	    ${alias}.Status
 	</sql>
 	
 	<select id="getWorkflowProcessByMap" parameterType="map" resultMap="workflowPorcessMap">
 		SELECT
-			<include refid="workflowPorcessColumns" />
-		FROM
-			Bpm_Process t 
+			<include refid="workflowPorcessColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_Process t 
 			<if test="flowCode != null">
 			    JOIN Bpm_BizForm b ON t.BizForm_Id = b.BizForm_Id
 			</if>
-		WHERE 
-			( d.`Status` = 1 ) 
-			<if test="flowCode != null and ">
+		<where>
+			<if test="flowCode != null">
 			    and ( b.Code = #{flowCode} ) 
 			</if>
 			<if test="version = #{version}">
-			    and ( version = #{version} ) 
+			    and ( t.version = #{version} ) 
+			</if>
+			<if test="id != null">
+			    and ( t.Process_Id = #{id} ) 
+			</if>
+			<if test="status != null">
+			    and ( t.`Status` = status ) 
 			</if>
 		</where>
-		ORDER BY Version DESC
+		ORDER BY t.Version DESC
 		LIMIT 1
 	</select>
 	
-	<select id="getWorkflowProcessById" parameterType="string" resultMap="workflowPorcessMap">
-	    SELECT
-			<include refid="workflowPorcessColumns" />
-		FROM
-			Bpm_Process t 
-		WHERE t.Process_Id = #{id}
+	<select id="workflowProcessExists" parameterType="string" resultType="bool">
+	   	SELECT COUNT(1) > 0 FROM Bpm_Process t WHERE t.Process_Id = #{id}
 	</select>
+	
+	<insert id="insertWorkflowProcess" parameterType="org.kayura.bpm.models.WorkflowProcess">
+	    INSERT Bpm_Process (
+		    Process_Id,
+			Parent_Id,
+			BizForm_Id,
+			Code,
+			Name,
+			Description,
+			Version,
+			ModifiedTime,
+			Modifier,
+			Listeners,
+			Attributes,
+			Status
+		) Values (
+			#{id},
+			<choose>
+			    <when test="parent != null and parent.id != null">
+			        #{parent.id}
+			    </when>
+			    <otherwise>
+			        null,
+			    </otherwise>
+			</choose>
+			#{bizForm.id},
+			#{code},
+			#{name},
+			#{description},
+			#{version},
+			#{createdTime},
+			#{modifiedTime},
+			#{modifier},
+			#{listeners},
+			#{attributes},
+			#{status}
+		)
+	</insert>
+	
+	<update id="updateWorkflowProcess" parameterType="org.kayura.bpm.models.WorkflowProcess">
+	    UPDATE Bpm_Process
+	    SET Code = #{code},
+	    	Name = #{name},
+	    	Description = #{description},
+			ModifiedTime = #{modifiedTime},
+			Modifier = #{modifier},
+			Listeners = #{listeners},
+			Attributes = #{attributes},
+			Status = #{status}
+		WHERE Process_Id = #{id}
+	</update>
+	
+	<update id="updateWorkflowProcessForStatus" parameterType="string">
+	    UPDATE Bpm_Process 
+	    SET Status = #{status} 
+	    WHERE Process_Id = #{id}
+	</update>
 
+	<delete id="deleteWorkflowProcessById" parameterType="string">
+	    DELETE Bpm_Process WHERE Process_Id = #{id}
+	</delete>
+	
+	<delete id="deleteWorkflowProcessByBizFromId" parameterType="string">
+	    DELETE Bpm_Process WHERE BizFrom_Id = #{bizFromId}
+	</delete>
+	
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流环节定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 
 	<resultMap id="nodeMap" type="org.kayura.bpm.models.Node">
@@ -85,15 +230,18 @@
 		<result column="Code" property="code" />
 		<result column="Name" property="name" />
 		<result column="Description" property="description" />
-		<result column="Listeners" property="listeners" />
-		<result column="Attributes" property="attributes" />
+		<result column="Listeners" property="listeners" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
+		<result column="Attributes" property="attributes" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
 		<result column="CreateTime" property="createTime" />
 		<result column="ModifiedTime" property="modifiedTime" />
+		<collection property="fromTransitions" column="Node_Id" select="selectTransitionByFrom" />
+		<collection property="toTransitions"column="Node_Id" select="selectTransitionByTo" />
 		<!-- 0 StartNode; 1 Activity; 2 Route; 3 EndNode; -->
 		<discriminator javaType="int" column="NodeType">
 			<case value="0" resultType="org.kayura.bpm.models.StartNode" />
 			<case value="1" resultType="org.kayura.bpm.models.Activity">
 				<result column="HandleType" property="handleType" />
+				<collection property="actors" column="Node_Id" select="selectActivityActorsByNodeId" />
 			</case>
 			<case value="2" resultType="org.kayura.bpm.models.Route">
 				<result column="RouteType" property="routeType" />
@@ -104,50 +252,117 @@
     
 	<!-- 环节表的SQL片段. -->
 	<sql id="nodeColumns">
-    	t.Node_Id, t.Process_Id, t.Code, t.Name, t.Description, t.NodeType, t.Listeners,
-		t.Attributes, t.CreateTime, t.ModifiedTime, t.RouteType, t.HandleType
+    	${alias}.Node_Id, 
+    	${alias}.Process_Id, 
+    	${alias}.Code, 
+    	${alias}.Name, 
+    	${alias}.Description, 
+    	${alias}.NodeType, 
+    	${alias}.Listeners,
+		${alias}.Attributes, 
+		${alias}.CreateTime, 
+		${alias}.ModifiedTime, 
+		${alias}.RouteType, 
+		${alias}.HandleType
 	</sql>
 
 	<!-- 根据过程ID获取所有环节对象. -->
 	<select id="selectNodesByProcessId" parameterType="string" resultMap="nodeMap">
 	    SELECT
-			<include refid="nodeColumns" />
-		FROM
-			Bpm_Nodes t
+			<include refid="nodeColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_Nodes t
 		WHERE t.Process_Id = #{value}
 	</select>
 	
 	<!-- 根据环节ID获取该环节对象. -->
 	<select id="selectNodeById" parameterType="string" resultMap="nodeMap">
 	    SELECT
-			<include refid="nodeColumns" />
-		FROM
-			Bpm_Nodes t
+			<include refid="nodeColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_Nodes t
 		WHERE t.Node_Id = #{value}
+	</select>
+	
+	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流环节转移线SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+	
+	<resultMap id="transitionMap" type="org.kayura.bpm.models.Transition">
+	    <id property="id" column="Transition_Id" />
+		<association property="parent" column="Process_Id" resultMap="workflowPorcessMap" />
+		<result column="Code" property="code" />
+		<result column="Name" property="name" />
+		<result column="Description" property="description" />
+		<result column="Listeners" property="listeners" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
+		<result column="Attributes" property="attributes" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
+		<result column="CreateTime" property="createTime" />
+		<result column="ModifiedTime" property="modifiedTime" />
+		<association property="fromNode" column="FromNode_Id" resultMap="nodeMap" />
+		<association property="toNode" column="ToNode_Id" resultMap="nodeMap" />
+		<result column="Conditions" property="conditions" />
+	</resultMap>
+	
+	<sql id="transitionColumns">
+	    ${alias}.Transition_Id,
+		${alias}.FromNode_Id,
+		${alias}.ToNode_Id,
+		${alias}.Process_Id,
+		${alias}.Code,
+		${alias}.Name,
+		${alias}.Description,
+		${alias}.Listeners,
+		${alias}.Attributes,
+		${alias}.CreatedTime,
+		${alias}.ModifiedTime,
+		${alias}.Conditions
+	</sql>
+	
+	<select id="selectTransitionByFrom" parameterType="string" resultMap="transitionMap">
+	    SELECT 
+			<include refid="transitionColumns">
+			    <property name="alias" value="t"/>
+			</include>
+	    FROM Bpm_Transitions t
+	    WHERE t.FromNode_Id = #{nodeId}
+	</select>
+	
+	<select id="selectTransitionByTo" parameterType="string" resultMap="transitionMap">
+	    SELECT 
+			<include refid="transitionColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_Transitions t
+	    WHERE t.ToNode_Id = #{nodeId}
 	</select>
 	
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流活动参与者SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 
 	<resultMap id="activityActorMap" type="org.kayura.bpm.models.ActivityActor">
 		<id property="id" column="ActivityActor_Id" />
-		<result property="" column="" />
-		<result property="" column="" />
-		<result property="" column="" />
-		<result property="" column="" />
+		<association property="activity" column="Activity_Id" resultMap="nodeMap" />
+		<result property="actorId" column="Actor_Id" />
+		<result property="sn" column="Sn" />
+		<result property="actorType" column="ActorType" />
+		<result property="displayName" column="DisplayName" />
 	</resultMap>
+
+	<sql id="activityActorColumns">
+		${alias}.ActivityActor_Id,
+		${alias}.Activity_Id,
+		${alias}.Actor_Id,
+		${alias}.Sn,
+		${alias}.ActorType,
+		${alias}.DisplayName
+	</sql>
 	
-	<select id="selectActivityActors" parameterType="string" resultMap="activityActorMap" >
+	<select id="selectActivityActorsByNodeId" parameterType="string" resultMap="activityActorMap" >
 	    SELECT
-		    t.ActivityActor_Id,
-			t.Activity_Id,
-			t.Actor_Id,
-			t.Sn,
-			t.ActorType,
-			t.DisplayName
-		FROM
-			Bpm_ActivityActors t
-	    WHERE
-	    	t.Node_Id = #{nodeId}
+			<include refid="activityActorColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_ActivityActors t
+	    WHERE t.Node_Id = #{nodeId}
 	</select>
 	
 	

@@ -1,6 +1,10 @@
 package org.kayura.bpm.models;
 
-public class EventListener {
+import java.io.Serializable;
+
+public class EventListener implements Serializable {
+    
+    private static final long serialVersionUID = 9084285660620966038L;
     
     private String className;
     private int sn;

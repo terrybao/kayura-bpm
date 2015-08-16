@@ -12,7 +12,7 @@ public abstract class WfElement {
     private String code;
     private String name;
     private String description;
-    private Date createTime;
+    private Date createdTime;
     private Date modifiedTime;
     private List<EventListener> listeners;
     private Properties attributes;
@@ -76,12 +76,12 @@ public abstract class WfElement {
 	this.description = description;
     }
     
-    public Date getCreateTime() {
-	return createTime;
+    public Date getCreatedTime() {
+	return createdTime;
     }
     
-    public void setCreateTime(Date createTime) {
-	this.createTime = createTime;
+    public void setCreatedTime(Date createdTime) {
+	this.createdTime = createdTime;
     }
     
     public Date getModifiedTime() {
