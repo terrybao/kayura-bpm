@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.kayura.bpm">
+    
+	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流单据SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+	
+    <resultMap id="bizFormMap" type="org.kayura.bpm.models.BizForm">
+        <id column="BizForm_Id" property="id" />
+        <result column="Code" property="code" />
+        <result column="DisplayName" property="displayName" />
+        <result column="Sn" property="sn" />
+        <result column="Description" property="description" />
+        <result column="Attributes" property="attributes" />
+        <result column="Status" property="status" />
+    </resultMap>
+    
+    <select id="getBizFormById" parameterType="string" resultMap="bizFormMap">
+        SELECT
+        	BizForm_Id, Code, DisplayName, Sn, Description, Attributes, Status
+		FROM
+			Bpm_BizForm
+		WHERE 
+			BizForm_Id = #{id}
+    </select>
+
+	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流过程定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+	
+	<resultMap id="workflowPorcessMap" type="org.kayura.bpm.models.WorkflowProcess">
+		<id column="Process_Id" property="id" />
+		<result column="Code" property="code" />
+		<result column="Name" property="name" />
+		<result column="Description" property="description" />
+		<result column="Version" property="version" />
+		<result column="CreateTime" property="createTime" />
+		<result column="ModifiedTime" property="modifiedTime" />
+		<result column="Modifier" property="modifier" />
+		<result column="Listeners" property="listeners" />
+		<result column="Attributes" property="attributes" />
+		<result column="Status" property="status" />
+		<association column="BizForm_Id" property="bizForm" fetchType="lazy" select="getBizFormById" />
+		<association column="Parent_Id" property="parent" fetchType="lazy" select="getWorkflowProcessById" />
+		<collection column="Process_Id" property="nodes" fetchType="lazy" select="selectNodesByProcessId" />
+	</resultMap>
+	
+	<sql id="workflowPorcessColumns">
+	    t.Process_Id, t.Parent_Id, t.BizForm_Id, t.Code, t.Name, t.Description, t.Version,
+	    t.ModifiedTime, t.Modifier, t.Listeners, t.Attributes, t.Status
+	</sql>
+	
+	<select id="getWorkflowProcessByMap" parameterType="map" resultMap="workflowPorcessMap">
+		SELECT
+			<include refid="workflowPorcessColumns" />
+		FROM
+			Bpm_Process t 
+			<if test="flowCode != null">
+			    JOIN Bpm_BizForm b ON t.BizForm_Id = b.BizForm_Id
+			</if>
+		WHERE 
+			( d.`Status` = 1 ) 
+			<if test="flowCode != null and ">
+			    and ( b.Code = #{flowCode} ) 
+			</if>
+			<if test="version = #{version}">
+			    and ( version = #{version} ) 
+			</if>
+		</where>
+		ORDER BY Version DESC
+		LIMIT 1
+	</select>
+	
+	<select id="getWorkflowProcessById" parameterType="string" resultMap="workflowPorcessMap">
+	    SELECT
+			<include refid="workflowPorcessColumns" />
+		FROM
+			Bpm_Process t 
+		WHERE t.Process_Id = #{id}
+	</select>
+
+	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流环节定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+
+	<resultMap id="nodeMap" type="org.kayura.bpm.models.Node">
+		<id column="Node_Id" property="id" />
+		<association property="parent" column="Process_Id" resultMap="workflowPorcessMap" />
+		<result column="Code" property="code" />
+		<result column="Name" property="name" />
+		<result column="Description" property="description" />
+		<result column="Listeners" property="listeners" />
+		<result column="Attributes" property="attributes" />
+		<result column="CreateTime" property="createTime" />
+		<result column="ModifiedTime" property="modifiedTime" />
+		<!-- 0 StartNode; 1 Activity; 2 Route; 3 EndNode; -->
+		<discriminator javaType="int" column="NodeType">
+			<case value="0" resultType="org.kayura.bpm.models.StartNode" />
+			<case value="1" resultType="org.kayura.bpm.models.Activity">
+				<result column="HandleType" property="handleType" />
+			</case>
+			<case value="2" resultType="org.kayura.bpm.models.Route">
+				<result column="RouteType" property="routeType" />
+			</case>
+			<case value="3" resultType="org.kayura.bpm.models.EndNode" />
+		</discriminator>
+	</resultMap>
+    
+	<!-- 环节表的SQL片段. -->
+	<sql id="nodeColumns">
+    	t.Node_Id, t.Process_Id, t.Code, t.Name, t.Description, t.NodeType, t.Listeners,
+		t.Attributes, t.CreateTime, t.ModifiedTime, t.RouteType, t.HandleType
+	</sql>
+
+	<!-- 根据过程ID获取所有环节对象. -->
+	<select id="selectNodesByProcessId" parameterType="string" resultMap="nodeMap">
+	    SELECT
+			<include refid="nodeColumns" />
+		FROM
+			Bpm_Nodes t
+		WHERE t.Process_Id = #{value}
+	</select>
+	
+	<!-- 根据环节ID获取该环节对象. -->
+	<select id="selectNodeById" parameterType="string" resultMap="nodeMap">
+	    SELECT
+			<include refid="nodeColumns" />
+		FROM
+			Bpm_Nodes t
+		WHERE t.Node_Id = #{value}
+	</select>
+	
+	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流活动参与者SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+
+	<resultMap id="activityActorMap" type="org.kayura.bpm.models.ActivityActor">
+		<id property="id" column="ActivityActor_Id" />
+		<result property="" column="" />
+		<result property="" column="" />
+		<result property="" column="" />
+		<result property="" column="" />
+	</resultMap>
+	
+	<select id="selectActivityActors" parameterType="string" resultMap="activityActorMap" >
+	    SELECT
+		    t.ActivityActor_Id,
+			t.Activity_Id,
+			t.Actor_Id,
+			t.Sn,
+			t.ActorType,
+			t.DisplayName
+		FROM
+			Bpm_ActivityActors t
+	    WHERE
+	    	t.Node_Id = #{nodeId}
+	</select>
+	
+	
+</mapper>
