@@ -12,12 +12,25 @@ public class Transition extends WfElement {
 	this.setToNode(toNode);
     }
     
+    public void remove() {
+	if (this.fromNode != null) {
+	    this.fromNode.removeTransition(this.getId());
+	    this.fromNode = null;
+	}
+	
+	if (this.toNode != null) {
+	    this.toNode.removeTransition(this.getId());
+	    this.toNode = null;
+	}
+    }
+    
     public Node getFromNode() {
 	return fromNode;
     }
     
     public void setFromNode(Node fromNode) {
 	this.fromNode = fromNode;
+	this.fromNode.addToTransition(this);
     }
     
     public Node getToNode() {
@@ -26,6 +39,7 @@ public class Transition extends WfElement {
     
     public void setToNode(Node toNode) {
 	this.toNode = toNode;
+	this.toNode.addFromTransition(this);
     }
     
     public String getConditions() {

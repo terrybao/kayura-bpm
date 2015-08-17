@@ -1,11 +1,21 @@
 package org.kayura.bpm.storage.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.kayura.bpm.models.Activity;
+import org.kayura.bpm.models.ActivityActor;
+import org.kayura.bpm.models.EndNode;
+import org.kayura.bpm.models.Route;
+import org.kayura.bpm.models.StartNode;
+import org.kayura.bpm.models.Transition;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.storage.impl.mapper.DefineMapper;
+import org.kayura.bpm.storage.impl.po.IdNodeType;
 
 public class StorageServiceImpl implements IStorageService {
     
@@ -16,7 +26,7 @@ public class StorageServiceImpl implements IStorageService {
 	Map<String, Object> args = new HashMap<String, Object>();
 	args.put("id", id);
 	
-	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcess(args);
+	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcessByMap(args);
 	return workflowProcess;
     }
     
@@ -29,11 +39,97 @@ public class StorageServiceImpl implements IStorageService {
 	    args.put("version", version);
 	}
 	
-	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcess(args);
+	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcessByMap(args);
 	return workflowProcess;
     }
     
-    public void saveOrUpdateWorkflowProcess(WorkflowProcess workflowProcess) {
+    public void syncWorkflowProcess(WorkflowProcess workflowProcess) {
 	
+	String processId = workflowProcess.getId();
+	Boolean newProcess = defineMapper.workflowProcessExists(processId);
+	
+	// workflowProcess
+	if (newProcess) {
+	    defineMapper.insertWorkflowProcess(workflowProcess);
+	} else {
+	    defineMapper.updateWorkflowProcess(workflowProcess);
+	}
+	
+	// idNodeTypes
+	List<IdNodeType> idNodeTypes = defineMapper.findNodeIdsNodeType(processId);
+	
+	// startNode
+	StartNode startNode = workflowProcess.getStartNode();
+	boolean exists = idNodeTypes.stream().anyMatch(s -> s.getId().equals(startNode.getId()));
+	if (exists) {
+	    idNodeTypes.removeIf(s -> s.getId().equals(startNode.getId()));
+	    defineMapper.updateNodeStartNode(startNode);
+	} else {
+	    defineMapper.insertNodeStartNode(startNode);
+	}
+	
+	// activity
+	List<Activity> activities = workflowProcess.getActivities();
+	for (Activity activity : activities) {
+	    exists = idNodeTypes.stream().anyMatch(s -> s.getId().equals(activity.getId()));
+	    if (exists) {
+		idNodeTypes.removeIf(s -> s.getId().equals(activity.getId()));
+		defineMapper.updateNodeActivity(activity);
+	    } else {
+		defineMapper.insertNodeActivity(activity);
+	    }
+	}
+	
+	// route
+	List<Route> routes = workflowProcess.getRoutes();
+	for (Route route : routes) {
+	    exists = idNodeTypes.stream().anyMatch(s -> s.getId().equals(route.getId()));
+	    if (exists) {
+		idNodeTypes.removeIf(s -> s.getId().equals(route.getId()));
+		defineMapper.updateNodeRoute(route);
+	    } else {
+		defineMapper.insertNodeRoute(route);
+	    }
+	}
+	
+	// endNode
+	List<EndNode> endNodes = workflowProcess.getEndNodes();
+	for (EndNode endNode : endNodes) {
+	    exists = idNodeTypes.stream().anyMatch(s -> s.getId().equals(endNode.getId()));
+	    if (exists) {
+		idNodeTypes.removeIf(s -> s.getId().equals(endNode.getId()));
+		defineMapper.updateNodeEndNode(endNode);
+	    } else {
+		defineMapper.insertNodeEndNode(endNode);
+	    }
+	}
+	
+	// ActivityActor
+	List<String> activityIds = activities.stream().map(s -> s.getId())
+		.collect(Collectors.toList());
+	defineMapper.deleteActivityActorByActivityIds(activityIds);
+	
+	List<ActivityActor> actors = new ArrayList<ActivityActor>();
+	activities.stream().map(s -> s.getActors()).forEach(a -> actors.addAll(a));
+	
+	for (ActivityActor actor : actors) {
+	    defineMapper.insertActivityActor(actor);
+	}
+	
+	// transition
+	List<Transition> transitions = workflowProcess.getTransitions();
+	defineMapper.deleteTransitionByProcess(processId);
+	for (Transition t : transitions) {
+	    defineMapper.insertTransition(t);
+	}
     }
+    
+    public void saveOrUpdateWorkflowProcess(WorkflowProcess workflowProcess) {
+	if (!defineMapper.workflowProcessExists(workflowProcess.getId())) {
+	    defineMapper.insertWorkflowProcess(workflowProcess);
+	} else {
+	    defineMapper.updateWorkflowProcess(workflowProcess);
+	}
+    }
+    
 }

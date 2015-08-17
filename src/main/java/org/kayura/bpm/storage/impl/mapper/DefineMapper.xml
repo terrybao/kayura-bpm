@@ -81,7 +81,7 @@
         WHERE BizForm_Id = #{id}
     </update>
     
-    <update id="updateBizFormForStatus" parameterType="string">
+    <update id="updateBizFormForStatus" parameterType="map">
         UPDATE Bpm_BizForm
         SET	Status = #{status}
         WHERE BizForm_Id = #{id}
@@ -95,20 +95,24 @@
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流过程定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 	
 	<resultMap id="workflowPorcessMap" type="org.kayura.bpm.models.WorkflowProcess">
-		<id column="Process_Id" property="id" />
-		<result column="Code" property="code" />
-		<result column="Name" property="name" />
-		<result column="Description" property="description" />
-		<result column="Version" property="version" />
-		<result column="CreateTime" property="createTime" />
-		<result column="ModifiedTime" property="modifiedTime" />
-		<result column="Modifier" property="modifier" />
-		<result column="Listeners" property="listeners" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
-		<result column="Attributes" property="attributes" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
-		<result column="Status" property="status" />
-		<association column="BizForm_Id" property="bizForm" fetchType="lazy" select="getBizFormById" />
-		<association column="Parent_Id" property="parent" fetchType="lazy" select="getWorkflowProcessById" />
-		<collection column="Process_Id" property="nodes" fetchType="lazy" select="selectNodesByProcessId" />
+		<id property="id" column="Process_Id" />
+		<result property="code" column="Code" />
+		<result property="name" column="Name" />
+		<result property="description" column="Description" />
+		<result property="version" column="Version" />
+		<result property="createTime" column="CreateTime" />
+		<result property="modifiedTime" column="ModifiedTime" />
+		<result property="modifier" column="Modifier" />
+		<result property="listeners" column="Listeners" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
+		<result property="attributes" column="Attributes" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
+		<result property="status" column="Status" />
+		<association property="bizForm" column="BizForm_Id" select="getBizFormById" />
+		<association property="parent" column="Parent_Id" select="getWorkflowProcessById" />
+		<association property="startNode" column="Parent_Id" select="selectNodesForStartNode" />
+		<collection property="activities" column="Process_Id" select="selectNodesForActivities" />
+		<collection property="routes" column="Process_Id" select="selectNodesByRoutes" />
+		<collection property="endNodes" column="Process_Id" select="selectNodesByEndNodes" />
+		<collection property="transitions" column="Process_Id" select="selectTransitionByProcess" />
 	</resultMap>
 	
 	<sql id="workflowPorcessColumns">
@@ -166,6 +170,7 @@
 			Name,
 			Description,
 			Version,
+			CreatedTime,
 			ModifiedTime,
 			Modifier,
 			Listeners,
@@ -249,6 +254,8 @@
 			<case value="3" resultType="org.kayura.bpm.models.EndNode" />
 		</discriminator>
 	</resultMap>
+	
+	<!-- >>>> SELECT <<<< -->
     
 	<!-- 环节表的SQL片段. -->
 	<sql id="nodeColumns">
@@ -265,7 +272,57 @@
 		${alias}.RouteType, 
 		${alias}.HandleType
 	</sql>
-
+	
+	<!-- 仅查询节点ID与节点类型. -->
+	<select id="findNodeIdsNodeType" parameterType="string" 
+	    resultType="org.kayura.bpm.storage.impl.po.IdNodeType">
+	    SELECT
+			t.Node_Id, t.NodeType
+		FROM Bpm_Nodes t
+		WHERE ( t.Process_Id = #{value} )
+	</select>
+	
+	<!-- 根据过程ID获取唯一的开始节点. -->
+	<select id="selectNodesForStartNode" parameterType="string" resultMap="nodeMap">
+	    SELECT
+			<include refid="nodeColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_Nodes t
+		WHERE ( t.Process_Id = #{value} ) AND ( t.NodeType = 0 )
+		LIMIT 1
+	</select>
+	
+	<!-- 根据过程ID获取活动节点. -->
+	<select id="selectNodesForActivities" parameterType="string" resultMap="nodeMap">
+	    SELECT
+			<include refid="nodeColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_Nodes t
+		WHERE ( t.Process_Id = #{value} ) AND ( t.NodeType = 1 )
+	</select>
+	
+	<!-- 根据过程ID获取路由节点. -->
+	<select id="selectNodesForRoutes" parameterType="string" resultMap="nodeMap">
+	    SELECT
+			<include refid="nodeColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_Nodes t
+		WHERE ( t.Process_Id = #{value} ) AND ( t.NodeType = 2 )
+	</select>
+	
+	<!-- 根据过程ID获取结束节点. -->
+	<select id="selectNodesForEndNodes" parameterType="string" resultMap="nodeMap">
+	    SELECT
+			<include refid="nodeColumns">
+			    <property name="alias" value="t"/>
+			</include>
+		FROM Bpm_Nodes t
+		WHERE ( t.Process_Id = #{value} ) AND ( t.NodeType = 3 )
+	</select>
+	
 	<!-- 根据过程ID获取所有环节对象. -->
 	<select id="selectNodesByProcessId" parameterType="string" resultMap="nodeMap">
 	    SELECT
@@ -286,11 +343,124 @@
 		WHERE t.Node_Id = #{value}
 	</select>
 	
+	<!-- >>>> INSERT <<<< -->
+	
+	<sql id="insertNodeColumns">
+    	Node_Id,
+    	Process_Id,
+    	Code,
+    	Name,
+    	Description,
+    	NodeType,
+    	Listeners,
+		Attributes, 
+		CreateTime, 
+		ModifiedTime
+	</sql>
+	
+	<sql id="insertNodeValues">
+	    #{id},
+    	#{parent.id},
+    	#{code},
+    	#{name},
+    	#{description},
+    	#{nodeType},
+    	#{listeners},
+		#{attributes}, 
+		#{createTime}, 
+		#{modifiedTime}
+	</sql>
+
+	<insert id="insertNodeStartNode" parameterType="org.kayura.bpm.models.StartNode">
+	    INSERT Bpm_Nodes (
+	    	<include refid="insertNodeColumns" />
+	    ) Values (
+	    	<include refid="insertNodeValues" />
+	    )
+	</insert>
+
+	<insert id="insertNodeActivity" parameterType="org.kayura.bpm.models.Activity">
+	    INSERT Bpm_Nodes (
+	    	<include refid="insertNodeColumns" />
+	    	, HandleType
+	    ) Values (
+	    	<include refid="insertNodeValues" />
+	    	, #{handleType}
+	    )
+	</insert>
+	
+	<insert id="insertNodeRoute" parameterType="org.kayura.bpm.models.Route">
+	    INSERT Bpm_Nodes (
+	    	<include refid="insertNodeColumns" />
+	    	, RouteType
+	    ) Values (
+	    	<include refid="insertNodeValues" />
+	    	, #{routeType}
+	    )
+	</insert>
+	
+	<insert id="insertNodeEndNode" parameterType="org.kayura.bpm.models.EndNode">
+	    INSERT Bpm_Nodes (
+	    	<include refid="insertNodeColumns" />
+	    ) Values (
+	    	<include refid="insertNodeValues" />
+	    )
+	</insert>
+	
+	<!-- >>>> UPDATE <<<< -->
+	
+	<sql id="updateNodeColumns">
+    	Code = #{code},
+    	Name = #{name},
+    	Description = #{description},
+    	Listeners = #{listeners},
+		Attributes = #{attributes}, 
+		ModifiedTime = #{modifiedTime}
+	</sql>
+	
+	<update id="updateNodeStartNode" parameterType="org.kayura.bpm.models.StartNode">
+	    UPDATE Bpm_Nodes
+	    SET <include refid="updateNodeColumns" />
+		WHERE Node_Id = #{id}
+	</update>
+
+	<update id="updateNodeActivity" parameterType="org.kayura.bpm.models.Activity">
+	    UPDATE Bpm_Nodes
+	    SET <include refid="updateNodeColumns" />
+			, HandleType = #{handleType}
+		WHERE Node_Id = #{id}
+	</update>
+
+	<update id="updateNodeRoute" parameterType="org.kayura.bpm.models.Route">
+	    UPDATE Bpm_Nodes
+	    SET <include refid="updateNodeColumns" />
+			, RouteType = #{routeType}
+		WHERE Node_Id = #{id}
+	</update>
+	
+	<update id="updateNodeEndNode" parameterType="org.kayura.bpm.models.EndNode">
+	    UPDATE Bpm_Nodes
+	    SET <include refid="updateNodeColumns" />
+		WHERE Node_Id = #{id}
+	</update>
+	
+	<!-- >>>> DELETE <<<< -->
+
+	<delete id="deleteNodeByIds" parameterType="list">
+		DELETE Bpm_Nodes
+		WHERE Node_Id IN
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流环节转移线SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 	
 	<resultMap id="transitionMap" type="org.kayura.bpm.models.Transition">
 	    <id property="id" column="Transition_Id" />
 		<association property="parent" column="Process_Id" resultMap="workflowPorcessMap" />
+		<association property="fromNode" column="FromNode_Id" resultMap="nodeMap" />
+		<association property="toNode" column="ToNode_Id" resultMap="nodeMap" />
 		<result column="Code" property="code" />
 		<result column="Name" property="name" />
 		<result column="Description" property="description" />
@@ -298,8 +468,6 @@
 		<result column="Attributes" property="attributes" typeHandler="org.kayura.mybatis.type.JsonTypeHandler" />
 		<result column="CreateTime" property="createTime" />
 		<result column="ModifiedTime" property="modifiedTime" />
-		<association property="fromNode" column="FromNode_Id" resultMap="nodeMap" />
-		<association property="toNode" column="ToNode_Id" resultMap="nodeMap" />
 		<result column="Conditions" property="conditions" />
 	</resultMap>
 	
@@ -318,6 +486,15 @@
 		${alias}.Conditions
 	</sql>
 	
+	<select id="selectTransitionByProcess" parameterType="string" resultMap="transitionMap">
+	    SELECT 
+			<include refid="transitionColumns">
+			    <property name="alias" value="t"/>
+			</include>
+	    FROM Bpm_Transitions t
+	    WHERE t.Process_Id = #{processId}
+	</select>
+	
 	<select id="selectTransitionByFrom" parameterType="string" resultMap="transitionMap">
 	    SELECT 
 			<include refid="transitionColumns">
@@ -335,6 +512,41 @@
 		FROM Bpm_Transitions t
 	    WHERE t.ToNode_Id = #{nodeId}
 	</select>
+	
+	<insert id="insertTransition" parameterType="org.kayura.bpm.models.Transition">
+	    INSERT Bpm_Transitions (
+	    	Transition_Id,
+		    Process_Id,
+		    FromNode_Id,
+		    ToNode_Id,
+			Code,
+			Name,
+			Description,
+			Listeners,
+			Attributes,
+			CreatedTime,
+			ModifiedTime,
+			Conditions
+		) Values (
+			#{id},
+			#{parent.id},
+			#{fromNode.id},
+			#{toNode.id},
+			#{code},
+			#{name},
+			#{description},
+			#{listeners},
+			#{attributes},
+			#{createdTime},
+			#{modifiedTime},
+			#{conditions}
+	    )
+	</insert>
+	
+	<delete id="deleteTransitionByProcess" parameterType="string">
+	    DELETE Bpm_Transitions
+	    WHERE Process_Id = #{processId}
+	</delete>
 	
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流活动参与者SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 
@@ -365,5 +577,31 @@
 	    WHERE t.Node_Id = #{nodeId}
 	</select>
 	
+	<insert id="insertActivityActor" parameterType="org.kayura.bpm.models.ActivityActor">
+	    INSERT Bpm_ActivityActors (
+			ActivityActor_Id,
+			Activity_Id,
+			Actor_Id,
+			Sn,
+			ActorType,
+			DisplayName
+		) Values (
+			#{id},
+			#{activity.id},
+			#{actorId},
+			#{sn},
+			#{actorType},
+			#{displayName}
+		)
+	</insert>
+
+	<delete id="deleteActivityActorByActivityIds" parameterType="list">
+		DELETE Bpm_ActivityActors
+		WHERE Activity_Id in
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
 	
+
 </mapper>
