@@ -5,7 +5,7 @@ public class Route extends Node {
     private RouteTypes routeType = RouteTypes.single;
     
     public Route(WorkflowProcess parent, String code) {
-	super(parent, NodeTypes.route, code);
+	super(parent, NodeTypes_Route, code);
     }
     
     public RouteTypes getRouteType() {

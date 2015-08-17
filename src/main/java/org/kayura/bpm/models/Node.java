@@ -5,11 +5,16 @@ import java.util.List;
 
 public abstract class Node extends WfElement {
     
+    public final static Integer NodeTypes_StartNode = 0;
+    public final static Integer NodeTypes_Activity = 1;
+    public final static Integer NodeTypes_Route = 2;
+    public final static Integer NodeTypes_EndNode = 3;
+    
     protected List<Transition> fromTransitions = new ArrayList<Transition>();
     protected List<Transition> toTransitions = new ArrayList<Transition>();
-    private NodeTypes nodeType;
+    private Integer nodeType;
     
-    public Node(WorkflowProcess parent, NodeTypes nodeType, String code) {
+    public Node(WorkflowProcess parent, Integer nodeType, String code) {
 	super(parent, code);
 	this.nodeType = nodeType;
     }
@@ -67,7 +72,7 @@ public abstract class Node extends WfElement {
 	}
     }
     
-    public NodeTypes getNodeType() {
+    public Integer getNodeType() {
 	return nodeType;
     }
     

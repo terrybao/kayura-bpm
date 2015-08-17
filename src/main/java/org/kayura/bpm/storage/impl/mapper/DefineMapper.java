@@ -38,6 +38,8 @@ public interface DefineMapper {
     
     Boolean workflowProcessExists(String id);
     
+    Integer getWorkflowProcessMaxVersion(String flowCode);
+    
     void insertWorkflowProcess(WorkflowProcess workflowProcess);
     
     void updateWorkflowProcess(WorkflowProcess workflowProcess);

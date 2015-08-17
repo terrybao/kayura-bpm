@@ -8,18 +8,24 @@ import java.util.List;
  */
 public class Activity extends Node {
     
+    // single, sequence, all, scale
+    public final static Integer HandleTypes_Single = 0;
+    public final static Integer HandleTypes_Sequence = 0;
+    public final static Integer HandleTypes_All = 0;
+    public final static Integer HandleTypes_Scale = 0;
+    
     private List<ActivityActor> actors = new ArrayList<ActivityActor>();
-    private HandleTypes handleType = HandleTypes.all;
+    private Integer handleType = HandleTypes_All;
     
     public Activity(WorkflowProcess parent, String code) {
-	super(parent, NodeTypes.activity, code);
+	super(parent, NodeTypes_Activity, code);
     }
     
-    public HandleTypes getHandleType() {
+    public Integer getHandleType() {
 	return handleType;
     }
     
-    public void setHandleType(HandleTypes handleType) {
+    public void setHandleType(Integer handleType) {
 	this.handleType = handleType;
     }
     
@@ -29,12 +35,5 @@ public class Activity extends Node {
     
     public void setActors(List<ActivityActor> actors) {
 	this.actors = actors;
-    }
-    
-    /*
-     * 0 单人签; 1 顺序签; 2 全签;3 比例签;
-     */
-    public enum HandleTypes {
-	single, sequence, all, scale
     }
 }

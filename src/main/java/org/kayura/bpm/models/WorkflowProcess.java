@@ -11,7 +11,7 @@ public class WorkflowProcess extends WfElement {
     private BizForm bizForm;
     private Integer version;
     private String modifier;
-    private DefineStatus status;
+    private Integer status = DefineStatus.design;
     
     private StartNode startNode;
     private List<Activity> activities = new ArrayList<Activity>();
@@ -20,11 +20,11 @@ public class WorkflowProcess extends WfElement {
     private List<Transition> transitions = new ArrayList<Transition>();
     
     public WorkflowProcess() {
-	
+	super();
     }
     
-    public WorkflowProcess(String code) {
-	super(null, code);
+    public WorkflowProcess(WorkflowProcess parent, String code) {
+	super(parent, code);
     }
     
     public BizForm getBizForm() {
@@ -51,11 +51,11 @@ public class WorkflowProcess extends WfElement {
 	this.modifier = modifier;
     }
     
-    public DefineStatus getStatus() {
+    public Integer getStatus() {
 	return status;
     }
     
-    public void setStatus(DefineStatus status) {
+    public void setStatus(Integer status) {
 	this.status = status;
     }
     
@@ -152,8 +152,15 @@ public class WorkflowProcess extends WfElement {
 	    throw new WorkflowException(String.format("到达环节Id %s 不存在。", toId));
 	}
 	
+	return createTransition(fromNode, toNode);
+    }
+    
+    public Transition createTransition(Node fromNode, Node toNode) {
+	
 	Transition transition = new Transition(this, fromNode, toNode);
 	transition.setId(KeyUtils.newId());
+	transition.setCode(String.format("%s->%s", fromNode.getCode(), toNode.getCode()));
+	transition.setName(String.format("%s->%s", fromNode.getName(), toNode.getName()));
 	this.transitions.add(transition);
 	return transition;
     }
@@ -225,7 +232,7 @@ public class WorkflowProcess extends WfElement {
     
     public EndNode findEndNodeById(String nodeId) {
 	Node node = findNodeById(nodeId);
-	if (node != null && node.getNodeType() == NodeTypes.endNode && node instanceof EndNode) {
+	if (node != null && node instanceof EndNode) {
 	    return (EndNode) node;
 	}
 	return null;
@@ -246,7 +253,7 @@ public class WorkflowProcess extends WfElement {
     
     public Activity findActivityById(String nodeId) {
 	Node node = findNodeById(nodeId);
-	if (node != null && node.getNodeType() == NodeTypes.activity && node instanceof Activity) {
+	if (node != null && node instanceof Activity) {
 	    return (Activity) node;
 	}
 	return null;
@@ -258,7 +265,7 @@ public class WorkflowProcess extends WfElement {
     
     public Route findRouteById(String nodeId) {
 	Node node = findNodeById(nodeId);
-	if (node != null && node.getNodeType() == NodeTypes.route && node instanceof Route) {
+	if (node != null && node instanceof Route) {
 	    return (Route) node;
 	}
 	return null;

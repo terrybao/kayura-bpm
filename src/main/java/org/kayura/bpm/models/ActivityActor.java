@@ -2,12 +2,24 @@ package org.kayura.bpm.models;
 
 public class ActivityActor {
     
+    // user, role, depart, special
+    public final static Integer ActorTypes_User = 0;
+    public final static Integer ActorTypes_Role = 1;
+    public final static Integer ActorTypes_Depart = 2;
+    public final static Integer ActorTypes_Special = 3;
+    
+    private String id;
     private Activity activity;
     private String actorId;
+    private String displayName;
     private Integer sn = 0;
-    private ActorTypes actorType;
+    private Integer actorType;
     
-    public ActivityActor(Activity activity, ActorTypes actorType, String actorId) {
+    public ActivityActor() {
+	
+    }
+    
+    public ActivityActor(Activity activity, Integer actorType, String actorId) {
 	this.activity = activity;
 	this.actorType = actorType;
 	this.actorId = actorId;
@@ -29,11 +41,11 @@ public class ActivityActor {
 	this.actorId = actorId;
     }
     
-    public ActorTypes getActorType() {
+    public Integer getActorType() {
 	return actorType;
     }
     
-    public void setActorType(ActorTypes actorType) {
+    public void setActorType(Integer actorType) {
 	this.actorType = actorType;
     }
     
@@ -43,6 +55,22 @@ public class ActivityActor {
     
     public void setSn(Integer sn) {
 	this.sn = sn;
+    }
+    
+    public String getDisplayName() {
+	return displayName;
+    }
+    
+    public void setDisplayName(String displayName) {
+	this.displayName = displayName;
+    }
+    
+    public String getId() {
+	return id;
+    }
+    
+    public void setId(String id) {
+	this.id = id;
     }
     
 }

@@ -2,6 +2,19 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.3//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 
+	<properties resource="db.properties">
+	</properties>
+
+	<typeAliases>
+		<typeAlias type="org.kayura.mybatis.type.JsonTypeHandler" alias="jsonTypeHandler" />
+		<typeAlias type="java.util.Properties" alias="properties" />
+	</typeAliases>
+
+	<typeHandlers>
+		<typeHandler handler="jsonTypeHandler" javaType="properties" jdbcType="VARCHAR" />
+		<typeHandler handler="jsonTypeHandler" javaType="list" jdbcType="VARCHAR" />
+	</typeHandlers>
+
 	<!-- 数据库环境配置节 -->
 	<environments default="dev">
 		<environment id="dev">
@@ -16,5 +29,8 @@
 			</dataSource>
 		</environment>
 	</environments>
+	<mappers>
+		<mapper class="org.kayura.bpm.storage.impl.mapper.DefineMapper" />
+	</mappers>
 
 </configuration>

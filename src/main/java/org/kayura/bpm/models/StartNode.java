@@ -11,12 +11,12 @@ import java.util.List;
 public class StartNode extends Node {
     
     public StartNode(WorkflowProcess parent, String code) {
-	super(parent, NodeTypes.startNode, code);
+	super(parent, NodeTypes_StartNode, code);
     }
     
     @Override
     public List<Transition> getToTransitions() {
-        return super.getToTransitions();
+	return super.getToTransitions();
     }
-
+    
 }

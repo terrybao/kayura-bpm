@@ -10,7 +10,7 @@ public class BizForm {
     private Integer sn;
     private String description;
     private Properties attributes;
-    private DefineStatus status;
+    private Integer status;
     
     public BizForm() {
 	
@@ -64,11 +64,11 @@ public class BizForm {
 	this.attributes = attributes;
     }
     
-    public DefineStatus getStatus() {
+    public Integer getStatus() {
 	return status;
     }
     
-    public void setStatus(DefineStatus status) {
+    public void setStatus(Integer status) {
 	this.status = status;
     }
     

@@ -1,29 +1,37 @@
 package org.kayura.bpm.models;
 
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.kayura.utils.DateUtils;
+import org.kayura.utils.KeyUtils;
+
 public abstract class WfElement {
     
-    private String id;
-    private WfElement parent;
-    private String code;
-    private String name;
-    private String description;
+    protected String id;
+    protected WfElement parent;
+    protected String code;
+    protected String name;
+    protected String description;
     private Date createdTime;
-    private Date modifiedTime;
-    private List<EventListener> listeners;
-    private Properties attributes;
+    protected Date modifiedTime;
+    protected List<EventListener> listeners;
+    protected Properties attributes;
     
     public WfElement() {
-	
+	this.id = KeyUtils.newId();
+	this.createdTime = DateUtils.now();
+	this.modifiedTime = this.createdTime;
     }
     
     public WfElement(WfElement parent, String code) {
+	this();
+	
 	this.parent = parent;
 	this.code = code;
+	this.name = code;
 	this.listeners = new ArrayList<EventListener>();
 	this.attributes = new Properties();
     }
@@ -76,14 +84,6 @@ public abstract class WfElement {
 	this.description = description;
     }
     
-    public Date getCreatedTime() {
-	return createdTime;
-    }
-    
-    public void setCreatedTime(Date createdTime) {
-	this.createdTime = createdTime;
-    }
-    
     public Date getModifiedTime() {
 	return modifiedTime;
     }
@@ -127,6 +127,14 @@ public abstract class WfElement {
     
     public void pubAllAttributes(Properties attributes) {
 	this.attributes.putAll(attributes);
+    }
+    
+    public Date getCreatedTime() {
+	return createdTime;
+    }
+    
+    public void setCreatedTime(Date createdTime) {
+	this.createdTime = createdTime;
     }
     
 }

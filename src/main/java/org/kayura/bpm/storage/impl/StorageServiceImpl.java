@@ -21,6 +21,18 @@ public class StorageServiceImpl implements IStorageService {
     
     private DefineMapper defineMapper;
     
+    public StorageServiceImpl() {
+	
+    }
+    
+    public StorageServiceImpl(DefineMapper defineMapper) {
+	this.defineMapper = defineMapper;
+    }
+    
+    public void setDefineMapper(DefineMapper defineMapper) {
+	this.defineMapper = defineMapper;
+    }
+    
     public WorkflowProcess getWorkflowProcess(String id) {
 	
 	Map<String, Object> args = new HashMap<String, Object>();
@@ -49,7 +61,8 @@ public class StorageServiceImpl implements IStorageService {
 	Boolean newProcess = defineMapper.workflowProcessExists(processId);
 	
 	// workflowProcess
-	if (newProcess) {
+	if (newProcess == true) {
+	    workflowProcess.setVersion(1);
 	    defineMapper.insertWorkflowProcess(workflowProcess);
 	} else {
 	    defineMapper.updateWorkflowProcess(workflowProcess);
@@ -122,6 +135,17 @@ public class StorageServiceImpl implements IStorageService {
 	for (Transition t : transitions) {
 	    defineMapper.insertTransition(t);
 	}
+    }
+    
+    public void insertWorkflowProcess(WorkflowProcess workflowProcess) {
+	Integer maxVer = defineMapper.getWorkflowProcessMaxVersion("");
+	
+	if (maxVer == null) {
+	    maxVer = 1;
+	}
+	workflowProcess.setVersion(maxVer);
+	
+	defineMapper.insertWorkflowProcess(workflowProcess);
     }
     
     public void saveOrUpdateWorkflowProcess(WorkflowProcess workflowProcess) {
