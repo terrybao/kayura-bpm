@@ -1,6 +1,5 @@
 package org.kayura.bpm.models;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -17,7 +16,7 @@ public abstract class WfElement {
     protected String description;
     private Date createdTime;
     protected Date modifiedTime;
-    protected List<EventListener> listeners;
+    protected EventListeners listeners;
     protected Properties attributes;
     
     public WfElement() {
@@ -32,7 +31,7 @@ public abstract class WfElement {
 	this.parent = parent;
 	this.code = code;
 	this.name = code;
-	this.listeners = new ArrayList<EventListener>();
+	this.listeners = new EventListeners();
 	this.attributes = new Properties();
     }
     
@@ -96,12 +95,16 @@ public abstract class WfElement {
 	return listeners;
     }
     
-    public void setListeners(List<EventListener> listeners) {
+    public void setListeners(EventListeners listeners) {
 	this.listeners = listeners;
     }
     
     public void addListener(EventListener listener) {
 	this.listeners.add(listener);
+    }
+    
+    public EventListener addistener(Class<?> classType, int sn) {
+	return addistener(classType.getName(), sn);
     }
     
     public EventListener addistener(String className, int sn) {
@@ -115,10 +118,7 @@ public abstract class WfElement {
     }
     
     public void setAttributes(Properties attributes) {
-	this.attributes.clear();
-	if (attributes != null) {
-	    this.attributes.putAll(attributes);
-	}
+	this.attributes = attributes;
     }
     
     public void putAttribute(String key, Object value) {

@@ -7,12 +7,15 @@
 
 	<typeAliases>
 		<typeAlias type="org.kayura.mybatis.type.JsonTypeHandler" alias="jsonTypeHandler" />
+		<typeAlias type="org.kayura.bpm.storage.impl.types.ListenersTypeHandler" alias="listenersTypeHandler"/>
 		<typeAlias type="java.util.Properties" alias="properties" />
+		<typeAlias type="org.kayura.bpm.models.EventListeners" alias="eventListeners" />
 	</typeAliases>
 
 	<typeHandlers>
+		<typeHandler handler="listenersTypeHandler" javaType="eventListeners" jdbcType="VARCHAR" />
+		<typeHandler handler="jsonTypeHandler" javaType="eventListeners" jdbcType="VARCHAR" />
 		<typeHandler handler="jsonTypeHandler" javaType="properties" jdbcType="VARCHAR" />
-		<typeHandler handler="jsonTypeHandler" javaType="list" jdbcType="VARCHAR" />
 	</typeHandlers>
 
 	<!-- 数据库环境配置节 -->

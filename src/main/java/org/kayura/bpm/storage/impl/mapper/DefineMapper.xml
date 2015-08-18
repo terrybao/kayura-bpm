@@ -23,15 +23,15 @@
 		<result property="createdTime" column="CreatedTime" />
 		<result property="modifiedTime" column="ModifiedTime" />
 		<result property="modifier" column="Modifier" />
-		<result property="listeners" column="Listeners" typeHandler="jsonTypeHandler" />
+		<result property="listeners" column="Listeners" typeHandler="listenersTypeHandler" />
 		<result property="attributes" column="Attributes" typeHandler="jsonTypeHandler" />
 		<result property="status" column="Status" />
 		<association property="bizForm" column="BizForm_Id" select="getBizFormById" />
-		<association property="parent" column="Parent_Id" select="getWorkflowProcessById" />
+		<association property="parent" column="Parent_Id" select="selectWorkflowProcessById" />
 		<association property="startNode" column="Parent_Id" select="selectNodesForStartNode" />
-		<collection property="activities" column="Process_Id" select="selectNodesForActivities" />
-		<collection property="routes" column="Process_Id" select="selectNodesByRoutes" />
-		<collection property="endNodes" column="Process_Id" select="selectNodesByEndNodes" />
+		<collection property="activities" column="Process_Id" select="selectNodesForActivity" />
+		<collection property="routes" column="Process_Id" select="selectNodesForRoute" />
+		<collection property="endNodes" column="Process_Id" select="selectNodesForEndNode" />
 		<collection property="transitions" column="Process_Id" select="selectTransitionByProcess" />
 	</resultMap>
 
@@ -40,7 +40,7 @@
 		<result column="Code" property="code" />
 		<result column="Name" property="name" />
 		<result column="Description" property="description" />
-		<result column="Listeners" property="listeners" typeHandler="jsonTypeHandler" />
+		<result column="Listeners" property="listeners" typeHandler="listenersTypeHandler" />
 		<result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
 		<result column="CreatedTime" property="createdTime" />
 		<result column="ModifiedTime" property="modifiedTime" />
@@ -66,7 +66,7 @@
 		<result column="Code" property="code" />
 		<result column="Name" property="name" />
 		<result column="Description" property="description" />
-		<result column="Listeners" property="listeners" typeHandler="jsonTypeHandler" />
+		<result column="Listeners" property="listeners" typeHandler="listenersTypeHandler" />
 		<result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
 		<result column="CreatedTime" property="createdTime" />
 		<result column="CreatedTime" property="createdTime" />
@@ -83,7 +83,7 @@
 		<result property="displayName" column="DisplayName" />
 		<result property="sn" column="Sn" />
 		<result property="actorType" column="ActorType" />
-		<association property="activity" column="Activity_Id" select="selectNodeForActivity" />
+		<association property="activity" column="Activity_Id" select="selectNodesForActivity" />
 	</resultMap>
 	
     <!-- SQL片段 -->
@@ -106,6 +106,7 @@
 	    ${alias}.Name, 
 	    ${alias}.Description, 
 	    ${alias}.Version,
+		${alias}.CreatedTime, 
 	    ${alias}.ModifiedTime, 
 	    ${alias}.Modifier, 
 	    ${alias}.Listeners, 
@@ -148,7 +149,7 @@
     	#{name},
     	#{description},
     	#{nodeType},
-    	#{listeners,typeHandler=jsonTypeHandler},
+    	#{listeners,typeHandler=listenersTypeHandler},
 		#{attributes,typeHandler=jsonTypeHandler}, 
 		#{createdTime}, 
 		#{modifiedTime}
@@ -158,7 +159,7 @@
     	Code = #{code},
     	Name = #{name},
     	Description = #{description},
-    	Listeners = #{listeners,typeHandler=jsonTypeHandler},
+    	Listeners = #{listeners,typeHandler=listenersTypeHandler},
 		Attributes = #{attributes,typeHandler=jsonTypeHandler}, 
 		ModifiedTime = #{modifiedTime}
 	</sql>
@@ -268,8 +269,8 @@
 			<if test="flowCode != null">
 			    and ( b.Code = #{flowCode} ) 
 			</if>
-			<if test="version = #{version}">
-			    and ( t.version = #{version} ) 
+			<if test="version != null">
+			    and ( t.Version = #{version} ) 
 			</if>
 			<if test="id != null">
 			    and ( t.Process_Id = #{id} ) 
@@ -335,7 +336,7 @@
 			#{createdTime},
 			#{modifiedTime},
 			#{modifier},
-			#{listeners,typeHandler=jsonTypeHandler},
+			#{listeners,typeHandler=listenersTypeHandler},
 			#{attributes,typeHandler=jsonTypeHandler}, 
 			#{status}
 		)
@@ -348,7 +349,7 @@
 	    	Description = #{description},
 			ModifiedTime = #{modifiedTime},
 			Modifier = #{modifier},
-			Listeners = #{listeners,typeHandler=jsonTypeHandler},
+			Listeners = #{listeners,typeHandler=listenersTypeHandler},
 			Attributes = #{attributes,typeHandler=jsonTypeHandler}, 
 			Status = #{status}
 		WHERE Process_Id = #{id}
@@ -401,7 +402,7 @@
 		WHERE ( t.Process_Id = #{value} ) AND ( t.NodeType = 1 )
 	</select>
 		
-	<select id="selectNodeForActivity" parameterType="string" resultMap="nodeMap">
+	<select id="selectNodesForActivity" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -411,7 +412,7 @@
 	</select>
 	
 	<!-- 根据过程ID获取路由节点. -->
-	<select id="selectNodesForRoutes" parameterType="string" resultMap="nodeMap">
+	<select id="selectNodesForRoute" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -421,7 +422,7 @@
 	</select>
 	
 	<!-- 根据过程ID获取结束节点. -->
-	<select id="selectNodesForEndNodes" parameterType="string" resultMap="nodeMap">
+	<select id="selectNodesForEndNode" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -577,7 +578,7 @@
 			#{code},
 			#{name},
 			#{description},
-			#{listeners,typeHandler=jsonTypeHandler},
+			#{listeners,typeHandler=listenersTypeHandler},
 			#{attributes,typeHandler=jsonTypeHandler}, 
 			#{createdTime},
 			#{modifiedTime},
@@ -598,7 +599,7 @@
 			    <property name="alias" value="t"/>
 			</include>
 		FROM Bpm_ActivityActors t
-	    WHERE t.Node_Id = #{nodeId}
+	    WHERE t.Activity_Id = #{nodeId}
 	</select>
 	
 	<insert id="insertActivityActor" parameterType="org.kayura.bpm.models.ActivityActor">

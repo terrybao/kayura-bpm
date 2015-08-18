@@ -6,6 +6,10 @@ public class Transition extends WfElement {
     private Node toNode;
     private String conditions;
     
+    public Transition() {
+	
+    }
+    
     public Transition(WorkflowProcess parent, Node fromNode, Node toNode) {
 	super(parent, null);
 	this.setFromNode(fromNode);

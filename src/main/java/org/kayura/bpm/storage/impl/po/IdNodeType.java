@@ -1,11 +1,9 @@
 package org.kayura.bpm.storage.impl.po;
 
-import org.kayura.bpm.models.NodeTypes;
-
 public class IdNodeType {
     
     private String id;
-    private NodeTypes nodeType;
+    private Integer nodeType;
     
     public String getId() {
 	return id;
@@ -15,11 +13,11 @@ public class IdNodeType {
 	this.id = id;
     }
     
-    public NodeTypes getNodeType() {
+    public Integer getNodeType() {
 	return nodeType;
     }
     
-    public void setNodeType(NodeTypes nodeType) {
+    public void setNodeType(Integer nodeType) {
 	this.nodeType = nodeType;
     }
     

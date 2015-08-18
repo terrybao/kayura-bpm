@@ -14,6 +14,10 @@ public abstract class Node extends WfElement {
     protected List<Transition> toTransitions = new ArrayList<Transition>();
     private Integer nodeType;
     
+    public Node() {
+	
+    }
+    
     public Node(WorkflowProcess parent, Integer nodeType, String code) {
 	super(parent, code);
 	this.nodeType = nodeType;

@@ -1,5 +1,7 @@
 package org.kayura.bpm.models;
 
+import org.kayura.utils.KeyUtils;
+
 public class ActivityActor {
     
     // user, role, depart, special
@@ -16,10 +18,12 @@ public class ActivityActor {
     private Integer actorType;
     
     public ActivityActor() {
-	
+	this.id = KeyUtils.newId();
     }
     
     public ActivityActor(Activity activity, Integer actorType, String actorId) {
+	this();
+	
 	this.activity = activity;
 	this.actorType = actorType;
 	this.actorId = actorId;
