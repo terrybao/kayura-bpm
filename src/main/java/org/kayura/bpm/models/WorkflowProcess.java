@@ -220,9 +220,6 @@ public class WorkflowProcess extends WfElement {
     }
     
     public StartNode getStartNode() {
-	if (this.startNode == null) {
-	    this.createStartNode();
-	}
 	return this.startNode;
     }
     

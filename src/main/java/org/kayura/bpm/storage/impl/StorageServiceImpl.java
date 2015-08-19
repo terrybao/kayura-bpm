@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
+import org.kayura.bpm.models.BizForm;
 import org.kayura.bpm.models.EndNode;
 import org.kayura.bpm.models.Route;
 import org.kayura.bpm.models.StartNode;
@@ -16,6 +17,7 @@ import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.storage.impl.mapper.DefineMapper;
 import org.kayura.bpm.storage.impl.po.IdNodeType;
+import org.kayura.utils.StringUtils;
 
 public class StorageServiceImpl implements IStorageService {
     
@@ -35,10 +37,7 @@ public class StorageServiceImpl implements IStorageService {
     
     public WorkflowProcess getWorkflowProcess(String id) {
 	
-	Map<String, Object> args = new HashMap<String, Object>();
-	args.put("id", id);
-	
-	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcessByMap(args);
+	WorkflowProcess workflowProcess = defineMapper.selectWorkflowProcessById(id);
 	return workflowProcess;
     }
     
@@ -51,7 +50,11 @@ public class StorageServiceImpl implements IStorageService {
 	    args.put("version", version);
 	}
 	
-	WorkflowProcess workflowProcess = defineMapper.getWorkflowProcessByMap(args);
+	WorkflowProcess workflowProcess = null;
+	String id = defineMapper.getWorkflowProcessIdByMap(args);
+	if (StringUtils.isEmpty(id)) {
+	    workflowProcess = defineMapper.selectWorkflowProcessById(id);
+	}
 	return workflowProcess;
     }
     
@@ -62,7 +65,12 @@ public class StorageServiceImpl implements IStorageService {
 	
 	// workflowProcess
 	if (newProcess == true) {
-	    workflowProcess.setVersion(1);
+	    
+	    BizForm bizForm = workflowProcess.getBizForm();
+	    Integer maxValue = defineMapper.getWorkflowProcessMaxVersion(bizForm != null ? bizForm
+		    .getId() : null);
+	    workflowProcess.setVersion(maxValue != null ? (maxValue + 1) : 1);
+	    
 	    defineMapper.insertWorkflowProcess(workflowProcess);
 	} else {
 	    defineMapper.updateWorkflowProcess(workflowProcess);

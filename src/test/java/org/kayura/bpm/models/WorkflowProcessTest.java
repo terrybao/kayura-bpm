@@ -8,6 +8,9 @@ public class WorkflowProcessTest {
     public static WorkflowProcess createWorkflowProcess() {
 	
 	WorkflowProcess wp = new WorkflowProcess(null, "master");
+	wp.putAttribute("key1", "xialiang");
+	wp.addistener(WorkflowProcessTest.class, 1);
+	
 	StartNode startNode = wp.createStartNode();
 	startNode.putAttribute("key1", "xialiang");
 	startNode.addistener(WorkflowProcessTest.class, 1);

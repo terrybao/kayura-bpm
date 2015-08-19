@@ -23,15 +23,17 @@
 		<result property="createdTime" column="CreatedTime" />
 		<result property="modifiedTime" column="ModifiedTime" />
 		<result property="modifier" column="Modifier" />
-		<result property="listeners" column="Listeners" typeHandler="listenersTypeHandler" />
+		<result property="listeners" column="Listeners" typeHandler="jsonTypeHandler" />
 		<result property="attributes" column="Attributes" typeHandler="jsonTypeHandler" />
 		<result property="status" column="Status" />
+		
 		<association property="bizForm" column="BizForm_Id" select="getBizFormById" />
 		<association property="parent" column="Parent_Id" select="selectWorkflowProcessById" />
-		<association property="startNode" column="Parent_Id" select="selectNodesForStartNode" />
-		<collection property="activities" column="Process_Id" select="selectNodesForActivity" />
-		<collection property="routes" column="Process_Id" select="selectNodesForRoute" />
-		<collection property="endNodes" column="Process_Id" select="selectNodesForEndNode" />
+		
+		<association property="startNode" column="Process_Id" select="selectStartNodeByProcess" />
+		<collection property="activities" column="Process_Id" select="selectActivitiesByProcess" />
+		<collection property="routes" column="Process_Id" select="selectRoutesByProcess" />
+		<collection property="endNodes" column="Process_Id" select="selectEndNodesByProcess" />
 		<collection property="transitions" column="Process_Id" select="selectTransitionByProcess" />
 	</resultMap>
 
@@ -40,13 +42,15 @@
 		<result column="Code" property="code" />
 		<result column="Name" property="name" />
 		<result column="Description" property="description" />
-		<result column="Listeners" property="listeners" typeHandler="listenersTypeHandler" />
+		<result column="Listeners" property="listeners" typeHandler="jsonTypeHandler" />
 		<result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
 		<result column="CreatedTime" property="createdTime" />
 		<result column="ModifiedTime" property="modifiedTime" />
+		
 		<association property="parent" column="Process_Id" select="selectWorkflowProcessById" />
 		<collection property="fromTransitions" column="Node_Id" select="selectTransitionByFrom" />
 		<collection property="toTransitions" column="Node_Id" select="selectTransitionByTo" />
+		
 		<!-- 0 StartNode; 1 Activity; 2 Route; 3 EndNode; -->
 		<discriminator javaType="int" column="NodeType">
 			<case value="0" resultType="org.kayura.bpm.models.StartNode" />
@@ -66,15 +70,15 @@
 		<result column="Code" property="code" />
 		<result column="Name" property="name" />
 		<result column="Description" property="description" />
-		<result column="Listeners" property="listeners" typeHandler="listenersTypeHandler" />
+		<result column="Listeners" property="listeners" typeHandler="jsonTypeHandler" />
 		<result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
 		<result column="CreatedTime" property="createdTime" />
 		<result column="CreatedTime" property="createdTime" />
 		<result column="ModifiedTime" property="modifiedTime" />
 		<result column="Conditions" property="conditions" />
 		<association property="parent" column="Process_Id" select="selectWorkflowProcessById"/>
-		<association property="fromNode" column="FromNode_Id" select="selectNodesForActivity"/>
-		<association property="toNode" column="ToNode_Id" select="selectNodesForActivity"/>
+		<association property="fromNode" column="FromNode_Id" select="selectActivityById"/>
+		<association property="toNode" column="ToNode_Id" select="selectActivityById"/>
 	</resultMap>
 	
 	<resultMap id="activityActorMap" type="org.kayura.bpm.models.ActivityActor">
@@ -83,7 +87,7 @@
 		<result property="displayName" column="DisplayName" />
 		<result property="sn" column="Sn" />
 		<result property="actorType" column="ActorType" />
-		<association property="activity" column="Activity_Id" select="selectNodesForActivity" />
+		<association property="activity" column="Activity_Id" select="selectActivityById" />
 	</resultMap>
 	
     <!-- SQL片段 -->
@@ -149,8 +153,8 @@
     	#{name},
     	#{description},
     	#{nodeType},
-    	#{listeners,typeHandler=listenersTypeHandler},
-		#{attributes,typeHandler=jsonTypeHandler}, 
+    	#{listeners,typeHandler=jsonTypeHandler},
+		#{attributes,typeHandler=jsonTypeHandler},
 		#{createdTime}, 
 		#{modifiedTime}
 	</sql>
@@ -159,7 +163,7 @@
     	Code = #{code},
     	Name = #{name},
     	Description = #{description},
-    	Listeners = #{listeners,typeHandler=listenersTypeHandler},
+    	Listeners = #{listeners,typeHandler=jsonTypeHandler},
 		Attributes = #{attributes,typeHandler=jsonTypeHandler}, 
 		ModifiedTime = #{modifiedTime}
 	</sql>
@@ -200,7 +204,9 @@
     
     <select id="findBizForms" parameterType="map" resultMap="bizFormMap">
 		SELECT 
-        	<include refid="bizFormColumns"><property name="alias" value="t"/></include>
+        	<include refid="bizFormColumns">
+        	    <property name="alias" value="t"/>
+        	</include>
 		FROM Bpm_BizForm t
 		<where>
 		    <if test="keyword != null">
@@ -256,11 +262,8 @@
     
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流过程定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 
-	<select id="getWorkflowProcessByMap" parameterType="map" resultMap="workflowPorcessMap">
-		SELECT
-			<include refid="workflowPorcessColumns">
-			    <property name="alias" value="t"/>
-			</include>
+	<select id="getWorkflowProcessIdByMap" parameterType="map" resultType="string">
+		SELECT t.Process_Id
 		FROM Bpm_Process t 
 			<if test="flowCode != null">
 			    JOIN Bpm_BizForm b ON t.BizForm_Id = b.BizForm_Id
@@ -272,9 +275,6 @@
 			<if test="version != null">
 			    and ( t.Version = #{version} ) 
 			</if>
-			<if test="id != null">
-			    and ( t.Process_Id = #{id} ) 
-			</if>
 			<if test="status != null">
 			    and ( t.`Status` = status ) 
 			</if>
@@ -282,12 +282,20 @@
 		ORDER BY t.Version DESC
 		LIMIT 1
 	</select>
-	
+
 	<select id="getWorkflowProcessMaxVersion" parameterType="string" resultType="int">
-	    SELECT Max(t.Version) 
-	    FROM Bpm_Process t 
-	    	 JOIN Bpm_BizForm b ON t.BizForm_Id = b.BizForm_Id
-	    WHERE ( b.Code = #{flowCode} ) 
+		SELECT Max(t.Version)
+		FROM Bpm_Process t
+		<where>
+			<choose>
+				<when test="bizFlowId != null">
+					( t.BizForm_Id = #{bizFlowId} )
+				</when>
+				<otherwise>
+					( t.BizForm_Id IS NULL )
+				</otherwise>
+			</choose>
+		</where>
 	</select>
 	
 	<select id="selectWorkflowProcessById" parameterType="string" resultMap="workflowPorcessMap">
@@ -336,7 +344,7 @@
 			#{createdTime},
 			#{modifiedTime},
 			#{modifier},
-			#{listeners,typeHandler=listenersTypeHandler},
+			#{listeners,typeHandler=jsonTypeHandler},
 			#{attributes,typeHandler=jsonTypeHandler}, 
 			#{status}
 		)
@@ -349,7 +357,7 @@
 	    	Description = #{description},
 			ModifiedTime = #{modifiedTime},
 			Modifier = #{modifier},
-			Listeners = #{listeners,typeHandler=listenersTypeHandler},
+			Listeners = #{listeners,typeHandler=jsonTypeHandler},
 			Attributes = #{attributes,typeHandler=jsonTypeHandler}, 
 			Status = #{status}
 		WHERE Process_Id = #{id}
@@ -382,7 +390,7 @@
 
 	
 	<!-- 根据过程ID获取唯一的开始节点. -->
-	<select id="selectNodesForStartNode" parameterType="string" resultMap="nodeMap">
+	<select id="selectStartNodeByProcess" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -393,7 +401,7 @@
 	</select>
 	
 	<!-- 根据过程ID获取活动节点. -->
-	<select id="selectNodesForActivities" parameterType="string" resultMap="nodeMap">
+	<select id="selectActivitiesByProcess" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -402,7 +410,7 @@
 		WHERE ( t.Process_Id = #{value} ) AND ( t.NodeType = 1 )
 	</select>
 		
-	<select id="selectNodesForActivity" parameterType="string" resultMap="nodeMap">
+	<select id="selectActivityById" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -412,7 +420,7 @@
 	</select>
 	
 	<!-- 根据过程ID获取路由节点. -->
-	<select id="selectNodesForRoute" parameterType="string" resultMap="nodeMap">
+	<select id="selectRoutesByProcess" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -422,7 +430,7 @@
 	</select>
 	
 	<!-- 根据过程ID获取结束节点. -->
-	<select id="selectNodesForEndNode" parameterType="string" resultMap="nodeMap">
+	<select id="selectEndNodesByProcess" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -432,7 +440,7 @@
 	</select>
 	
 	<!-- 根据过程ID获取所有环节对象. -->
-	<select id="selectNodesByProcessId" parameterType="string" resultMap="nodeMap">
+	<select id="selectNodesByProcess" parameterType="string" resultMap="nodeMap">
 	    SELECT
 			<include refid="nodeColumns">
 			    <property name="alias" value="t"/>
@@ -578,7 +586,7 @@
 			#{code},
 			#{name},
 			#{description},
-			#{listeners,typeHandler=listenersTypeHandler},
+			#{listeners,typeHandler=jsonTypeHandler},
 			#{attributes,typeHandler=jsonTypeHandler}, 
 			#{createdTime},
 			#{modifiedTime},

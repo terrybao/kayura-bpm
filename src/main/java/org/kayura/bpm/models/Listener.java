@@ -1,16 +1,16 @@
 package org.kayura.bpm.models;
 
-public class EventListener {
+public class Listener {
     
     private String className;
     private int sn;
     private String description;
     
-    public EventListener() {
+    public Listener() {
 	
     }
     
-    public EventListener(String className, int sn) {
+    public Listener(String className, int sn) {
 	this.className = className;
 	this.sn = sn;
     }

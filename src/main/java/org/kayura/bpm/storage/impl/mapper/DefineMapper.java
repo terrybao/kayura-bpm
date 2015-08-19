@@ -34,11 +34,13 @@ public interface DefineMapper {
     
     /* >>>>>>>>>>>>>> WorkflowProcess <<<<<<<<<<<<< */
     
-    WorkflowProcess getWorkflowProcessByMap(Map<String, Object> args);
+    String getWorkflowProcessIdByMap(Map<String, Object> args);
+    
+    WorkflowProcess selectWorkflowProcessById(String processId);
     
     Boolean workflowProcessExists(String id);
     
-    Integer getWorkflowProcessMaxVersion(String flowCode);
+    Integer getWorkflowProcessMaxVersion(String bizFlowId);
     
     void insertWorkflowProcess(WorkflowProcess workflowProcess);
     
