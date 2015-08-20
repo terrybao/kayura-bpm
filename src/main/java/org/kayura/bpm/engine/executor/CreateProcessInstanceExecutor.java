@@ -27,7 +27,7 @@ public class CreateProcessInstanceExecutor extends Executor<ProcessInstance> {
     }
     
     @Override
-    public ProcessInstance doRun(IWorkflowContext context) {
+    public ProcessInstance doExecure(IWorkflowContext context) {
 	
 	WorkflowProcess workflowProcess = null;
 	IStorageService storageService = context.getStorageService();
@@ -47,6 +47,8 @@ public class CreateProcessInstanceExecutor extends Executor<ProcessInstance> {
 	instance.setCreater(creater);
 	instance.setCreatedTime(DateUtils.now());
 	instance.setStatus(InstanceStatus.running);
+	
+	
 	
 	return instance;
     }

@@ -15,7 +15,7 @@ public class StartupWorkflowExecutor extends Executor<StartResult> {
     }
     
     @Override
-    public StartResult doRun(IWorkflowContext context) {
+    public StartResult doExecure(IWorkflowContext context) {
 	
 	StartResult result = new StartResult();
 	

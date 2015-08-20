@@ -9,12 +9,12 @@ public abstract class Executor<TResult> {
     
     private IWorkflowContext context;
     
-    public TResult run(IWorkflowContext context) {
+    public TResult execute(IWorkflowContext context) {
 	this.context = context;
-	return bind(doRun(context));
+	return bind(doExecure(context));
     }
     
-    public abstract TResult doRun(IWorkflowContext context);
+    public abstract TResult doExecure(IWorkflowContext context);
     
     public TResult bind(TResult result) {
 	if (result != null) {

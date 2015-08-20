@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.BizForm;
@@ -145,23 +146,10 @@ public class StorageServiceImpl implements IStorageService {
 	}
     }
     
-    public void insertWorkflowProcess(WorkflowProcess workflowProcess) {
-	Integer maxVer = defineMapper.getWorkflowProcessMaxVersion("");
+    @Override
+    public void saveOrUpdateProcessInstance(ProcessInstance instance) {
+	// TODO Auto-generated method stub
 	
-	if (maxVer == null) {
-	    maxVer = 1;
-	}
-	workflowProcess.setVersion(maxVer);
-	
-	defineMapper.insertWorkflowProcess(workflowProcess);
-    }
-    
-    public void saveOrUpdateWorkflowProcess(WorkflowProcess workflowProcess) {
-	if (!defineMapper.workflowProcessExists(workflowProcess.getId())) {
-	    defineMapper.insertWorkflowProcess(workflowProcess);
-	} else {
-	    defineMapper.updateWorkflowProcess(workflowProcess);
-	}
     }
     
 }

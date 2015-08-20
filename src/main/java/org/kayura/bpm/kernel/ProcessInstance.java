@@ -15,7 +15,7 @@ public class ProcessInstance {
     private Actor creater;
     private Date createdTime;
     private Date completedTime;
-    private InstanceStatus Status;
+    private Integer Status;
     
     public ProcessInstance() {
 	
@@ -77,11 +77,11 @@ public class ProcessInstance {
 	this.completedTime = completedTime;
     }
     
-    public InstanceStatus getStatus() {
+    public Integer getStatus() {
 	return Status;
     }
     
-    public void setStatus(InstanceStatus status) {
+    public void setStatus(Integer status) {
 	Status = status;
     }
     

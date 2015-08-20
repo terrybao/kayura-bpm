@@ -56,7 +56,7 @@ public class StorageServiceTest {
     public void getWorkflowProcessTest() {
 	try {
 	    WorkflowProcess wp = storageService
-		    .getWorkflowProcess("5137CF31-9D81-4160-AC3F-4B7F54BFC2BA");
+		    .getWorkflowProcess("A2E467A4-8BA0-4BC3-B192-56475E1A01E0");
 	    
 	    System.out.println(wp);
 	} catch (Exception e) {
