@@ -1,5 +1,5 @@
 package org.kayura.bpm.organize;
 
-public class IOrganizeService {
+public interface IOrganizeService {
     
 }
