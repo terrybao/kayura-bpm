@@ -18,12 +18,12 @@ public class CreateProcessInstanceExecutor extends Executor<ProcessInstance> {
 	private Integer version;
 	private String workflowProcessId;
 	private BizData bizData;
-	private Actor creater;
+	private Actor creator;
 
-	public CreateProcessInstanceExecutor(String flowCode, BizData bizData, Actor creater) {
+	public CreateProcessInstanceExecutor(String flowCode, BizData bizData, Actor creator) {
 		this.flowCode = flowCode;
 		this.bizData = bizData;
-		this.creater = creater;
+		this.creator = creator;
 	}
 
 	@Override
@@ -44,9 +44,9 @@ public class CreateProcessInstanceExecutor extends Executor<ProcessInstance> {
 		instance.setId(KeyUtils.newId());
 		instance.setBizDataId(bizData.getId());
 		instance.setTitle(bizData.getTitle());
-		instance.setCreater(creater);
+		instance.setCreator(creator);
 		instance.setCreatedTime(DateUtils.now());
-		instance.setStatus(InstanceStatus.running);
+		instance.setStatus(InstanceStatus.Running);
 
 		storageService.saveOrUpdateProcessInstance(instance);
 
@@ -86,11 +86,11 @@ public class CreateProcessInstanceExecutor extends Executor<ProcessInstance> {
 	}
 
 	public Actor getCreater() {
-		return creater;
+		return creator;
 	}
 
 	public void setCreater(Actor creater) {
-		this.creater = creater;
+		this.creator = creater;
 	}
 
 	public String getWorkflowProcessId() {

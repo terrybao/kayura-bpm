@@ -80,7 +80,7 @@ public abstract class Node extends WfElement {
 		return nodeType;
 	}
 
-	protected List<Transition> getFromTransitions() {
+	public List<Transition> getFromTransitions() {
 		return fromTransitions;
 	}
 
@@ -88,7 +88,7 @@ public abstract class Node extends WfElement {
 		this.fromTransitions = fromTransitions;
 	}
 
-	protected List<Transition> getToTransitions() {
+	public List<Transition> getToTransitions() {
 		return toTransitions;
 	}
 

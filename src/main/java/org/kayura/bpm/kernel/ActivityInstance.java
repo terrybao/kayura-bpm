@@ -1,11 +1,27 @@
+/**
+ * Copyright 2015-2015 the original author or authors.
+ * HomePage: http://www.kayura.org
+ */
 package org.kayura.bpm.kernel;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.types.Actor;
 
-public class ActivityInstance {
+public class ActivityInstance extends AbsNodeInstance {
+
+	// 0 未处理、1 正常、2 退回、3 重置、4 回滚
+
+	public static class ExecuteTypes {
+		public final static Integer Unhandled = 0;
+		public final static Integer Normal = 1;
+		public final static Integer Back = 2;
+		public final static Integer Start = 3;
+		public final static Integer Special = 4;
+	}
 
 	private String id;
 	private ProcessInstance processInstance;
@@ -15,11 +31,12 @@ public class ActivityInstance {
 	private Date createdTime;
 	private Date completedTime;
 	private ActivityInstance preActInstance;
-	private InstanceStatus status;
-	private HandleTypes handleType;
+	private Integer status;
+	private Integer executeType;
 
-	public ActivityInstance() {
-
+	public ActivityInstance(Activity activity) {
+		super(activity);
+		this.activity = activity;
 	}
 
 	public String getId() {
@@ -86,20 +103,26 @@ public class ActivityInstance {
 		this.preActInstance = preActInstance;
 	}
 
-	public InstanceStatus getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(InstanceStatus status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
-	public HandleTypes getHandleType() {
-		return handleType;
+	public Integer getExecuteType() {
+		return executeType;
 	}
 
-	public void setHandleType(HandleTypes handleType) {
-		this.handleType = handleType;
+	public void setExecuteType(Integer executeType) {
+		this.executeType = executeType;
+	}
+
+	public List<Actor> findActors() {
+		List<Actor> actors = new ArrayList<Actor>();
+
+		return actors;
 	}
 
 }

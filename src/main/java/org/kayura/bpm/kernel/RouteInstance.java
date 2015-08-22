@@ -1,28 +1,27 @@
+/**
+ * Copyright 2015-2015 the original author or authors.
+ * HomePage: http://www.kayura.org
+ */
 package org.kayura.bpm.kernel;
 
-import java.util.List;
-
 import org.kayura.bpm.models.Route;
-import org.kayura.bpm.models.Transition;
-import org.kayura.bpm.models.WorkflowProcess;
 
-public class RouteInstance {
+/**
+ * 
+ * @author liangxia@live.com
+ */
+public class RouteInstance extends AbsNodeInstance {
 
 	private Route route;
-	private WorkflowProcess process;
 
-	public RouteInstance(Route route) {
-		this.route = route;
-		this.process = (WorkflowProcess) route.getParent();
+	public RouteInstance(Route node) {
+		super(node);
+		route = node;
 	}
 
-	public List<ActivityInstance> getNextActivities() {
-
-		List<Transition> toTransitions = route.getToTransitions();
-
-		
-		
-		return null;
+	public Route getRoute() {
+		return route;
 	}
-
+	
+	
 }

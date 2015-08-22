@@ -6,26 +6,26 @@ import org.kayura.xml.XDocument;
 
 @SuppressWarnings("unused")
 public class WorkflowProcessBuilder {
-    
-    private Integer convertType;
-    private XDocument document;
-    private WorkflowProcess workflowProcess;
-    
-    public WorkflowProcessBuilder(String xml) {
-	this.document = new XDocument(xml);
-    }
-    
-    public WorkflowProcessBuilder(WorkflowProcess workflowProcess) {
-	this.workflowProcess = workflowProcess;
-    }
-    
-    public WorkflowProcess parseWorkflowProcess() {
-	
-	return null;
-    }
-    
-    public String parseXml() {
-	
-	return null;
-    }
+
+	private Integer convertType;
+	private XDocument document;
+	private WorkflowProcess workflowProcess;
+
+	public WorkflowProcessBuilder(String xml) {
+		this.document = new XDocument(xml);
+	}
+
+	public WorkflowProcessBuilder(WorkflowProcess workflowProcess) {
+		this.workflowProcess = workflowProcess;
+	}
+
+	public WorkflowProcess parseWorkflowProcess() {
+
+		return null;
+	}
+
+	public String parseXml() {
+
+		return null;
+	}
 }

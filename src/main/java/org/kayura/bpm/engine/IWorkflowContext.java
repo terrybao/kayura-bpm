@@ -8,4 +8,6 @@ public interface IWorkflowContext {
     IStorageService getStorageService();
     
     IOrganizeService getOrganizeService();
+    
+    <T> T bind(T o);
 }

@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
+import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.BizForm;
@@ -17,23 +19,25 @@ import org.kayura.bpm.models.Transition;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.storage.impl.mapper.DefineMapper;
+import org.kayura.bpm.storage.impl.mapper.InstanceMapper;
 import org.kayura.bpm.storage.impl.po.IdNodeType;
 import org.kayura.utils.StringUtils;
 
 public class StorageServiceImpl implements IStorageService {
 
 	private DefineMapper defineMapper;
+	private InstanceMapper instanceMapper;
 
 	public StorageServiceImpl() {
 
 	}
 
-	public StorageServiceImpl(DefineMapper defineMapper) {
+	public void setDefineMapper(DefineMapper defineMapper) {
 		this.defineMapper = defineMapper;
 	}
 
-	public void setDefineMapper(DefineMapper defineMapper) {
-		this.defineMapper = defineMapper;
+	public void setInstanceMapper(InstanceMapper instanceMapper) {
+		this.instanceMapper = instanceMapper;
 	}
 
 	public WorkflowProcess getWorkflowProcess(String id) {
@@ -146,8 +150,22 @@ public class StorageServiceImpl implements IStorageService {
 
 	@Override
 	public void saveOrUpdateProcessInstance(ProcessInstance instance) {
-		// TODO Auto-generated method stub
-
+		if (instanceMapper.processInstanceExists(instance.getId())) {
+			instanceMapper.updateProcessInstance(instance);
+		} else {
+			instanceMapper.insertProcessInstance(instance);
+		}
 	}
 
+	public void deleteProcessInstance(String id) {
+		instanceMapper.deleteProcessInstance(id);
+	}
+
+	public void insertActivityInstance(ActivityInstance instance) {
+		instanceMapper.insertActivityInstance(instance);
+	}
+
+	public void insertWorkItem(WorkItem workItem) {
+		instanceMapper.insertWorkItem(workItem);
+	}
 }

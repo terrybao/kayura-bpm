@@ -5,13 +5,133 @@
 	<!-- 过程实例 ProcessInstance -->
 
 	<resultMap id="processInstanceMap" type="org.kayura.bpm.kernel.ProcessInstance">
-		<id property="id" column=""/>
+		<id property="id" column="ProcessInstance_Id" />
+		<result property="parentId" column="Parent_Id" />
+		<result property="title" column="Title" />
+		<result property="bizDataId" column="BizData_Id" />
+		<result property="createdTime" column="CreatedTime" />
+		<result property="completedTime" column="CompletedTime" />
+		<result property="status" column="Status" />
+		<association property="process" column="Process_Id" select="selectWorkflowProcessById" />
+		<association property="creator" javaType="org.kayura.bpm.types.Actor">
+			<id property="id" column="Creater_Id" />
+			<result property="deptId" column="CreaterDept_Id" />
+		</association>
 	</resultMap>
+	
+	<sql id="processInstance_Columns">
+		${alias}.ProcessInstance_Id,
+		${alias}.Parent_Id,
+		${alias}.Process_Id,
+		${alias}.Title,
+		${alias}.BizData_Id,
+		${alias}.Creator_Id,
+		${alias}.CreatorDept_Id,
+		${alias}.CreatedTime,
+		${alias}.CompletedTime,
+		${alias}.Status
+	</sql>
+
+	<select id="getProcessInstanceById" parameterType="string">
+		SELECT
+			<include refid="processInstance_Columns">
+				<property name="alias" value="t"/>
+			</include>
+		FROM Bpm_ProcessInstance t
+		WHERE t.ProcessInstance_Id = #{id}
+	</select>
+	
+	<select id="processInstanceExists" parameterType="string" resultType="boolean">
+		SELECT COUNT(1) > 0
+		FROM Bpm_ProcessInstance t
+		WHERE t.ProcessInstance_Id = #{id}
+	</select>
 
 	<insert id="insertProcessInstance" parameterType="org.kayura.bpm.kernel.ProcessInstance">
-
-
-
+		INSERT Bpm_ProcessInstance (
+			ProcessInstance_Id,
+			Parent_Id,
+			Process_Id,
+			Title,
+			BizData_Id,
+			Creator_Id,
+			CreatorDept_Id,
+			CreatedTime,
+			CompletedTime,
+			Status
+		) Values (
+			#{id},
+			#{parentId},
+			#{process.id},
+			#{title},
+			#{bizDataId},
+			#{creator.id},
+			#{creator.deptId},
+			#{createdTime},
+			#{completedTime},
+			#{status}
+		)
 	</insert>
+	
+	<update id="updateProcessInstance" parameterType="org.kayura.bpm.kernel.ProcessInstance">
+		UPDATE Bpm_ProcessInstance
+		SET	Parent_Id = #{parentId},
+			Process_Id = #{process.id},
+			Title = #{title},
+			BizData_Id = #{bizDataId},
+			Creater_Id = #{creater.id},
+			CreaterDept_Id = #{creater.deptId},
+			CreatedTime = #{createdTime},
+			CompletedTime = #{completedTime},
+			Status = #{status}
+		WHERE ProcessInstance_Id = #{id}
+	</update>
+	
+	<delete id="deleteProcessInstance" parameterType="string">
+		DELETE FROM Bpm_ProcessInstance
+		WHERE ProcessInstance_Id = #{id}
+	</delete>
+	
+	<!--  ActivityInstance  -->
+	
+	<select id="insertActivityInstance" parameterType="org.kayura.bpm.kernel.ActivityInstance">
+		INSERT Bpm_ActivityInstance (
+			ActivityInstance_Id,
+			ProcessInstance_Id,
+			Activity_Id,
+			DisplayName,
+			Creator_Id,
+			CreatedTime,
+			CompletedTime,
+			PreActInstance_Id,
+			Status,
+			ExecuteType
+		) Values (
+			#{id},
+			#{processInstance.id},
+			#{activity.id},
+			#{displayName},
+			#{creator.id},
+			#{createdTime},
+			#{completedTime},
+			#{preActInstanceId},
+			#{status},
+			#{executeType}
+		)
+	</select>
+	
+	<select id="updateActivityInstance" parameterType="org.kayura.bpm.kernel.ActivityInstance">
+		UPDATE Bpm_ActivityInstance
+		SET ProcessInstance_Id = #{processInstance.id},
+			Activity_Id = #{activity.id},
+			DisplayName = #{displayName},
+			Creator_Id = #{creator.id},
+			CreatedTime = #{createdTime},
+			CompletedTime = #{completedTime},
+			PreActInstance_Id = #{preActInstanceId},
+			Status = #{status},
+			ExecuteType = #{executeType}
+		WHERE ActivityInstance_Id = #{id},
+	</select>
 
 </mapper>
