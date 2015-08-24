@@ -23,6 +23,10 @@ public class AbsNodeInstance implements IWorkflowContextAware {
 	private Node node;
 	protected IWorkflowContext context;
 
+	public AbsNodeInstance() {
+
+	}
+
 	public AbsNodeInstance(Node node) {
 		this.node = node;
 	}

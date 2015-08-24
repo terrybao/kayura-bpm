@@ -7,8 +7,12 @@ package org.kayura.bpm.kernel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.kayura.bpm.models.Activity;
+import org.kayura.bpm.models.ActivityActor;
+import org.kayura.bpm.models.ActivityActor.ActorTypes;
+import org.kayura.bpm.organize.IOrganizeService;
 import org.kayura.bpm.types.Actor;
 
 public class ActivityInstance extends AbsNodeInstance {
@@ -33,6 +37,9 @@ public class ActivityInstance extends AbsNodeInstance {
 	private ActivityInstance preActInstance;
 	private Integer status;
 	private Integer executeType;
+
+	public ActivityInstance() {
+	}
 
 	public ActivityInstance(Activity activity) {
 		super(activity);
@@ -120,6 +127,73 @@ public class ActivityInstance extends AbsNodeInstance {
 	}
 
 	public List<Actor> findActors() {
+
+		IOrganizeService service = this.context.getOrganizeService();
+		List<ActivityActor> actActors = activity.getActors();
+
+		List<Actor> actors = new ArrayList<Actor>();
+
+		// 处理公司.
+		List<String> companyIds = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Company)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
+		for (String id : companyIds) {
+			List<Actor> list = service.findActorsByCompany(id);
+			actors.addAll(list);
+		}
+
+		// 处理部门人员.
+		List<String> departIds = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Depart)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
+		for (String id : departIds) {
+			List<Actor> list = service.findActorsByDepartment(id);
+			actors.addAll(list);
+		}
+
+		// 处理岗位人员.
+		List<String> positionIds = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Position)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
+		for (String id : positionIds) {
+			List<Actor> list = service.findActorsByPosition(id);
+			actors.addAll(list);
+		}
+
+		// 处理角色人员.
+		List<String> roleIds = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Role).map(s -> s.getActorId())
+				.collect(Collectors.toList());
+		for (String id : roleIds) {
+			List<Actor> list = service.findActorsByRole(id);
+			actors.addAll(list);
+		}
+
+		// 处理特殊人员.
+		List<String> specials = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Special)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
+		if (specials.size() > 0) {
+			List<Actor> list = findSpecialUsers(specials);
+			if (list.size() > 0) {
+				actors.addAll(list);
+			}
+		}
+
+		// 处理员工.
+		List<String> userIds = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.User).map(s -> s.getActorId())
+				.collect(Collectors.toList());
+		if (userIds.size() > 0) {
+			List<Actor> list = service.findActorsByEmpIds(userIds);
+			actors.addAll(list);
+		}
+
+		return actors.stream().distinct().collect(Collectors.toList());
+	}
+
+	private List<Actor> findSpecialUsers(List<String> specials) {
+
 		List<Actor> actors = new ArrayList<Actor>();
 
 		return actors;

@@ -10,7 +10,7 @@ public class StartNode extends AbsRoute {
 	}
 
 	public StartNode(WorkflowProcess parent, String code) {
-		super(parent, NodeTypes_StartNode, code);
+		super(parent, NodeTypes.StartNode, code);
 	}
 
 }

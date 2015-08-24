@@ -5,10 +5,12 @@ import java.util.List;
 
 public abstract class Node extends WfElement {
 
-	public final static Integer NodeTypes_StartNode = 0;
-	public final static Integer NodeTypes_Activity = 1;
-	public final static Integer NodeTypes_Route = 2;
-	public final static Integer NodeTypes_EndNode = 3;
+	public static class NodeTypes {
+		public final static Integer StartNode = 0;
+		public final static Integer Activity = 1;
+		public final static Integer Route = 2;
+		public final static Integer EndNode = 3;
+	}
 
 	protected List<Transition> fromTransitions = new ArrayList<Transition>();
 	protected List<Transition> toTransitions = new ArrayList<Transition>();

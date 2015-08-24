@@ -1,14 +1,18 @@
+/**
+ * Copyright 2015-2015 the original author or authors.
+ * HomePage: http://www.kayura.org
+ */
 package org.kayura.bpm.organize.models;
 
-public class Employee {
+/**
+ * @author liangxia@live.com
+ */
+public class Position {
 
 	private String id;
+	private String departmentId;
 	private String displayName;
 	private Integer status;
-
-	public Employee() {
-
-	}
 
 	public String getId() {
 		return id;
@@ -16,6 +20,14 @@ public class Employee {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(String departmentId) {
+		this.departmentId = departmentId;
 	}
 
 	public String getDisplayName() {

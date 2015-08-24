@@ -1,1 +1,272 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.kayura.bpm.organize.impl.mapper.OrganizeMapper">
+
+	<!--  >>>>>>>>>>>>>>>>>>>  Company  <<<<<<<<<<<<<<<<<<<< -->
+
+	<resultMap id="companyMap" type="org.kayura.bpm.organize.models.Company">
+		<id property="id" column="Company_Id" />
+		<result property="parentId" column="Parent_Id"/>
+		<result property="path" column="Path" />
+		<result property="displayName" column="DisplayName" />
+		<result property="status" column="Status" />
+	</resultMap>
+	
+	<select id="getCompanyById" parameterType="string" resultMap="companyMap">
+		SELECT
+			t.Company_Id,
+			t.Parent_Id,
+			t.Path,
+			t.DisplayName,
+			t.Status
+		FROM Bpm_Company t
+		WHERE t.Company_Id = #{id}
+	</select>
+
+	<select id="findCompanies" resultMap="companyMap">
+		SELECT
+			t.Company_Id,
+			t.Parent_Id,
+			t.Path,
+			t.DisplayName,
+			t.Status
+		FROM Bpm_Company t
+		<where>
+			<if test="parentId != null">
+				<choose>
+					<when test="parentId == 'root' ">
+						AND ( t.Parent_Id = null )
+					</when>
+					<otherwise>
+						AND ( t.Parent_Id = #{parentId} )
+					</otherwise>
+				</choose>
+			</if>
+			<if test="keyword != null">
+				AND ( t.DisplayName LIKE '%${keyword}%' )
+			</if>
+			<if test="status != null">
+				AND ( t.Status = #{status} )
+			</if>
+		</where>
+	</select>
+	
+	<!--  >>>>>>>>>>>>>>>>>>>  Department  <<<<<<<<<<<<<<<<<<<< -->
+	
+	<resultMap id="departmentMap" type="org.kayura.bpm.organize.models.Department">
+		<id property="id" column="Department_Id" />
+		<result property="parentId" column="Parent_Id"/>
+		<result property="companyId" column="Company_Id"/>
+		<result property="path" column="Path" />
+		<result property="displayName" column="DisplayName" />
+		<result property="status" column="Status" />
+	</resultMap>
+
+	<select id="getDepartmentById" parameterType="string" resultMap="departmentMap">
+		SELECT 
+			t.Department_Id,
+			t.Parent_Id,
+			t.Company_Id,
+			t.Path,
+			t.DisplayName,
+			t.Status
+		FROM Bpm_Department t
+		WHERE t.Company_Id = #{id}
+	</select>
+	
+	<select id="findDepartments" parameterMap="map" resultMap="departmentMap">
+		SELECT 
+			t.Department_Id,
+			t.Parent_Id,
+			t.Company_Id,
+			t.Path,
+			t.DisplayName,
+			t.Status
+		FROM Bpm_Department t
+		<where>
+			<if test="companyId != null">
+				AND ( t.Company_Id = #{companyId} )
+			</if>
+			<if test="parentId != null">
+				AND ( t.Parent_Id = #{parentId} )
+			</if>
+			<if test="keyword != null">
+				AND ( t.DisplayName LIKE '%${keyword}%' )
+			</if>
+			<if test="status != null">
+				AND ( t.Status = #{status} )
+			</if>
+		</where>
+	</select>
+	
+	<!--  >>>>>>>>>>>>>>>>>>>  Position  <<<<<<<<<<<<<<<<<<<< -->
+	
+	<resultMap id="positionMap" type="org.kayura.bpm.organize.models.Position">
+		<id property="id" column="Position_Id" />
+		<result property="departmentId" column="Department_Id"/>
+		<result property="displayName" column="DisplayName" />
+		<result property="status" column="Status" />
+	</resultMap>
+	
+	<select id="findPositions" parameterType="map" resultMap="departmentMap">
+		SELECT 
+			t.Position_Id,
+			t.Department_Id,
+			t.DisplayName,
+			t.Status
+		FROM Bpm_Position t
+		<where>
+			<if test="departmentId != null">
+				AND ( t.Department_Id = #{departmentId} )
+			</if>
+			<if test="keyword != null">
+				AND ( t.DisplayName LIKE '%${keyword}%' )
+			</if>
+			<if test="status != null">
+				AND ( t.Status = #{status} )
+			</if>
+		</where>
+	</select>
+
+	<!--  >>>>>>>>>>>>>>>>>>>  Employee  <<<<<<<<<<<<<<<<<<<< -->
+	
+	<resultMap id="employeeMap" type="org.kayura.bpm.organize.models.Employee">
+		<id property="id" column="Employee_Id" />
+		<result property="Code" column="Code"/>
+		<result property="displayName" column="DisplayName" />
+		<result property="status" column="Status" />
+	</resultMap>
+	
+	<select id="findEmployees" parameterType="map" resultMap="employeeMap">
+		SELECT
+			t.Employee_Id,
+			t.`Code`,
+			t.DisplayName,
+			t.`Status`
+		FROM bpm_employees AS t
+		<if test="departmentId != null OR positionId != null OR companyId != null">
+			INNER JOIN bpm_departempposi AS dep ON dep.Employee_Id = t.Employee_Id
+			INNER JOIN bpm_department AS d ON d.Department_Id = dep.Department_Id
+		</if>
+		<if test="companyId != null">
+			INNER JOIN bpm_company AS c ON c.Company_Id = d.Company_Id
+		</if>
+		<if test="roleId != null">
+			INNER JOIN bpm_roleemployee AS re ON re.Employee_Id = t.Employee_Id
+			INNER JOIN bpm_roles AS r ON r.Role_Id = re.Role_Id
+		</if>
+		<where>
+			<if test="keyword != null">
+				AND ( t.Code LIKE #{keyword} OR t.DisplayName LIKE #{keyword} )
+			</if>
+			<if test="status != null">
+				AND ( t.Status = #{status} )
+			</if>
+			<if test="departmentId != null">
+				AND ( dep.Department_Id = #{departmentId} )
+			</if>
+			<if test="positionId != null">
+				AND ( dep.Position_Id = #{positionId} )
+			</if>
+			<if test="companyId != null">
+				AND ( c.Company_Id = #{companyId} )
+			</if>
+			<if test="roleId != null">
+				AND ( re.Role_Id = #{roleId} )
+			</if>
+		</where>
+	</select>
+	
+	<select id="findActors" parameterType="map" resultType="org.kayura.bpm.types.Actor">
+		SELECT 
+			dep.Employee_Id AS id, 
+			emp.DisplayName as displayName,
+			dep.Department_Id AS departId, 
+			dep.Position_Id AS positionId
+		FROM bpm_departempposi AS dep 
+			INNER JOIN bpm_employees AS emp ON dep.Employee_Id = emp.Employee_Id 
+		<if test="departmentPath != null OR positionId != null OR companyPath != null">
+			INNER JOIN bpm_department AS d ON d.Department_Id = dep.Department_Id
+		</if>
+		<if test="companyPath != null">
+			INNER JOIN bpm_company AS c ON c.Company_Id = d.Company_Id
+		</if>
+		<if test="rolePath != null">
+			INNER JOIN bpm_roleemployee AS re ON re.Employee_Id = dep.Employee_Id
+			INNER JOIN bpm_roles AS r ON r.Role_Id = re.Role_Id
+		</if>
+		<where>
+			<if test="departmentPath != null">
+				OR ( d.Path LIKE '${departmentPath}%' )
+			</if>
+			<if test="positionId != null">
+				OR ( dep.Position_Id = #{positionId} )
+			</if>
+			<if test="companyPath != null">
+				OR ( c.Path LIKE '${companyPath}%' )
+			</if>
+			<if test="rolePath != null">
+				OR ( r.Path LIKE '${rolePath}%' )
+			</if>
+			<if test="rolePath != null">
+				OR ( r.Path LIKE '${rolePath}%' )
+			</if>
+		</where>
+	</select>
+	
+	<select id="findActorsByEmpIds" parameterType="list" resultType="org.kayura.bpm.types.Actor">
+		SELECT 
+			dep.Employee_Id AS id, 
+			emp.DisplayName as displayName,
+			dep.Department_Id AS departId, 
+			dep.Position_Id AS positionId
+		FROM bpm_departempposi AS dep 
+			INNER JOIN bpm_employees AS emp ON dep.Employee_Id = emp.Employee_Id 
+		WHERE 
+			dep.Employee_Id IN 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+			
+	<!--  >>>>>>>>>>>>>>>>>>>  Role  <<<<<<<<<<<<<<<<<<<< -->
+	
+	<resultMap id="roleMap" type="org.kayura.bpm.organize.models.Role">
+		<id property="id" column="Role_Id" />
+		<result property="parentId" column="Parent_Id"/>
+		<result property="displayName" column="DisplayName" />
+		<result property="status" column="Status" />
+	</resultMap>
+
+	<select id="getRoleById" parameterType="string" resultMap="roleMap">
+		SELECT 
+			t.Role_Id,
+			t.Parent_Id,
+			t.DisplayName,
+			t.Status
+		FROM Bpm_Roles t
+		WHERE t.Role_Id = #{id}
+	</select>
+	
+	<select id="findRoles" parameterType="map" resultMap="roleMap">
+		SELECT 
+			t.Role_Id,
+			t.Parent_Id,
+			t.DisplayName,
+			t.Status
+		FROM Bpm_Roles t
+		<where>
+			<if test="parentId != null">
+				AND ( t.Parent_Id = #{parentId} )
+			</if>
+			<if test="keyword != null">
+				AND ( t.DisplayName LIKE '%${keyword}%' )
+			</if>
+			<if test="status != null">
+				AND ( t.Status = #{status} )
+			</if>
+		</where>
+	</select>
+
+
+</mapper>

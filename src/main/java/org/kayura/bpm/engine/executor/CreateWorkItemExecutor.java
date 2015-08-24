@@ -6,6 +6,7 @@ package org.kayura.bpm.engine.executor;
 
 import org.kayura.bpm.engine.IWorkflowContext;
 import org.kayura.bpm.kernel.ActivityInstance;
+import org.kayura.bpm.kernel.InstanceStatus;
 import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.types.Actor;
@@ -20,6 +21,9 @@ public class CreateWorkItemExecutor extends Executor<WorkItem> {
 	private ActivityInstance instance;
 	private Actor sender;
 	private Actor owner;
+	private Integer priority;
+	private Integer taskType;
+	private Integer sn;
 
 	public CreateWorkItemExecutor(ActivityInstance instance, Actor sender, Actor owner) {
 		this.instance = instance;
@@ -34,6 +38,18 @@ public class CreateWorkItemExecutor extends Executor<WorkItem> {
 		this.owner = owner;
 	}
 
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
+
+	public void setTaskType(Integer taskType) {
+		this.taskType = taskType;
+	}
+
+	public void setSn(Integer sn) {
+		this.sn = sn;
+	}
+
 	@Override
 	public WorkItem doExecure(IWorkflowContext context) {
 
@@ -46,12 +62,15 @@ public class CreateWorkItemExecutor extends Executor<WorkItem> {
 		task.setActivityInstance(this.instance);
 		task.setParent(this.parent);
 		task.setDepth(depth);
-		task.setSender(sender);
-		task.setOwner(owner);
+		task.setSender(this.sender);
+		task.setOwner(this.owner);
+		task.setStatus(InstanceStatus.Running);
+		task.setPriority(this.priority);
+		task.setTaskType(this.taskType);
+		task.setSn(this.sn);
 
 		storageService.insertWorkItem(task);
 
 		return task;
 	}
-
 }

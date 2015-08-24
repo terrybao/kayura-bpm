@@ -4,14 +4,12 @@
  */
 package org.kayura.bpm.kernel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.kayura.bpm.models.Activity;
-import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.Node;
 import org.kayura.bpm.models.StartNode;
 import org.kayura.bpm.types.Actor;

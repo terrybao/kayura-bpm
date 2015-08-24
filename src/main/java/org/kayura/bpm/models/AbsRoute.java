@@ -9,9 +9,10 @@ package org.kayura.bpm.models;
  */
 public abstract class AbsRoute extends Node {
 
-	// single, multi
-	public final static Integer RouteTypes_Single = 0;
-	public final static Integer RouteTypes_Multi = 1;
+	public static class RouteTypes {
+		public final static Integer Single = 0;
+		public final static Integer Multi = 1;
+	}
 
 	private Integer routeType;
 
@@ -21,7 +22,7 @@ public abstract class AbsRoute extends Node {
 
 	public AbsRoute(WorkflowProcess parent, Integer nodeType, String code) {
 		super(parent, nodeType, code);
-		this.routeType = RouteTypes_Single;
+		this.routeType = RouteTypes.Single;
 	}
 
 	public Integer getRouteType() {

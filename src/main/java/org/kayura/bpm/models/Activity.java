@@ -12,20 +12,22 @@ import org.kayura.utils.StringUtils;
  */
 public class Activity extends Node {
 
-	public final static Integer HandleTypes_Single = 0;
-	public final static Integer HandleTypes_Sequence = 1;
-	public final static Integer HandleTypes_All = 2;
-	public final static Integer HandleTypes_Scale = 3;
+	public static class HandleTypes {
+		public final static Integer Single = 0;
+		public final static Integer Sequence = 1;
+		public final static Integer All = 2;
+		public final static Integer Scale = 3;
+	}
 
 	private List<ActivityActor> actors = new ArrayList<ActivityActor>();
-	private Integer handleType = HandleTypes_All;
+	private Integer handleType = HandleTypes.All;
 
 	public Activity() {
 
 	}
 
 	public Activity(WorkflowProcess parent, String code) {
-		super(parent, NodeTypes_Activity, code);
+		super(parent, NodeTypes.Activity, code);
 	}
 
 	public Integer getHandleType() {

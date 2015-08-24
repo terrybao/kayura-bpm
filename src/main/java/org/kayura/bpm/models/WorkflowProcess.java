@@ -11,7 +11,7 @@ public class WorkflowProcess extends WfElement {
     private BizForm bizForm;
     private Integer version;
     private String modifier;
-    private Integer status = DefineStatus.design;
+    private Integer status = DefineStatus.Design;
     
     private StartNode startNode;
     private List<Activity> activities = new ArrayList<Activity>();

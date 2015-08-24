@@ -1,14 +1,11 @@
 package org.kayura.bpm.organize.models;
 
-public class Employee {
+public class Company {
 
 	private String id;
+	private String parentId;
 	private String displayName;
 	private Integer status;
-
-	public Employee() {
-
-	}
 
 	public String getId() {
 		return id;
@@ -16,6 +13,14 @@ public class Employee {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 
 	public String getDisplayName() {

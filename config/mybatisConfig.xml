@@ -5,7 +5,8 @@
 	<properties resource="db.properties" />
 
 	<typeAliases>
-		<typeAlias type="org.kayura.mybatis.type.JsonTypeHandler" alias="jsonTypeHandler" />
+		<typeAlias type="org.kayura.mybatis.type.JsonTypeHandler"
+			alias="jsonTypeHandler" />
 	</typeAliases>
 
 	<!-- 数据库环境配置节 -->
@@ -23,7 +24,8 @@
 		</environment>
 	</environments>
 	<mappers>
-		<mapper class="org.kayura.bpm.storage.impl.mapper.DefineMapper" />
+		<mapper class="org.kayura.bpm.organize.impl.mapper.OrganizeMapper" />
+		<package name="org.kayura.bpm.storage.impl.mapper" />
 	</mappers>
 
 </configuration>

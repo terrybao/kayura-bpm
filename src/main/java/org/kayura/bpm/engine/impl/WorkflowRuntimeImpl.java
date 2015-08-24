@@ -14,6 +14,8 @@ import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.StartNodeInstance;
 import org.kayura.bpm.kernel.WorkItem;
+import org.kayura.bpm.kernel.WorkItem.Prioritys;
+import org.kayura.bpm.kernel.WorkItem.TaskTypes;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.StartArgs;
@@ -54,19 +56,28 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 					new CreateProcessInstanceExecutor(args.getFlowCode(), args.getBizData(), creator));
 
 			// 取得可用的后续活动实例.
-			StartNodeInstance startNodeInstance = instance.getStartNodeInstance();
-			Map<Activity, List<Actor>> activityActors = startNodeInstance.findNextActivityActors(args.getVariables());
+			StartNodeInstance si = instance.getStartNodeInstance();
+			Map<Activity, List<Actor>> activityActors = si.findNextActivityActors(args.getVariables());
 
 			Map<String, List<Actor>> nextActivities = args.getNextActivities();
-			for (Activity activity : activityActors.keySet()) {
-				if (nextActivities.size() > 0 && !nextActivities.keySet().contains(activity.getId())) {
+			for (Activity nextAct : activityActors.keySet()) {
+
+				if (nextActivities.size() > 0 && !activityActors.keySet().contains(nextAct.getId())) {
 					continue;
 				}
 
-				ActivityInstance ai = this.execute(new CreateActivityInstanceExecutor(instance, activity));
-				List<Actor> actors = activityActors.get(activity);
+				CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(instance, nextAct);
+				ActivityInstance ai = this.execute(ae);
+
+				List<Actor> actors = activityActors.get(nextAct);
 				for (Actor actor : actors) {
-					WorkItem workItem = this.execute(new CreateWorkItemExecutor(ai, creator, actor));
+
+					CreateWorkItemExecutor we = new CreateWorkItemExecutor(ai, creator, actor);
+					we.setPriority(Prioritys.Lower);
+					we.setTaskType(TaskTypes.Task);
+					we.setSn(0);
+
+					this.execute(we);
 				}
 			}
 

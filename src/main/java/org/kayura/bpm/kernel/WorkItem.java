@@ -25,7 +25,7 @@ public class WorkItem {
 	private Integer priority;
 	private Integer depth;
 	private Integer taskType;
-	private InstanceStatus status;
+	private Integer status;
 	private String commint;
 	private String completedTime;
 
@@ -113,11 +113,11 @@ public class WorkItem {
 		this.taskType = taskType;
 	}
 
-	public InstanceStatus getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(InstanceStatus status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
