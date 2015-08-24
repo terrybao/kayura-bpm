@@ -85,9 +85,9 @@ public interface OrganizeMapper {
 	 * 查询指定组织或角色下的参与者信息.
 	 * 
 	 * @param args 支持参数如下：
+	 * <p>companyPath: 该公司下的所有人员.
 	 * <p>departmentPath: 该部门及子部的的所有人员.
 	 * <p>positionId: 该岗位下的所有人员.
-	 * <p>companyPath: 该公司下的所有人员.
 	 * <p>rolePath: 该角色下的所有人员.
 	 * @return 返回 {@link Actor } 的 {@link List} 集合.
 	 */

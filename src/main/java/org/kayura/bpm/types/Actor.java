@@ -7,9 +7,8 @@ public class Actor {
 	private String departId;
 	private String positionId;
 
-	public Actor(String id, String deptId) {
-		this.id = id;
-		this.setDepartId(deptId);
+	public Actor() {
+		
 	}
 
 	public String getId() {

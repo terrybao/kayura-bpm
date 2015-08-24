@@ -4,6 +4,7 @@ public class Role {
 
 	private String id;
 	private String parentId;
+	private String path;
 	private String displayName;
 	private Integer status;
 
@@ -29,6 +30,14 @@ public class Role {
 
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public String getDisplayName() {

@@ -12,6 +12,7 @@ public class Department {
 	private String id;
 	private String parentId;
 	private String companyId;
+	private String path;
 	private String displayName;
 	private Integer status;
 
@@ -37,6 +38,14 @@ public class Department {
 
 	public void setCompanyId(String companyId) {
 		this.companyId = companyId;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public String getDisplayName() {

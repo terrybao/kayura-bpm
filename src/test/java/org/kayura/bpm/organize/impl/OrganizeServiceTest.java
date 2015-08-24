@@ -6,7 +6,11 @@ package org.kayura.bpm.organize.impl;
 
 import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
 import org.kayura.bpm.organize.models.Company;
+import org.kayura.bpm.organize.models.Department;
+import org.kayura.bpm.organize.models.Employee;
+import org.kayura.bpm.organize.models.Position;
 import org.kayura.bpm.organize.models.Role;
+import org.kayura.bpm.types.Actor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,26 +53,95 @@ public class OrganizeServiceTest {
 	}
 
 	@Test
-	public void findOrgMemberByAllTest() {
+	public void findCompaniesTest() {
 		try {
-
 			List<Company> list = organizeService.findCompanies(null, null, null);
-
-			System.out.println(list);
+			System.out.println(list.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	public void findRolesByAllTest() {
+	public void findDepartmentsTest() {
 		try {
-
-			List<Role> list = organizeService.findRoles(null, null, null);
-
-			System.out.println(list);
+			List<Department> list = organizeService.findDepartments(null, null, null,
+					null);
+			System.out.println(list.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+	@Test
+	public void findPositions() {
+		try {
+			List<Position> list = organizeService.findPositions(null, null, null);
+			System.out.println(list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void findRolesTest() {
+		try {
+			List<Role> list = organizeService.findRoles(null, null, null);
+			System.out.println(list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void findEmployeesTest() {
+		try {
+			List<Employee> list = organizeService.findEmployees(null, null, null, null,
+					null, null);
+			System.out.println(list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void findActorsByCompanyTest() {
+		try {
+			List<Actor> list = organizeService.findActorsByCompany(null);
+			System.out.println(list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void findActorsByDepartmentTest() {
+		try {
+			List<Actor> list = organizeService.findActorsByDepartment(null);
+			System.out.println(list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void findActorsByPositionTest() {
+		try {
+			List<Actor> list = organizeService.findActorsByPosition(null);
+			System.out.println(list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void findActorsByRoleTest() {
+		try {
+			List<Actor> list = organizeService.findActorsByRole(null);
+			System.out.println(list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

@@ -1,5 +1,6 @@
 package org.kayura.bpm.organize.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +17,10 @@ import org.kayura.utils.StringUtils;
 
 public class OrganizeServiceImpl implements IOrganizeService {
 
-	private OrganizeMapper organizeMapper;
+	private OrganizeMapper mapper;
 
-	public void setOrganizeMapper(OrganizeMapper organizeMapper) {
-		this.organizeMapper = organizeMapper;
+	public void setOrganizeMapper(OrganizeMapper mapper) {
+		this.mapper = mapper;
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 			args.put("status", status);
 		}
 
-		return organizeMapper.findCompanies(args);
+		return mapper.findCompanies(args);
 	}
 
 	@Override
@@ -59,7 +60,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 			args.put("status", status);
 		}
 
-		return organizeMapper.findDepartments(args);
+		return mapper.findDepartments(args);
 	}
 
 	@Override
@@ -78,7 +79,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 			args.put("status", status);
 		}
 
-		return organizeMapper.findPositions(args);
+		return mapper.findPositions(args);
 	}
 
 	@Override
@@ -96,7 +97,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 			args.put("status", status);
 		}
 
-		return organizeMapper.findRoles(args);
+		return mapper.findRoles(args);
 	}
 
 	@Override
@@ -124,60 +125,67 @@ public class OrganizeServiceImpl implements IOrganizeService {
 			args.put("status", status);
 		}
 
-		return organizeMapper.findEmployees(args);
+		return mapper.findEmployees(args);
 	}
 
 	@Override
 	public List<Actor> findActorsByCompany(String companyId) {
 
-		Map<String, Object> args = new HashMap<String, Object>();
+		Company comapny = mapper.getCompanyById(companyId);
+		if (comapny != null) {
 
-		if (StringUtils.isEmpty(companyId)) {
-			args.put("companyId", companyId);
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("companyPath", comapny.getPath());
+
+			return mapper.findActors(args);
+		} else {
+			return new ArrayList<Actor>();
 		}
-
-		return organizeMapper.findActors(args);
 	}
 
 	@Override
 	public List<Actor> findActorsByDepartment(String departmentId) {
 
-		Map<String, Object> args = new HashMap<String, Object>();
+		Department department = mapper.getDepartmentById(departmentId);
+		if (department != null) {
 
-		if (StringUtils.isEmpty(departmentId)) {
-			args.put("departmentId", departmentId);
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("departmentPath", department.getPath());
+
+			return mapper.findActors(args);
+		} else {
+			return new ArrayList<Actor>();
 		}
-
-		return organizeMapper.findActors(args);
 	}
 
 	@Override
 	public List<Actor> findActorsByPosition(String positionId) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
-
 		if (StringUtils.isEmpty(positionId)) {
 			args.put("positionId", positionId);
 		}
 
-		return organizeMapper.findActors(args);
+		return mapper.findActors(args);
 	}
 
 	@Override
 	public List<Actor> findActorsByRole(String roleId) {
 
-		Map<String, Object> args = new HashMap<String, Object>();
+		Role role = mapper.getRoleById(roleId);
+		if (role != null) {
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("rolePath", role.getPath());
 
-		if (StringUtils.isEmpty(roleId)) {
-			args.put("roleId", roleId);
+			return mapper.findActors(args);
+		} else {
+			return new ArrayList<Actor>();
 		}
-
-		return organizeMapper.findActors(args);
 	}
 
 	@Override
 	public List<Actor> findActorsByEmpIds(List<String> empIds) {
-		return organizeMapper.findActorsByEmpIds(empIds);
+		return mapper.findActorsByEmpIds(empIds);
 	}
 
 }

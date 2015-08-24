@@ -23,7 +23,7 @@
 		WHERE t.Company_Id = #{id}
 	</select>
 
-	<select id="findCompanies" resultMap="companyMap">
+	<select id="findCompanies" parameterType="map" resultMap="companyMap">
 		SELECT
 			t.Company_Id,
 			t.Parent_Id,
@@ -74,7 +74,7 @@
 		WHERE t.Company_Id = #{id}
 	</select>
 	
-	<select id="findDepartments" parameterMap="map" resultMap="departmentMap">
+	<select id="findDepartments" parameterType="map" resultMap="departmentMap">
 		SELECT 
 			t.Department_Id,
 			t.Parent_Id,
@@ -108,7 +108,7 @@
 		<result property="status" column="Status" />
 	</resultMap>
 	
-	<select id="findPositions" parameterType="map" resultMap="departmentMap">
+	<select id="findPositions" parameterType="map" resultMap="positionMap">
 		SELECT 
 			t.Position_Id,
 			t.Department_Id,
@@ -132,7 +132,7 @@
 	
 	<resultMap id="employeeMap" type="org.kayura.bpm.organize.models.Employee">
 		<id property="id" column="Employee_Id" />
-		<result property="Code" column="Code"/>
+		<result property="code" column="Code"/>
 		<result property="displayName" column="DisplayName" />
 		<result property="status" column="Status" />
 	</resultMap>
@@ -144,7 +144,7 @@
 			t.DisplayName,
 			t.`Status`
 		FROM bpm_employees AS t
-		<if test="departmentId != null OR positionId != null OR companyId != null">
+		<if test="companyId != null or departmentId != null or positionId != null">
 			INNER JOIN bpm_departempposi AS dep ON dep.Employee_Id = t.Employee_Id
 			INNER JOIN bpm_department AS d ON d.Department_Id = dep.Department_Id
 		</if>
@@ -185,7 +185,7 @@
 			dep.Position_Id AS positionId
 		FROM bpm_departempposi AS dep 
 			INNER JOIN bpm_employees AS emp ON dep.Employee_Id = emp.Employee_Id 
-		<if test="departmentPath != null OR positionId != null OR companyPath != null">
+		<if test="departmentPath != null or positionId != null or companyPath != null">
 			INNER JOIN bpm_department AS d ON d.Department_Id = dep.Department_Id
 		</if>
 		<if test="companyPath != null">
