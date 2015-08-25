@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+	<constructors>
+		<item name="" class="" />
+	</constructors>
+
+	<properties resource="db.properties">
+		<property name="" value="" />
+	</properties>
+
+	<plugins>
+		<plugin class="">
+			<property name="" value="" />
+		</plugin>
+	</plugins>
+
+</configuration>

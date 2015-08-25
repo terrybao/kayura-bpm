@@ -1,7 +1,6 @@
 package org.kayura.bpm.organize;
 
 import java.util.List;
-import java.util.Map;
 
 import org.kayura.bpm.organize.models.Company;
 import org.kayura.bpm.organize.models.Department;
@@ -41,7 +40,8 @@ public interface IOrganizeService {
 	 * @param status : 数据状态.{@link DataStatus }
 	 * @return 返回 {@link Department } 的 {@link List} 集合.
 	 */
-	List<Department> findDepartments(String companyId, String parentId, String keyword, Integer status);
+	List<Department> findDepartments(String companyId, String parentId, String keyword,
+			Integer status);
 
 	/**
 	 * 查询符合条件的岗位集合.
@@ -80,8 +80,8 @@ public interface IOrganizeService {
 	 * @param status : 数据状态.{@link DataStatus }
 	 * @return 返回 {@link Employee } 的 {@link List} 集合.
 	 */
-	List<Employee> findEmployees(String companyId, String departmentId, String positionId, String roleId,
-			String keyword, Integer status);
+	List<Employee> findEmployees(String companyId, String departmentId, String positionId,
+			String roleId, String keyword, Integer status);
 
 	/**
 	 * 查询符合条件的员工信息列表。
@@ -122,7 +122,7 @@ public interface IOrganizeService {
 	 * @return 返回 {@link Actor } 的 {@link List} 集合.
 	 */
 	List<Actor> findActorsByRole(String roleId);
-	
+
 	/**
 	 * 通过员工ID集查询相应的参与者信息.
 	 * 

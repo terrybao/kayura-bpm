@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.models.WorkflowProcessTest;
-import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.storage.impl.mapper.DefineMapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +55,8 @@ public class StorageServiceTest {
 	@Test
 	public void getWorkflowProcessTest() {
 		try {
-			WorkflowProcess wp = storageService.getWorkflowProcess("A2E467A4-8BA0-4BC3-B192-56475E1A01E0");
+			WorkflowProcess wp = storageService
+					.getWorkflowProcess("A2E467A4-8BA0-4BC3-B192-56475E1A01E0");
 
 			System.out.println(wp);
 		} catch (Exception e) {

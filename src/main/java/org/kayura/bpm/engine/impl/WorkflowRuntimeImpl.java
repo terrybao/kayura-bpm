@@ -13,7 +13,6 @@ import org.kayura.bpm.exceptions.WorkflowException;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.StartNodeInstance;
-import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.kernel.WorkItem.Prioritys;
 import org.kayura.bpm.kernel.WorkItem.TaskTypes;
 import org.kayura.bpm.models.Activity;

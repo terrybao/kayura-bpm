@@ -2,7 +2,9 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.3//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 
-	<properties resource="db.properties" />
+	<properties resource="db.properties">
+		<property name="" value="" />
+	</properties>
 
 	<typeAliases>
 		<typeAlias type="org.kayura.mybatis.type.JsonTypeHandler"
