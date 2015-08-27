@@ -4,6 +4,7 @@
  */
 package org.kayura.bpm.organize.impl;
 
+import org.kayura.bpm.organize.IOrganizeService;
 import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
 import org.kayura.bpm.organize.models.Company;
 import org.kayura.bpm.organize.models.Department;
@@ -33,7 +34,7 @@ public class OrganizeServiceTest {
 
 	ObjectMapper om = new ObjectMapper();
 
-	private OrganizeServiceImpl organizeService;
+	private IOrganizeService organizeService;
 	private SqlSessionFactory sqlSessionFactory;
 	private SqlSession session;
 
@@ -43,8 +44,7 @@ public class OrganizeServiceTest {
 		sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 		session = sqlSessionFactory.openSession();
 		OrganizeMapper mapper = session.getMapper(OrganizeMapper.class);
-		organizeService = new OrganizeServiceImpl();
-		organizeService.setOrganizeMapper(mapper);
+		organizeService = new OrganizeServiceImpl(mapper);
 	}
 
 	@After

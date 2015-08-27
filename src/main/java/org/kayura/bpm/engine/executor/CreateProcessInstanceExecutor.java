@@ -39,9 +39,9 @@ public class CreateProcessInstanceExecutor extends Executor<ProcessInstance> {
 		}
 
 		ProcessInstance instance = new ProcessInstance();
+		instance.setId(KeyUtils.newId());
 		instance.setParentId(parentId);
 		instance.setProcess(workflowProcess);
-		instance.setId(KeyUtils.newId());
 		instance.setBizDataId(bizData.getId());
 		instance.setTitle(bizData.getTitle());
 		instance.setCreator(creator);

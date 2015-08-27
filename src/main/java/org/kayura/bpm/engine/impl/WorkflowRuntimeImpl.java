@@ -32,6 +32,10 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 		this.context = context;
 	}
 
+	public WorkflowRuntimeImpl(IWorkflowContext context) {
+		this.context = context;
+	}
+
 	public <T> T execute(Executor<T> exec) {
 		return exec.execute(this.context);
 	}
@@ -51,8 +55,8 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 			}
 
 			// 创建工作流实例.
-			ProcessInstance instance = execute(
-					new CreateProcessInstanceExecutor(args.getFlowCode(), args.getBizData(), creator));
+			ProcessInstance instance = execute(new CreateProcessInstanceExecutor(args.getFlowCode(),
+					args.getBizData(), creator));
 
 			// 取得可用的后续活动实例.
 			StartNodeInstance si = instance.getStartNodeInstance();

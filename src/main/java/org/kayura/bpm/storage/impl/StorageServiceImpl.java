@@ -21,6 +21,9 @@ import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.storage.impl.mapper.DefineMapper;
 import org.kayura.bpm.storage.impl.mapper.InstanceMapper;
 import org.kayura.bpm.storage.impl.po.IdNodeType;
+import org.kayura.mybatis.type.PageBounds;
+import org.kayura.type.PageList;
+import org.kayura.type.PageParams;
 import org.kayura.utils.StringUtils;
 
 public class StorageServiceImpl implements IStorageService {
@@ -32,6 +35,11 @@ public class StorageServiceImpl implements IStorageService {
 
 	}
 
+	public StorageServiceImpl(DefineMapper defineMapper, InstanceMapper instanceMapper) {
+		this.defineMapper = defineMapper;
+		this.instanceMapper = instanceMapper;
+	}
+
 	public void setDefineMapper(DefineMapper defineMapper) {
 		this.defineMapper = defineMapper;
 	}
@@ -39,6 +47,31 @@ public class StorageServiceImpl implements IStorageService {
 	public void setInstanceMapper(InstanceMapper instanceMapper) {
 		this.instanceMapper = instanceMapper;
 	}
+
+	// 工作流表单 BizForm
+
+	public BizForm getBizFormById(String id) {
+		return defineMapper.getBizFormById(id);
+	}
+
+	public PageList<BizForm> findBizForms(Map<String, Object> args, PageParams pageParams) {
+		return defineMapper.findBizForms(args, new PageBounds(pageParams));
+	}
+
+	public void saveOrUpdateBizForm(BizForm bizForm) {
+
+		if (defineMapper.bizFormExists(bizForm.getId())) {
+			defineMapper.updateBizForm(bizForm);
+		} else {
+			defineMapper.insertBizForm(bizForm);
+		}
+	}
+
+	public void updateBizFormForStatus(String id, Integer status) {
+		defineMapper.updateBizFormForStatus(id, status);
+	}
+
+	// 工作流定义
 
 	public WorkflowProcess getWorkflowProcess(String id) {
 
@@ -57,7 +90,7 @@ public class StorageServiceImpl implements IStorageService {
 
 		WorkflowProcess workflowProcess = null;
 		String id = defineMapper.getWorkflowProcessIdByMap(args);
-		if (StringUtils.isEmpty(id)) {
+		if (!StringUtils.isEmpty(id)) {
 			workflowProcess = defineMapper.selectWorkflowProcessById(id);
 		}
 		return workflowProcess;
@@ -72,8 +105,12 @@ public class StorageServiceImpl implements IStorageService {
 		if (newProcess == true) {
 
 			BizForm bizForm = workflowProcess.getBizForm();
-			Integer maxValue = defineMapper.getWorkflowProcessMaxVersion(bizForm != null ? bizForm.getId() : null);
-			workflowProcess.setVersion(maxValue != null ? (maxValue + 1) : 1);
+			String bizFormId = bizForm != null ? bizForm.getId() : null;
+
+			Integer maxValue = defineMapper.getWorkflowProcessMaxVersion(bizFormId);
+			Integer newVersion = maxValue != null ? (maxValue + 1) : 1;
+
+			workflowProcess.setVersion(newVersion);
 
 			defineMapper.insertWorkflowProcess(workflowProcess);
 		} else {
@@ -130,7 +167,8 @@ public class StorageServiceImpl implements IStorageService {
 		}
 
 		// ActivityActor
-		List<String> activityIds = activities.stream().map(s -> s.getId()).collect(Collectors.toList());
+		List<String> activityIds = activities.stream().map(s -> s.getId())
+				.collect(Collectors.toList());
 		defineMapper.deleteActivityActorByActivityIds(activityIds);
 
 		List<ActivityActor> actors = new ArrayList<ActivityActor>();

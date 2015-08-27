@@ -28,7 +28,7 @@ public class TransitionInstance {
 	}
 
 	public boolean checkExpress(Properties vars) {
-		return false;
+		return true;
 	}
 
 }

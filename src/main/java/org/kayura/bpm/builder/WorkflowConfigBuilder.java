@@ -4,6 +4,8 @@
  */
 package org.kayura.bpm.builder;
 
+import java.io.InputStream;
+
 import org.kayura.bpm.engine.Configuration;
 import org.kayura.xml.XDocument;
 
@@ -15,20 +17,10 @@ public class WorkflowConfigBuilder {
 	private XDocument document;
 	private Configuration configuration;
 
-	public XDocument getDocument() {
-		return document;
+	public WorkflowConfigBuilder(InputStream inputStream) {
+		this.document = new XDocument(inputStream);
 	}
 
-	public void setDocument(XDocument document) {
-		this.document = document;
-	}
-
-	public Configuration getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-	}
+	
 
 }

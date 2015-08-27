@@ -19,7 +19,19 @@ public class OrganizeServiceImpl implements IOrganizeService {
 
 	private OrganizeMapper mapper;
 
-	public void setOrganizeMapper(OrganizeMapper mapper) {
+	public OrganizeMapper getMapper() {
+		return mapper;
+	}
+
+	public void setMapper(OrganizeMapper mapper) {
+		this.mapper = mapper;
+	}
+
+	public OrganizeServiceImpl() {
+
+	}
+
+	public OrganizeServiceImpl(OrganizeMapper mapper) {
 		this.mapper = mapper;
 	}
 
@@ -42,8 +54,8 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	}
 
 	@Override
-	public List<Department> findDepartments(String companyId, String parentId,
-			String keyword, Integer status) {
+	public List<Department> findDepartments(String companyId, String parentId, String keyword,
+			Integer status) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
 
@@ -64,8 +76,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	}
 
 	@Override
-	public List<Position> findPositions(String departmentId, String keyword,
-			Integer status) {
+	public List<Position> findPositions(String departmentId, String keyword, Integer status) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
 
@@ -101,8 +112,8 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	}
 
 	@Override
-	public List<Employee> findEmployees(String companyId, String departmentId,
-			String positionId, String roleId, String keyword, Integer status) {
+	public List<Employee> findEmployees(String companyId, String departmentId, String positionId,
+			String roleId, String keyword, Integer status) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
 
@@ -129,58 +140,92 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	}
 
 	@Override
-	public List<Actor> findActorsByCompany(String companyId) {
+	public List<Actor> findActorsByCompany(List<String> companyIds) {
 
-		Company comapny = mapper.getCompanyById(companyId);
-		if (comapny != null) {
+		List<Actor> actors = new ArrayList<Actor>();
+		for (String companyId : companyIds) {
 
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("companyPath", comapny.getPath());
+			Company comapny = mapper.getCompanyById(companyId);
+			if (comapny != null) {
 
-			return mapper.findActors(args);
-		} else {
-			return new ArrayList<Actor>();
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put("companyPath", comapny.getPath());
+
+				List<Actor> list = mapper.findActors(args);
+				for (Actor actor : list) {
+					if (!actors.contains(actor)) {
+						actors.add(actor);
+					}
+				}
+			}
 		}
+
+		return actors;
 	}
 
 	@Override
-	public List<Actor> findActorsByDepartment(String departmentId) {
+	public List<Actor> findActorsByDepartment(List<String> departmentIds) {
 
-		Department department = mapper.getDepartmentById(departmentId);
-		if (department != null) {
+		List<Actor> actors = new ArrayList<Actor>();
+		for (String departmentId : departmentIds) {
 
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("departmentPath", department.getPath());
+			Department department = mapper.getDepartmentById(departmentId);
+			if (department != null) {
 
-			return mapper.findActors(args);
-		} else {
-			return new ArrayList<Actor>();
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put("departmentPath", department.getPath());
+
+				List<Actor> list = mapper.findActors(args);
+				for (Actor actor : list) {
+					if (!actors.contains(actor)) {
+						actors.add(actor);
+					}
+				}
+			}
 		}
+		return actors;
 	}
 
 	@Override
-	public List<Actor> findActorsByPosition(String positionId) {
+	public List<Actor> findActorsByPosition(List<String> positionIds) {
 
-		Map<String, Object> args = new HashMap<String, Object>();
-		if (StringUtils.isEmpty(positionId)) {
+		List<Actor> actors = new ArrayList<Actor>();
+		for (String positionId : positionIds) {
+
+			Map<String, Object> args = new HashMap<String, Object>();
 			args.put("positionId", positionId);
-		}
 
-		return mapper.findActors(args);
+			List<Actor> list = mapper.findActors(args);
+			for (Actor actor : list) {
+				if (!actors.contains(actor)) {
+					actors.add(actor);
+				}
+			}
+		}
+		return actors;
 	}
 
 	@Override
-	public List<Actor> findActorsByRole(String roleId) {
+	public List<Actor> findActorsByRole(List<String> roleIds) {
 
-		Role role = mapper.getRoleById(roleId);
-		if (role != null) {
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("rolePath", role.getPath());
+		List<Actor> actors = new ArrayList<Actor>();
+		for (String roleId : roleIds) {
 
-			return mapper.findActors(args);
-		} else {
-			return new ArrayList<Actor>();
+			Role role = mapper.getRoleById(roleId);
+			if (role != null) {
+
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put("rolePath", role.getPath());
+
+				List<Actor> list = mapper.findActors(args);
+				for (Actor actor : list) {
+					if (!actors.contains(actor)) {
+						actors.add(actor);
+					}
+				}
+			}
 		}
+		return actors;
 	}
 
 	@Override

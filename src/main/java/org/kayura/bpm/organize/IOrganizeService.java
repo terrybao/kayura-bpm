@@ -91,7 +91,7 @@ public interface IOrganizeService {
 	 * @param companyId : 员工所属的公司Id.
 	 * @return 返回 {@link Actor } 的 {@link List} 集合.
 	 */
-	List<Actor> findActorsByCompany(String companyId);
+	List<Actor> findActorsByCompany(List<String> companyIds);
 
 	/**
 	 * 查询符合条件的员工信息列表。
@@ -101,7 +101,7 @@ public interface IOrganizeService {
 	 * @param departmentId : 指定的所属部门ID.
 	 * @return 返回 {@link Actor } 的 {@link List} 集合.
 	 */
-	List<Actor> findActorsByDepartment(String departmentId);
+	List<Actor> findActorsByDepartment(List<String> departmentIds);
 
 	/**
 	 * 查询符合条件的员工信息列表。
@@ -111,7 +111,7 @@ public interface IOrganizeService {
 	 * @param positionId : 指定的所属岗位ID.
 	 * @return 返回 {@link Actor } 的 {@link List} 集合.
 	 */
-	List<Actor> findActorsByPosition(String positionId);
+	List<Actor> findActorsByPosition(List<String> positionIds);
 
 	/**
 	 * 查询符合条件的员工信息列表。
@@ -121,7 +121,7 @@ public interface IOrganizeService {
 	 * @param roleId : 指定的所属角色ID.
 	 * @return 返回 {@link Actor } 的 {@link List} 集合.
 	 */
-	List<Actor> findActorsByRole(String roleId);
+	List<Actor> findActorsByRole(List<String> roleIds);
 
 	/**
 	 * 通过员工ID集查询相应的参与者信息.

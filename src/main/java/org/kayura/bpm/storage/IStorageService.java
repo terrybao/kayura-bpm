@@ -1,9 +1,15 @@
 package org.kayura.bpm.storage;
 
+import java.util.Map;
+
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.WorkItem;
+import org.kayura.bpm.models.BizForm;
+import org.kayura.bpm.models.DefineStatus;
 import org.kayura.bpm.models.WorkflowProcess;
+import org.kayura.type.PageList;
+import org.kayura.type.PageParams;
 
 /**
  * 工作流系统存储服务接口.
@@ -13,7 +19,41 @@ import org.kayura.bpm.models.WorkflowProcess;
  */
 public interface IStorageService {
 
-	// 工作流定义存储接口.
+	// **************** 工作流表单存储接口 ***********************
+
+	/**
+	 * 获取一个工作流表单信息对象.
+	 * 
+	 * @param id 工作流表单Id.
+	 * @return 返回获取的结果.
+	 */
+	BizForm getBizFormById(String id);
+
+	/**
+	 * 查询符件条件的工作流表单列表.
+	 * 
+	 * @param args 条件参数.
+	 * @param pageParams 分页参数.
+	 * @return 返回符合条件的列表.
+	 */
+	PageList<BizForm> findBizForms(Map<String, Object> args, PageParams pageParams);
+
+	/**
+	 * 保存或更新一个工作流表单定义信息.
+	 * 
+	 * @param bizForm 工作流表单对象.
+	 */
+	void saveOrUpdateBizForm(BizForm bizForm);
+
+	/**
+	 * 仅用于更新工作流表单的状态信息.
+	 * 
+	 * @param id 工作流表单Id.
+	 * @param status 状态类型.{@link DefineStatus }
+	 */
+	void updateBizFormForStatus(String id, Integer status);
+
+	// ****************** 工作流定义存储接口 **********************
 
 	/**
 	 * 获取一个工作流的完整定义信息.
@@ -68,4 +108,5 @@ public interface IStorageService {
 	 * @param workItem 工作项对象.
 	 */
 	void insertWorkItem(WorkItem workItem);
+
 }

@@ -4,9 +4,18 @@
  */
 package org.kayura.bpm.engine;
 
+import java.io.InputStream;
+
 /**
  * @author liangxia@live.com
  */
-public class Configuration {
-	
+public class WorkflowRuntimeBuilder {
+
+	public IWorkflowRuntime build(InputStream inputStream) {
+
+		
+		
+		return null;
+	}
+
 }

@@ -28,6 +28,15 @@ public class WorkflowContextImpl implements IWorkflowContext {
 		this.organizeService = organizeService;
 	}
 
+	public WorkflowContextImpl() {
+
+	}
+
+	public WorkflowContextImpl(IStorageService storageService, IOrganizeService organizeService) {
+		this.storageService = storageService;
+		this.organizeService = organizeService;
+	}
+
 	@Override
 	public <T> T bind(T result) {
 		if (result != null) {

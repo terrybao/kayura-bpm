@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.kayura.bpm.storage.impl.mapper.DefineMapper">
-    
-    <!-- resultMap -->
-    
+
+	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流业务表单. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+
     <resultMap id="bizFormMap" type="org.kayura.bpm.models.BizForm">
         <id column="BizForm_Id" property="id" />
         <result column="Code" property="code" />
@@ -13,85 +13,7 @@
         <result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
         <result column="Status" property="status" />
     </resultMap>
-
-	<resultMap id="workflowPorcessMap" type="org.kayura.bpm.models.WorkflowProcess">
-		<id property="id" column="Process_Id" />
-		<result property="code" column="Code" />
-		<result property="name" column="Name" />
-		<result property="description" column="Description" />
-		<result property="version" column="Version" />
-		<result property="createdTime" column="CreatedTime" />
-		<result property="modifiedTime" column="ModifiedTime" />
-		<result property="modifier" column="Modifier" />
-		<result property="listeners" column="Listeners" typeHandler="jsonTypeHandler" />
-		<result property="attributes" column="Attributes" typeHandler="jsonTypeHandler" />
-		<result property="status" column="Status" />
-		
-		<association property="bizForm" column="BizForm_Id" select="getBizFormById" />
-		<association property="parent" column="Parent_Id" select="selectWorkflowProcessById" />
-		
-		<association property="startNode" column="Process_Id" select="selectStartNodeByProcess" />
-		<collection property="activities" column="Process_Id" select="selectActivitiesByProcess" />
-		<collection property="routes" column="Process_Id" select="selectRoutesByProcess" />
-		<collection property="endNodes" column="Process_Id" select="selectEndNodesByProcess" />
-		<collection property="transitions" column="Process_Id" select="selectTransitionByProcess" />
-	</resultMap>
-
-	<resultMap id="nodeMap" type="org.kayura.bpm.models.Node">
-		<id column="Node_Id" property="id" />
-		<result column="Code" property="code" />
-		<result column="Name" property="name" />
-		<result column="Description" property="description" />
-		<result column="Listeners" property="listeners" typeHandler="jsonTypeHandler" />
-		<result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
-		<result column="CreatedTime" property="createdTime" />
-		<result column="ModifiedTime" property="modifiedTime" />
-		
-		<association property="parent" column="Process_Id" select="selectWorkflowProcessById" />
-		<collection property="fromTransitions" column="Node_Id" select="selectTransitionByFrom" />
-		<collection property="toTransitions" column="Node_Id" select="selectTransitionByTo" />
-		
-		<!-- 0 StartNode; 1 Activity; 2 Route; 3 EndNode; -->
-		<discriminator javaType="int" column="NodeType">
-			<case value="0" resultType="org.kayura.bpm.models.StartNode" />
-			<case value="1" resultType="org.kayura.bpm.models.Activity">
-				<result column="HandleType" property="handleType" />
-				<collection property="actors" column="Node_Id" select="selectActivityActorsByNodeId" />
-			</case>
-			<case value="2" resultType="org.kayura.bpm.models.Route">
-				<result column="RouteType" property="routeType" />
-			</case>
-			<case value="3" resultType="org.kayura.bpm.models.EndNode" />
-		</discriminator>
-	</resultMap>
-	
-	<resultMap id="transitionMap" type="org.kayura.bpm.models.Transition">
-	    <id property="id" column="Transition_Id" />
-		<result column="Code" property="code" />
-		<result column="Name" property="name" />
-		<result column="Description" property="description" />
-		<result column="Listeners" property="listeners" typeHandler="jsonTypeHandler" />
-		<result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
-		<result column="CreatedTime" property="createdTime" />
-		<result column="CreatedTime" property="createdTime" />
-		<result column="ModifiedTime" property="modifiedTime" />
-		<result column="Conditions" property="conditions" />
-		<association property="parent" column="Process_Id" select="selectWorkflowProcessById"/>
-		<association property="fromNode" column="FromNode_Id" select="selectActivityById"/>
-		<association property="toNode" column="ToNode_Id" select="selectActivityById"/>
-	</resultMap>
-	
-	<resultMap id="activityActorMap" type="org.kayura.bpm.models.ActivityActor">
-		<id property="id" column="ActivityActor_Id" />
-		<result property="actorId" column="Actor_Id" />
-		<result property="displayName" column="DisplayName" />
-		<result property="sn" column="Sn" />
-		<result property="actorType" column="ActorType" />
-		<association property="activity" column="Activity_Id" select="selectActivityById" />
-	</resultMap>
-	
-    <!-- SQL片段 -->
-    
+        
     <sql id="bizFormColumns">
         ${alias}.BizForm_Id, 
         ${alias}.Code, 
@@ -102,97 +24,6 @@
         ${alias}.Status
     </sql>
     
-	<sql id="workflowPorcessColumns">
-	    ${alias}.Process_Id, 
-	    ${alias}.Parent_Id, 
-	    ${alias}.BizForm_Id, 
-	    ${alias}.Code, 
-	    ${alias}.Name, 
-	    ${alias}.Description, 
-	    ${alias}.Version,
-		${alias}.CreatedTime, 
-	    ${alias}.ModifiedTime, 
-	    ${alias}.Modifier, 
-	    ${alias}.Listeners, 
-	    ${alias}.Attributes, 
-	    ${alias}.Status
-	</sql>
-	
-	<sql id="nodeColumns">
-    	${alias}.Node_Id, 
-    	${alias}.Process_Id, 
-    	${alias}.Code, 
-    	${alias}.Name, 
-    	${alias}.Description, 
-    	${alias}.NodeType, 
-    	${alias}.Listeners,
-		${alias}.Attributes, 
-		${alias}.CreatedTime, 
-		${alias}.ModifiedTime, 
-		${alias}.RouteType, 
-		${alias}.HandleType
-	</sql>
-
-	<sql id="insertNodeColumns">
-    	Node_Id,
-    	Process_Id,
-    	Code,
-    	Name,
-    	Description,
-    	NodeType,
-    	Listeners,
-		Attributes, 
-		CreatedTime, 
-		ModifiedTime
-	</sql>
-	
-	<sql id="insertNodeValues">
-	    #{id},
-    	#{parent.id},
-    	#{code},
-    	#{name},
-    	#{description},
-    	#{nodeType},
-    	#{listeners,typeHandler=jsonTypeHandler},
-		#{attributes,typeHandler=jsonTypeHandler},
-		#{createdTime}, 
-		#{modifiedTime}
-	</sql>
-
-	<sql id="updateNodeColumns">
-    	Code = #{code},
-    	Name = #{name},
-    	Description = #{description},
-    	Listeners = #{listeners,typeHandler=jsonTypeHandler},
-		Attributes = #{attributes,typeHandler=jsonTypeHandler}, 
-		ModifiedTime = #{modifiedTime}
-	</sql>
-
-	<sql id="activityActorColumns">
-		${alias}.ActivityActor_Id,
-		${alias}.Activity_Id,
-		${alias}.Actor_Id,
-		${alias}.Sn,
-		${alias}.ActorType,
-		${alias}.DisplayName
-	</sql>
-	
-	<sql id="transitionColumns">
-	    ${alias}.Transition_Id,
-		${alias}.FromNode_Id,
-		${alias}.ToNode_Id,
-		${alias}.Process_Id,
-		${alias}.Code,
-		${alias}.Name,
-		${alias}.Description,
-		${alias}.Listeners,
-		${alias}.Attributes,
-		${alias}.CreatedTime,
-		${alias}.ModifiedTime,
-		${alias}.Conditions
-	</sql>
-
-
     <select id="getBizFormById" parameterType="string" resultMap="bizFormMap">
         SELECT 
         	<include refid="bizFormColumns">
@@ -216,6 +47,12 @@
 		        ( t.Status = #{status} )
 		    </if>
 		</where>
+    </select>
+    
+    <select id="bizFormExists" parameterType="string" resultType="boolean">
+        SELECT COUNT(1) > 0 
+		FROM Bpm_BizForm t 
+		WHERE t.BizForm_Id = #{id} 
     </select>
     
     <insert id="insertBizForm" parameterType="org.kayura.bpm.models.BizForm">
@@ -262,6 +99,45 @@
     
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流过程定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 
+	<resultMap id="workflowPorcessMap" type="org.kayura.bpm.models.WorkflowProcess">
+		<id property="id" column="Process_Id" />
+		<result property="code" column="Code" />
+		<result property="name" column="Name" />
+		<result property="description" column="Description" />
+		<result property="version" column="Version" />
+		<result property="createdTime" column="CreatedTime" />
+		<result property="modifiedTime" column="ModifiedTime" />
+		<result property="modifier" column="Modifier" />
+		<result property="listeners" column="Listeners" typeHandler="jsonTypeHandler" />
+		<result property="attributes" column="Attributes" typeHandler="jsonTypeHandler" />
+		<result property="status" column="Status" />
+		
+		<association property="bizForm" column="BizForm_Id" select="getBizFormById" />
+		<association property="parent" column="Parent_Id" select="selectWorkflowProcessById" />
+		
+		<association property="startNode" column="Process_Id" select="selectStartNodeByProcess" />
+		<collection property="activities" column="Process_Id" select="selectActivitiesByProcess" />
+		<collection property="routes" column="Process_Id" select="selectRoutesByProcess" />
+		<collection property="endNodes" column="Process_Id" select="selectEndNodesByProcess" />
+		<collection property="transitions" column="Process_Id" select="selectTransitionByProcess" />
+	</resultMap>
+	
+	<sql id="workflowPorcessColumns">
+	    ${alias}.Process_Id, 
+	    ${alias}.Parent_Id, 
+	    ${alias}.BizForm_Id, 
+	    ${alias}.Code, 
+	    ${alias}.Name, 
+	    ${alias}.Description, 
+	    ${alias}.Version,
+		${alias}.CreatedTime, 
+	    ${alias}.ModifiedTime, 
+	    ${alias}.Modifier, 
+	    ${alias}.Listeners, 
+	    ${alias}.Attributes, 
+	    ${alias}.Status
+	</sql>
+	
 	<select id="getWorkflowProcessIdByMap" parameterType="map" resultType="string">
 		SELECT t.Process_Id
 		FROM Bpm_Process t 
@@ -276,7 +152,7 @@
 			    and ( t.Version = #{version} ) 
 			</if>
 			<if test="status != null">
-			    and ( t.`Status` = status ) 
+			    and ( t.`Status` = #{status} ) 
 			</if>
 		</where>
 		ORDER BY t.Version DESC
@@ -286,16 +162,15 @@
 	<select id="getWorkflowProcessMaxVersion" parameterType="string" resultType="int">
 		SELECT Max(t.Version)
 		FROM Bpm_Process t
-		<where>
+		WHERE
 			<choose>
-				<when test="bizFlowId != null">
-					( t.BizForm_Id = #{bizFlowId} )
+				<when test="value != null">
+					( t.BizForm_Id = #{value} )
 				</when>
 				<otherwise>
 					( t.BizForm_Id IS NULL )
 				</otherwise>
 			</choose>
-		</where>
 	</select>
 	
 	<select id="selectWorkflowProcessById" parameterType="string" resultMap="workflowPorcessMap">
@@ -379,6 +254,126 @@
 	
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流环节定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 
+	<resultMap id="nodeMap" type="org.kayura.bpm.models.Node">
+		<id column="Node_Id" property="id" />
+		<result column="Code" property="code" />
+		<result column="Name" property="name" />
+		<result column="Description" property="description" />
+		<result column="Listeners" property="listeners" typeHandler="jsonTypeHandler" />
+		<result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
+		<result column="CreatedTime" property="createdTime" />
+		<result column="ModifiedTime" property="modifiedTime" />
+		
+		<association property="parent" column="Process_Id" select="selectWorkflowProcessById" />
+		<collection property="fromTransitions" column="Node_Id" select="selectTransitionByFrom" />
+		<collection property="toTransitions" column="Node_Id" select="selectTransitionByTo" />
+		
+		<!-- 0 StartNode; 1 Activity; 2 Route; 3 EndNode; -->
+		<discriminator javaType="int" column="NodeType">
+			<case value="0" resultType="org.kayura.bpm.models.StartNode" />
+			<case value="1" resultType="org.kayura.bpm.models.Activity">
+				<result column="HandleType" property="handleType" />
+				<collection property="actors" column="Node_Id" select="selectActivityActorsByNodeId" />
+			</case>
+			<case value="2" resultType="org.kayura.bpm.models.Route">
+				<result column="RouteType" property="routeType" />
+			</case>
+			<case value="3" resultType="org.kayura.bpm.models.EndNode" />
+		</discriminator>
+	</resultMap>
+	
+	<resultMap id="activityActorMap" type="org.kayura.bpm.models.ActivityActor">
+		<id property="id" column="ActivityActor_Id" />
+		<result property="actorId" column="Actor_Id" />
+		<result property="displayName" column="DisplayName" />
+		<result property="sn" column="Sn" />
+		<result property="actorType" column="ActorType" />
+		<association property="activity" column="Activity_Id" select="selectActivityById" />
+	</resultMap>
+	
+	<resultMap id="transitionMap" type="org.kayura.bpm.models.Transition">
+	    <id property="id" column="Transition_Id" />
+		<result column="Code" property="code" />
+		<result column="Name" property="name" />
+		<result column="Description" property="description" />
+		<result column="Listeners" property="listeners" typeHandler="jsonTypeHandler" />
+		<result column="Attributes" property="attributes" typeHandler="jsonTypeHandler" />
+		<result column="CreatedTime" property="createdTime" />
+		<result column="CreatedTime" property="createdTime" />
+		<result column="ModifiedTime" property="modifiedTime" />
+		<result column="Conditions" property="conditions" />
+		<association property="parent" column="Process_Id" select="selectWorkflowProcessById"/>
+		<association property="fromNode" column="FromNode_Id" select="selectActivityById"/>
+		<association property="toNode" column="ToNode_Id" select="selectActivityById"/>
+	</resultMap>
+
+	<!--  SQL 片段 -->
+
+	<sql id="nodeColumns">
+    	${alias}.Node_Id, 
+    	${alias}.Process_Id, 
+    	${alias}.Code, 
+    	${alias}.Name, 
+    	${alias}.Description, 
+    	${alias}.NodeType, 
+    	${alias}.Listeners,
+		${alias}.Attributes, 
+		${alias}.CreatedTime, 
+		${alias}.ModifiedTime, 
+		${alias}.RouteType, 
+		${alias}.HandleType
+	</sql>
+
+	<sql id="insertNodeColumns">
+    	Node_Id,
+    	Process_Id,
+    	Code,
+    	Name,
+    	Description,
+    	NodeType,
+    	Listeners,
+		Attributes, 
+		CreatedTime, 
+		ModifiedTime
+	</sql>
+	
+	<sql id="insertNodeValues">
+	    #{id},
+    	#{parent.id},
+    	#{code},
+    	#{name},
+    	#{description},
+    	#{nodeType},
+    	#{listeners,typeHandler=jsonTypeHandler},
+		#{attributes,typeHandler=jsonTypeHandler},
+		#{createdTime}, 
+		#{modifiedTime}
+	</sql>
+
+	<sql id="updateNodeColumns">
+    	Code = #{code},
+    	Name = #{name},
+    	Description = #{description},
+    	Listeners = #{listeners,typeHandler=jsonTypeHandler},
+		Attributes = #{attributes,typeHandler=jsonTypeHandler}, 
+		ModifiedTime = #{modifiedTime}
+	</sql>
+	
+	<sql id="transitionColumns">
+	    ${alias}.Transition_Id,
+		${alias}.FromNode_Id,
+		${alias}.ToNode_Id,
+		${alias}.Process_Id,
+		${alias}.Code,
+		${alias}.Name,
+		${alias}.Description,
+		${alias}.Listeners,
+		${alias}.Attributes,
+		${alias}.CreatedTime,
+		${alias}.ModifiedTime,
+		${alias}.Conditions
+	</sql>
+	
 	<!-- 仅查询节点ID与节点类型. -->
 	<select id="findNodeIdsNodeType" parameterType="string" 
 	    resultType="org.kayura.bpm.storage.impl.po.IdNodeType">
@@ -388,7 +383,6 @@
 		WHERE ( t.Process_Id = #{value} )
 	</select>
 
-	
 	<!-- 根据过程ID获取唯一的开始节点. -->
 	<select id="selectStartNodeByProcess" parameterType="string" resultMap="nodeMap">
 	    SELECT
@@ -601,6 +595,15 @@
 	
 	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流活动参与者SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
 
+	<sql id="activityActorColumns">
+		${alias}.ActivityActor_Id,
+		${alias}.Activity_Id,
+		${alias}.Actor_Id,
+		${alias}.Sn,
+		${alias}.ActorType,
+		${alias}.DisplayName
+	</sql>
+	
 	<select id="selectActivityActorsByNodeId" parameterType="string" resultMap="activityActorMap" >
 	    SELECT
 			<include refid="activityActorColumns">

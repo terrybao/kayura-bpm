@@ -20,7 +20,9 @@ public interface DefineMapper {
     
     /* >>>>>>>>>>>>>>> BizForm <<<<<<<<<<<<< */
     
-    BizForm getBizFormById(String id);
+	BizForm getBizFormById(String id);
+    
+    Boolean bizFormExists(String id);
     
     PageList<BizForm> findBizForms(Map<String, Object> args, PageBounds pageBouds);
     

@@ -15,7 +15,7 @@
 		<association property="process" column="Process_Id" select="selectWorkflowProcessById" />
 		<association property="creator" javaType="org.kayura.bpm.types.Actor">
 			<id property="id" column="Creater_Id" />
-			<result property="deptId" column="CreaterDept_Id" />
+			<result property="departId" column="CreaterDept_Id" />
 		</association>
 	</resultMap>
 	
@@ -66,7 +66,7 @@
 			#{title},
 			#{bizDataId},
 			#{creator.id},
-			#{creator.deptId},
+			#{creator.departId},
 			#{createdTime},
 			#{completedTime},
 			#{status}
@@ -80,7 +80,7 @@
 			Title = #{title},
 			BizData_Id = #{bizDataId},
 			Creater_Id = #{creater.id},
-			CreaterDept_Id = #{creater.deptId},
+			CreaterDept_Id = #{creater.departId},
 			CreatedTime = #{createdTime},
 			CompletedTime = #{completedTime},
 			Status = #{status}

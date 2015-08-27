@@ -136,43 +136,56 @@ public class ActivityInstance extends AbsNodeInstance {
 		// 处理公司.
 		List<String> companyIds = actActors.stream()
 				.filter(s -> s.getActorType() == ActorTypes.Company)
-				.map(s -> s.getActorId()).collect(Collectors.toList());
-		for (String id : companyIds) {
-			List<Actor> list = service.findActorsByCompany(id);
-			actors.addAll(list);
+				.map(s -> s.getActorId())
+				.collect(Collectors.toList());
+		if (companyIds.size() > 0) {
+			List<Actor> list = service.findActorsByCompany(companyIds);
+			if (list.size() > 0) {
+				actors.addAll(list);
+			}
 		}
 
 		// 处理部门人员.
 		List<String> departIds = actActors.stream()
 				.filter(s -> s.getActorType() == ActorTypes.Depart)
-				.map(s -> s.getActorId()).collect(Collectors.toList());
-		for (String id : departIds) {
-			List<Actor> list = service.findActorsByDepartment(id);
-			actors.addAll(list);
+				.map(s -> s.getActorId())
+				.collect(Collectors.toList());
+		if (departIds.size() > 0) {
+			List<Actor> list = service.findActorsByDepartment(departIds);
+			if (list.size() > 0) {
+				actors.addAll(list);
+			}
 		}
 
 		// 处理岗位人员.
 		List<String> positionIds = actActors.stream()
 				.filter(s -> s.getActorType() == ActorTypes.Position)
-				.map(s -> s.getActorId()).collect(Collectors.toList());
-		for (String id : positionIds) {
-			List<Actor> list = service.findActorsByPosition(id);
-			actors.addAll(list);
+				.map(s -> s.getActorId())
+				.collect(Collectors.toList());
+		if (positionIds.size() > 0) {
+			List<Actor> list = service.findActorsByPosition(positionIds);
+			if (list.size() > 0) {
+				actors.addAll(list);
+			}
 		}
 
 		// 处理角色人员.
 		List<String> roleIds = actActors.stream()
-				.filter(s -> s.getActorType() == ActorTypes.Role).map(s -> s.getActorId())
+				.filter(s -> s.getActorType() == ActorTypes.Role)
+				.map(s -> s.getActorId())
 				.collect(Collectors.toList());
-		for (String id : roleIds) {
-			List<Actor> list = service.findActorsByRole(id);
-			actors.addAll(list);
+		if (roleIds.size() > 0) {
+			List<Actor> list = service.findActorsByRole(roleIds);
+			if (list.size() > 0) {
+				actors.addAll(list);
+			}
 		}
 
 		// 处理特殊人员.
 		List<String> specials = actActors.stream()
 				.filter(s -> s.getActorType() == ActorTypes.Special)
-				.map(s -> s.getActorId()).collect(Collectors.toList());
+				.map(s -> s.getActorId())
+				.collect(Collectors.toList());
 		if (specials.size() > 0) {
 			List<Actor> list = findSpecialUsers(specials);
 			if (list.size() > 0) {
@@ -182,11 +195,14 @@ public class ActivityInstance extends AbsNodeInstance {
 
 		// 处理员工.
 		List<String> userIds = actActors.stream()
-				.filter(s -> s.getActorType() == ActorTypes.User).map(s -> s.getActorId())
+				.filter(s -> s.getActorType() == ActorTypes.User)
+				.map(s -> s.getActorId())
 				.collect(Collectors.toList());
 		if (userIds.size() > 0) {
 			List<Actor> list = service.findActorsByEmpIds(userIds);
-			actors.addAll(list);
+			if (list.size() > 0) {
+				actors.addAll(list);
+			}
 		}
 
 		return actors.stream().distinct().collect(Collectors.toList());
