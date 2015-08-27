@@ -3,7 +3,7 @@ package org.kayura.bpm.models;
 public class Listener {
 
 	private String className;
-	private int sn;
+	private Integer sn;
 	private String description;
 
 	public Listener() {
@@ -23,11 +23,11 @@ public class Listener {
 		this.className = className;
 	}
 
-	public int getSn() {
+	public Integer getSn() {
 		return sn;
 	}
 
-	public void setSn(int sn) {
+	public void setSn(Integer sn) {
 		this.sn = sn;
 	}
 

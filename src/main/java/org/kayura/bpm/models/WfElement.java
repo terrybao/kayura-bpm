@@ -17,8 +17,8 @@ public abstract class WfElement {
 	protected String description;
 	private Date createdTime;
 	protected Date modifiedTime;
-	protected List<Listener> listeners;
-	protected Properties attributes;
+	protected List<Listener> listeners = new ArrayList<Listener>();
+	protected Properties attributes = new Properties();
 
 	public WfElement() {
 		this.id = KeyUtils.newId();
@@ -32,8 +32,6 @@ public abstract class WfElement {
 		this.parent = parent;
 		this.code = code;
 		this.name = code;
-		this.listeners = new ArrayList<Listener>();
-		this.attributes = new Properties();
 	}
 
 	@Override

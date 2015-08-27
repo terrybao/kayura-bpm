@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<workflowProcess code="master" name="master">
+  <listeners>
+    <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+  </listeners>
+  <properties>
+    <property name="key1" value="xialiang"/>
+  </properties>
+  <startNode code="startNode" name="开始">
+    <listeners>
+      <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+    </listeners>
+    <properties>
+      <property name="key1" value="xialiang"/>
+    </properties>
+  </startNode>
+  <endNodes>
+    <endNode code="endNode" name="endNode">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </endNode>
+  </endNodes>
+  <activities>
+    <activity code="bumen" handleType="2" name="bumen">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+      <actors>
+        <actor actorId="D99F65F8-36E8-4AF0-9450-D561BF7395E5" actorType="0"/>
+        <actor actorId="0D93478F-AC20-4BC9-B856-D924DFAF9BA6" actorType="5"/>
+      </actors>
+    </activity>
+    <activity code="jinli1" handleType="2" name="jinli1">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+      <actors>
+        <actor actorId="838637B3-36A8-4A9A-96D7-057C155667E4" actorType="4"/>
+        <actor actorId="DDE4FC5D-3BCF-487D-98CA-6EADCDB4D33A" actorType="0"/>
+      </actors>
+    </activity>
+    <activity code="jinli2" handleType="2" name="jinli2">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+      <actors>
+        <actor actorId="0AA0F9AD-B607-43E6-AD1C-4B3ECC72ACC0" actorType="4"/>
+        <actor actorId="366ED6C5-336D-4CAD-A5A0-619A84EC1650" actorType="0"/>
+      </actors>
+    </activity>
+    <activity code="zongjili" handleType="2" name="zongjili">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+      <actors>
+        <actor actorId="2E047B08-C2D1-40F8-BEC5-A38DA8427FD4" actorType="0"/>
+        <actor actorId="32AC72CD-3911-4F67-BF03-D10920261925" actorType="5"/>
+      </actors>
+    </activity>
+  </activities>
+  <routes>
+    <route code="fz" name="fz">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </route>
+    <route code="jiuhe" name="jiuhe">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </route>
+  </routes>
+  <transitions>
+    <transition code="[startNode]-&gt;[fz]" from="startNode" name="[开始]-&gt;[fz]" to="fz">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </transition>
+    <transition code="[fz]-&gt;[jinli1]" from="fz" name="[fz]-&gt;[jinli1]" to="jinli1">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </transition>
+    <transition code="[fz]-&gt;[jinli2]" from="fz" name="[fz]-&gt;[jinli2]" to="jinli2">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </transition>
+    <transition code="[jinli1]-&gt;[jiuhe]" from="jinli1" name="[jinli1]-&gt;[jiuhe]" to="jiuhe">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </transition>
+    <transition code="[jinli2]-&gt;[jiuhe]" from="jinli2" name="[jinli2]-&gt;[jiuhe]" to="jiuhe">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </transition>
+    <transition code="[jiuhe]-&gt;[zongjili]" from="jiuhe" name="[jiuhe]-&gt;[zongjili]" to="zongjili">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </transition>
+    <transition code="[zongjili]-&gt;[endNode]" from="zongjili" name="[zongjili]-&gt;[endNode]" to="endNode">
+      <listeners>
+        <listener className="org.kayura.bpm.models.WorkflowProcessTest" sn="1"/>
+      </listeners>
+      <properties>
+        <property name="key1" value="xialiang"/>
+      </properties>
+    </transition>
+  </transitions>
+</workflowProcess>
