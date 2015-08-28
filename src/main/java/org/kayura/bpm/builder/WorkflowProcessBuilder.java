@@ -360,7 +360,7 @@ public class WorkflowProcessBuilder {
 			String name = element.getName();
 
 			if (StringUtils.isEmpty(name)) {
-				throw new WorkflowException("存在未定义名字的环节。");
+				throw new WorkflowException("存在未定义名称的环节。");
 			}
 
 			context.setAttribute("name", name);
