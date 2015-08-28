@@ -1,5 +1,7 @@
 package org.kayura.bpm.kernel;
 
+import java.util.Date;
+
 import org.kayura.bpm.types.Actor;
 
 public class WorkItem {
@@ -21,6 +23,7 @@ public class WorkItem {
 	private Actor sender;
 	private Actor owner;
 	private Actor handler;
+	private Date alarmTime;
 	private Integer sn;
 	private Integer priority;
 	private Integer depth;
@@ -79,6 +82,14 @@ public class WorkItem {
 
 	public void setHandler(Actor handler) {
 		this.handler = handler;
+	}
+
+	public Date getAlarmTime() {
+		return alarmTime;
+	}
+
+	public void setAlarmTime(Date alarmTime) {
+		this.alarmTime = alarmTime;
 	}
 
 	public Integer getSn() {

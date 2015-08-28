@@ -133,5 +133,39 @@
 			ExecuteType = #{executeType}
 		WHERE ActivityInstance_Id = #{id},
 	</select>
+	
+	<!-- WorkItems -->
+	
+	<insert id="insertWorkItem" parameterType="org.kayura.bpm.kernel.WorkItem">
+		INSERT INTO bpm_workitems (
+			WorkItem_Id,
+			ActivityInstance_Id,
+			<if test="parent != null ">Parent_Id,</if>
+			Sender_Id,
+			SenderDept_Id,
+			Owner_Id,
+			OwnerDept_Id,
+			Sn,
+			Priority,
+			AlarmTime,
+			Depth,
+			TaskType,
+			Status
+		) VALUES (
+			#{id},
+			#{activityInstance.id},
+			<if test="parent != null ">#{parent.id},</if>
+			#{sender.id},
+			#{sender.departId},
+			#{owner.id},
+			#{owner.departId},
+			#{sn},
+			#{priority},
+			#{alarmTime},
+			#{depth},
+			#{taskType},
+			#{status}
+		)
+	</insert>
 
 </mapper>

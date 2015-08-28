@@ -34,7 +34,7 @@ public class ActivityInstance extends AbsNodeInstance {
 	private Actor creator;
 	private Date createdTime;
 	private Date completedTime;
-	private ActivityInstance preActInstance;
+	private String preActInstanceId;
 	private Integer status;
 	private Integer executeType;
 
@@ -102,12 +102,12 @@ public class ActivityInstance extends AbsNodeInstance {
 		this.completedTime = completedTime;
 	}
 
-	public ActivityInstance getPreActInstance() {
-		return preActInstance;
+	public String getPreActInstanceId() {
+		return preActInstanceId;
 	}
 
-	public void setPreActInstance(ActivityInstance preActInstance) {
-		this.preActInstance = preActInstance;
+	public void setPreActInstanceId(String preActInstanceId) {
+		this.preActInstanceId = preActInstanceId;
 	}
 
 	public Integer getStatus() {
@@ -134,10 +134,8 @@ public class ActivityInstance extends AbsNodeInstance {
 		List<Actor> actors = new ArrayList<Actor>();
 
 		// 处理公司.
-		List<String> companyIds = actActors.stream()
-				.filter(s -> s.getActorType() == ActorTypes.Company)
-				.map(s -> s.getActorId())
-				.collect(Collectors.toList());
+		List<String> companyIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Company)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
 		if (companyIds.size() > 0) {
 			List<Actor> list = service.findActorsByCompany(companyIds);
 			if (list.size() > 0) {
@@ -146,10 +144,8 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理部门人员.
-		List<String> departIds = actActors.stream()
-				.filter(s -> s.getActorType() == ActorTypes.Depart)
-				.map(s -> s.getActorId())
-				.collect(Collectors.toList());
+		List<String> departIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Depart)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
 		if (departIds.size() > 0) {
 			List<Actor> list = service.findActorsByDepartment(departIds);
 			if (list.size() > 0) {
@@ -158,10 +154,8 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理岗位人员.
-		List<String> positionIds = actActors.stream()
-				.filter(s -> s.getActorType() == ActorTypes.Position)
-				.map(s -> s.getActorId())
-				.collect(Collectors.toList());
+		List<String> positionIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Position)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
 		if (positionIds.size() > 0) {
 			List<Actor> list = service.findActorsByPosition(positionIds);
 			if (list.size() > 0) {
@@ -170,10 +164,8 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理角色人员.
-		List<String> roleIds = actActors.stream()
-				.filter(s -> s.getActorType() == ActorTypes.Role)
-				.map(s -> s.getActorId())
-				.collect(Collectors.toList());
+		List<String> roleIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Role)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
 		if (roleIds.size() > 0) {
 			List<Actor> list = service.findActorsByRole(roleIds);
 			if (list.size() > 0) {
@@ -182,10 +174,8 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理特殊人员.
-		List<String> specials = actActors.stream()
-				.filter(s -> s.getActorType() == ActorTypes.Special)
-				.map(s -> s.getActorId())
-				.collect(Collectors.toList());
+		List<String> specials = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Special)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
 		if (specials.size() > 0) {
 			List<Actor> list = findSpecialUsers(specials);
 			if (list.size() > 0) {
@@ -194,10 +184,8 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理员工.
-		List<String> userIds = actActors.stream()
-				.filter(s -> s.getActorType() == ActorTypes.User)
-				.map(s -> s.getActorId())
-				.collect(Collectors.toList());
+		List<String> userIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.User)
+				.map(s -> s.getActorId()).collect(Collectors.toList());
 		if (userIds.size() > 0) {
 			List<Actor> list = service.findActorsByEmpIds(userIds);
 			if (list.size() > 0) {

@@ -70,6 +70,8 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 				}
 
 				CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(instance, nextAct);
+				ae.setCreator(args.getCreator());
+				
 				ActivityInstance ai = this.execute(ae);
 
 				List<Actor> actors = activityActors.get(nextAct);

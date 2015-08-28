@@ -58,6 +58,7 @@ public class WorkflowStartupTest {
 
 	@After
 	public void setDown() {
+		session.commit();
 		session.close();
 	}
 
@@ -74,8 +75,7 @@ public class WorkflowStartupTest {
 		StartResult startResult = runtime.startup(args);
 
 		System.out.println(startResult.getMessage());
-		
-		
+
 	}
 
 }

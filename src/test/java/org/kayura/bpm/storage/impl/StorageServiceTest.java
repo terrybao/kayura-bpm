@@ -45,11 +45,17 @@ public class StorageServiceTest {
 	}
 
 	@Test
+	public void initData() {
+		saveBizFormTest();
+		syncLineWorkflowProcess();
+	}
+
+	@Test
 	public void saveBizFormTest() {
 		try {
 
 			BizForm bizForm = new BizForm();
-			bizForm.setId(KeyUtils.newId());
+			bizForm.setId("74C741FD-1A93-4431-B85B-5111D632073B");
 			bizForm.setCode("UnitTest");
 			bizForm.setDisplayName("仅供开发调用");
 			bizForm.setStatus(DefineStatus.Release);
@@ -69,7 +75,8 @@ public class StorageServiceTest {
 
 			BizForm bizForm = storageService.getBizFormById("74C741FD-1A93-4431-B85B-5111D632073B");
 			wp.setBizForm(bizForm);
-
+			wp.setStatus(DefineStatus.Release);
+			
 			storageService.syncWorkflowProcess(wp);
 
 			session.commit();
@@ -98,8 +105,7 @@ public class StorageServiceTest {
 	@Test
 	public void getWorkflowProcessTest() {
 		try {
-			WorkflowProcess wp = storageService
-					.getWorkflowProcess("A2E467A4-8BA0-4BC3-B192-56475E1A01E0");
+			WorkflowProcess wp = storageService.getWorkflowProcess("A2E467A4-8BA0-4BC3-B192-56475E1A01E0");
 
 			System.out.println(wp);
 		} catch (Exception e) {
