@@ -12,30 +12,26 @@
 		<result property="status" column="Status" />
 	</resultMap>
 	
-	<select id="getCompanyById" parameterType="string" resultMap="companyMap">
-		SELECT
-			t.Company_Id,
-			t.Parent_Id,
-			t.Path,
-			t.DisplayName,
-			t.Status
-		FROM Bpm_Company t
-		WHERE t.Company_Id = #{id}
-	</select>
+	<sql id="companyColumns">
+		${alias}.Company_Id,
+		${alias}.Parent_Id,
+		${alias}.Path,
+		${alias}.DisplayName,
+		${alias}.Status
+	</sql>
 
+	<!-- 查询符合条件的部门集合 -->
 	<select id="findCompanies" parameterType="map" resultMap="companyMap">
 		SELECT
-			t.Company_Id,
-			t.Parent_Id,
-			t.Path,
-			t.DisplayName,
-			t.Status
-		FROM Bpm_Company t
+        	<include refid="companyColumns">
+        	    <property name="alias" value="t"/>
+        	</include>
+		FROM Bpm_Companies t
 		<where>
 			<if test="parentId != null">
 				<choose>
 					<when test="parentId == 'root' ">
-						AND ( t.Parent_Id = null )
+						AND ( t.Parent_Id IS NULL )
 					</when>
 					<otherwise>
 						AND ( t.Parent_Id = #{parentId} )
@@ -51,6 +47,16 @@
 		</where>
 	</select>
 	
+	<!-- 获取单个部门信息 -->
+	<select id="getCompanyById" parameterType="string" resultMap="companyMap">
+		SELECT
+        	<include refid="companyColumns">
+        	    <property name="alias" value="t"/>
+        	</include>
+		FROM Bpm_Companies t
+		WHERE t.Company_Id = #{id}
+	</select>
+	
 	<!--  >>>>>>>>>>>>>>>>>>>  Department  <<<<<<<<<<<<<<<<<<<< -->
 	
 	<resultMap id="departmentMap" type="org.kayura.bpm.organize.models.Department">
@@ -62,27 +68,22 @@
 		<result property="status" column="Status" />
 	</resultMap>
 
-	<select id="getDepartmentById" parameterType="string" resultMap="departmentMap">
-		SELECT 
-			t.Department_Id,
-			t.Parent_Id,
-			t.Company_Id,
-			t.Path,
-			t.DisplayName,
-			t.Status
-		FROM Bpm_Department t
-		WHERE t.Company_Id = #{id}
-	</select>
+	<sql id="departmentColumns">
+		${alias}.Department_Id,
+		${alias}.Parent_Id,
+		${alias}.Company_Id,
+		${alias}.Path,
+		${alias}.DisplayName,
+		${alias}.Status
+	</sql>
 	
+	<!-- 查询符合条件的公司集合. -->
 	<select id="findDepartments" parameterType="map" resultMap="departmentMap">
 		SELECT 
-			t.Department_Id,
-			t.Parent_Id,
-			t.Company_Id,
-			t.Path,
-			t.DisplayName,
-			t.Status
-		FROM Bpm_Department t
+        	<include refid="departmentColumns">
+        	    <property name="alias" value="t"/>
+        	</include>
+		FROM bpm_departments t
 		<where>
 			<if test="companyId != null">
 				AND ( t.Company_Id = #{companyId} )
@@ -97,6 +98,16 @@
 				AND ( t.Status = #{status} )
 			</if>
 		</where>
+	</select>
+	
+	<!-- 获取单独公司信息. -->
+	<select id="getDepartmentById" parameterType="string" resultMap="departmentMap">
+		SELECT 
+        	<include refid="departmentColumns">
+        	    <property name="alias" value="t"/>
+        	</include>
+		FROM bpm_departments t
+		WHERE t.Company_Id = #{id}
 	</select>
 	
 	<!--  >>>>>>>>>>>>>>>>>>>  Position  <<<<<<<<<<<<<<<<<<<< -->
@@ -128,107 +139,146 @@
 		</where>
 	</select>
 
-	<!--  >>>>>>>>>>>>>>>>>>>  Employee  <<<<<<<<<<<<<<<<<<<< -->
+	<!--  >>>>>>>>>>>>>>>>>>>  Actors  <<<<<<<<<<<<<<<<<<<< -->
 	
-	<resultMap id="employeeMap" type="org.kayura.bpm.organize.models.Employee">
-		<id property="id" column="Employee_Id" />
-		<result property="code" column="Code"/>
+	<resultMap id="actorMap" type="org.kayura.bpm.types.Actor">
+		<id property="id" column="Acotr_Id" />
+		<result property="parentId" column="Parent_Id" />
+		<result property="employeeId" column="Employee_Id" />
 		<result property="displayName" column="DisplayName" />
-		<result property="status" column="Status" />
+		<result property="departmentId" column="Department_Id" />
+		<result property="companyId" column="Company_Id" />
+		<result property="positionId" column="Position_Id" />
 	</resultMap>
-	
-	<select id="findEmployees" parameterType="map" resultMap="employeeMap">
+
+	<select id="findActorsByOrganize" parameterType="map" resultMap="actorMap">
 		SELECT
+			t.Actor_Id,
+			t.Parent_Id,
 			t.Employee_Id,
-			t.`Code`,
-			t.DisplayName,
-			t.`Status`
-		FROM bpm_employees AS t
-		<if test="companyId != null or departmentId != null or positionId != null">
-			INNER JOIN bpm_departempposi AS dep ON dep.Employee_Id = t.Employee_Id
-			INNER JOIN bpm_department AS d ON d.Department_Id = dep.Department_Id
-		</if>
-		<if test="companyId != null">
-			INNER JOIN bpm_company AS c ON c.Company_Id = d.Company_Id
-		</if>
-		<if test="roleId != null">
-			INNER JOIN bpm_roleemployee AS re ON re.Employee_Id = t.Employee_Id
-			INNER JOIN bpm_roles AS r ON r.Role_Id = re.Role_Id
-		</if>
+			e.DisplayName,
+			d.Company_Id,
+			t.Department_Id,
+			t.Position_Id
+		FROM
+			bpm_actors AS t
+			INNER JOIN bpm_employees AS e ON e.Employee_Id = t.Employee_Id
+			INNER JOIN bpm_departments AS d ON d.Department_Id = t.Department_Id
+			INNER JOIN bpm_companies AS c ON c.Company_Id = d.Company_Id
+			INNER JOIN bpm_positions AS p ON p.Position_Id = t.Position_Id
 		<where>
-			<if test="keyword != null">
-				AND ( t.Code LIKE #{keyword} OR t.DisplayName LIKE #{keyword} )
-			</if>
 			<if test="status != null">
-				AND ( t.Status = #{status} )
-			</if>
-			<if test="departmentId != null">
-				AND ( dep.Department_Id = #{departmentId} )
-			</if>
-			<if test="positionId != null">
-				AND ( dep.Position_Id = #{positionId} )
-			</if>
-			<if test="companyId != null">
-				AND ( c.Company_Id = #{companyId} )
-			</if>
-			<if test="roleId != null">
-				AND ( re.Role_Id = #{roleId} )
-			</if>
-		</where>
-	</select>
-	
-	<select id="findActors" parameterType="map" resultType="org.kayura.bpm.types.Actor">
-		SELECT 
-			dep.Employee_Id AS id, 
-			emp.DisplayName as displayName,
-			dep.Department_Id AS departId, 
-			dep.Position_Id AS positionId
-		FROM bpm_departempposi AS dep 
-			INNER JOIN bpm_employees AS emp ON dep.Employee_Id = emp.Employee_Id 
-		<if test="departmentPath != null or positionId != null or companyPath != null">
-			INNER JOIN bpm_department AS d ON d.Department_Id = dep.Department_Id
-		</if>
-		<if test="companyPath != null">
-			INNER JOIN bpm_company AS c ON c.Company_Id = d.Company_Id
-		</if>
-		<if test="rolePath != null">
-			INNER JOIN bpm_roleemployee AS re ON re.Employee_Id = dep.Employee_Id
-			INNER JOIN bpm_roles AS r ON r.Role_Id = re.Role_Id
-		</if>
-		<where>
-			<if test="departmentPath != null">
-				OR ( d.Path LIKE '${departmentPath}%' )
-			</if>
-			<if test="positionId != null">
-				OR ( dep.Position_Id = #{positionId} )
+				AND ( e.Status = #{status} AND d.Status = #{status} 
+				AND   c.Status = #{status} AND p.Status = #{status} )
 			</if>
 			<if test="companyPath != null">
-				OR ( c.Path LIKE '${companyPath}%' )
+				AND ( c.Path LIKE '${companyPath}%' )
+			</if>
+			<if test="departmentPath != null">
+				AND ( d.Path LIKE '${departmentPath}%' )
+			</if>
+			<if test="positionId != null">
+				AND ( t.Position_Id = #{positionId} )
+			</if>
+		</where>
+	</select>
+
+	<select id="findActorsByRole" parameterType="map" resultMap="actorMap">
+		SELECT
+			t.Actor_Id,
+			t.Parent_Id,
+			t.Employee_Id,
+			e.DisplayName,
+			d.Company_Id,
+			t.Department_Id,
+			t.Position_Id
+		FROM
+			bpm_actors AS t
+			INNER JOIN bpm_employees AS e ON e.Employee_Id = t.Employee_Id
+			INNER JOIN bpm_departments AS d ON d.Department_Id = t.Department_Id
+			INNER JOIN bpm_roleactor AS ra ON ra.Actor_Id = t.Actor_Id
+			INNER JOIN bpm_roles AS r ON r.Role_Id = ra.Role_Id
+		<where>
+			<if test="status != null">
+				AND ( e.Status = #{status} AND r.Status = #{status} )
 			</if>
 			<if test="rolePath != null">
-				OR ( r.Path LIKE '${rolePath}%' )
-			</if>
-			<if test="rolePath != null">
-				OR ( r.Path LIKE '${rolePath}%' )
+				AND ( r.Path LIKE '${rolePath}%' )
 			</if>
 		</where>
 	</select>
 	
-	<select id="findActorsByEmpIds" parameterType="list" resultType="org.kayura.bpm.types.Actor">
-		SELECT 
-			dep.Employee_Id AS id, 
-			emp.DisplayName as displayName,
-			dep.Department_Id AS departId, 
-			dep.Position_Id AS positionId
-		FROM bpm_departempposi AS dep 
-			INNER JOIN bpm_employees AS emp ON dep.Employee_Id = emp.Employee_Id 
-		WHERE 
-			dep.Employee_Id IN 
+	<select id="findActorsByActor" parameterType="map" resultMap="actorMap">
+		SELECT
+			t.Actor_Id,
+			t.Parent_Id,
+			t.Employee_Id,
+			e.DisplayName,
+			t.Department_Id,
+			d.Company_Id,
+			t.Position_Id
+		FROM
+			bpm_actors AS t
+			INNER JOIN bpm_departments AS d ON d.Department_Id = t.Department_Id
+			INNER JOIN bpm_employees AS e ON e.Employee_Id = t.Employee_Id
+		<where>
+			<choose>
+				<when test="actorId != null">
+					AND ( t.Actor_Id = #{actorId} )
+				</when>
+				<when test="parentId != null">
+					AND ( t.Parent_Id = #{parentId} )				
+				</when>
+				<otherwise>
+					<if test="employeeId != null">
+						AND ( t.Employee_Id = #{employeeId} )
+					</if>
+					<if test="departmentId != null">
+						AND ( t.Department_Id = #{departmentId} )
+					</if>
+					<if test="positionId != null">
+						AND ( t.Position_Id = #{positionId} )
+					</if>	
+				</otherwise>
+			</choose>
+		</where>
+	</select>
+
+	<select id="getActorById" parameterType="string" resultMap="actorMap">
+		SELECT
+			t.Actor_Id,
+			t.Parent_Id,
+			t.Employee_Id,
+			e.DisplayName,
+			t.Department_Id,
+			d.Company_Id,
+			t.Position_Id
+		FROM 
+			bpm_actors AS t
+			INNER JOIN bpm_departments AS d ON d.Department_Id = t.Department_Id
+			INNER JOIN bpm_employees AS e ON e.Employee_Id = t.Employee_Id
+		WHERE ( t.Actor_Id = #{actorId} )
+	</select>
+
+	<select id="findActorsByIds" parameterType="list" resultMap="actorMap">
+		SELECT
+			t.Actor_Id,
+			t.Parent_Id,
+			t.Employee_Id,
+			e.DisplayName,
+			t.Department_Id,
+			d.Company_Id,
+			t.Position_Id
+		FROM 
+			bpm_actors AS t
+			INNER JOIN bpm_departments AS d ON d.Department_Id = t.Department_Id
+			INNER JOIN bpm_employees AS e ON e.Employee_Id = t.Employee_Id
+		WHERE t.Actor_Id  IN
 		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
 			#{item}
 		</foreach>
 	</select>
-			
+	
 	<!--  >>>>>>>>>>>>>>>>>>>  Role  <<<<<<<<<<<<<<<<<<<< -->
 	
 	<resultMap id="roleMap" type="org.kayura.bpm.organize.models.Role">

@@ -17,6 +17,16 @@ public class WorkItem {
 		public final static Integer Read = 1;
 	}
 
+	/**
+	 *  0 正常、1 挂起、2 完成、3 终止
+	 */
+	public static class TaskStatus {
+		public final static Integer Running = 0;
+		public final static Integer Hang = 1;
+		public final static Integer Completed = 2;		
+		public final static Integer End = 3;	
+	}
+	
 	private String id;
 	private WorkItem parent;
 	private ActivityInstance activityInstance;

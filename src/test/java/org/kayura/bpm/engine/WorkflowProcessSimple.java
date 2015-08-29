@@ -22,7 +22,7 @@ public class WorkflowProcessSimple {
 		StartNode startNode = process.createStartNode();
 
 		Activity shenpi = process.createActivity("shenpi");
-		shenpi.addActor("xialiang", ActorTypes.User);
+		shenpi.addActor("xialiang", ActorTypes.Actor);
 
 		EndNode endNode = process.createEndNode("endnode");
 

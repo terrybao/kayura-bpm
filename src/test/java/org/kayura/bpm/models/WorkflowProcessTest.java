@@ -18,7 +18,7 @@ public class WorkflowProcessTest {
 		Activity bumen = wp.createActivity("bumen");
 		bumen.putAttribute("key1", "xialiang");
 		bumen.addistener(WorkflowProcessTest.class, 1);
-		bumen.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.User);
+		bumen.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.Actor);
 		bumen.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.Special);
 
 		Route fz = wp.createRoute("fz");
@@ -33,13 +33,13 @@ public class WorkflowProcessTest {
 		jinli1.putAttribute("key1", "xialiang");
 		jinli1.addistener(WorkflowProcessTest.class, 1);
 		jinli1.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.Role);
-		jinli1.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.User);
+		jinli1.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.Actor);
 
 		Activity jinli2 = wp.createActivity("jinli2");
 		jinli2.putAttribute("key1", "xialiang");
 		jinli2.addistener(WorkflowProcessTest.class, 1);
 		jinli2.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.Role);
-		jinli2.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.User);
+		jinli2.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.Actor);
 
 		Transition t2 = wp.createTransition(fz, jinli1);
 		t2.putAttribute("key1", "xialiang");
@@ -64,7 +64,7 @@ public class WorkflowProcessTest {
 		Activity zongjili = wp.createActivity("zongjili");
 		zongjili.putAttribute("key1", "xialiang");
 		zongjili.addistener(WorkflowProcessTest.class, 1);
-		zongjili.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.User);
+		zongjili.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.Actor);
 		zongjili.addActor(KeyUtils.newId(), ActivityActor.ActorTypes.Special);
 
 		Transition t6 = wp.createTransition(jiuhe, zongjili);

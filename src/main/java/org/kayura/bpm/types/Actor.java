@@ -5,8 +5,11 @@ import org.kayura.utils.StringUtils;
 public class Actor {
 
 	private String id;
+	private String parentId;
+	private String employeeId;
 	private String displayName;
-	private String departId;
+	private String departmentId;
+	private String companyId;
 	private String positionId;
 
 	public Actor() {
@@ -37,11 +40,11 @@ public class Actor {
 			return true;
 		}
 
-		Actor tar = (Actor) obj;
+		Actor target = (Actor) obj;
 
-		if (StringUtils.equals(this.id, tar.getId())
-				&& StringUtils.equals(this.departId, tar.getDepartId())
-				&& StringUtils.equals(this.positionId, tar.getPositionId())) {
+		if (StringUtils.equals(this.id, target.id) && StringUtils.equals(this.employeeId, target.employeeId)
+				&& StringUtils.equals(this.departmentId, target.departmentId)
+				&& StringUtils.equals(this.positionId, target.positionId)) {
 			return true;
 		}
 
@@ -56,6 +59,22 @@ public class Actor {
 		this.id = id;
 	}
 
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+
+	public String getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(String employeeId) {
+		this.employeeId = employeeId;
+	}
+
 	public String getDisplayName() {
 		return displayName;
 	}
@@ -64,12 +83,20 @@ public class Actor {
 		this.displayName = displayName;
 	}
 
-	public String getDepartId() {
-		return departId;
+	public String getDepartmentId() {
+		return departmentId;
 	}
 
-	public void setDepartId(String departId) {
-		this.departId = departId;
+	public void setDepartmentId(String departId) {
+		this.departmentId = departId;
+	}
+
+	public String getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(String companyId) {
+		this.companyId = companyId;
 	}
 
 	public String getPositionId() {

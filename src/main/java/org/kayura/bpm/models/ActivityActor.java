@@ -8,7 +8,7 @@ public class ActivityActor {
 	 * user, role, depart, special
 	 */
 	public static class ActorTypes {
-		public final static Integer User = 0;
+		public final static Integer Actor = 0;
 		public final static Integer Company = 1;
 		public final static Integer Depart = 2;
 		public final static Integer Position = 3;

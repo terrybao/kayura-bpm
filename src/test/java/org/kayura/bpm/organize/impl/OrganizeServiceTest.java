@@ -94,17 +94,6 @@ public class OrganizeServiceTest {
 	}
 
 	@Test
-	public void findEmployeesTest() {
-		try {
-			List<Employee> list = organizeService.findEmployees(null, null, null, null,
-					null, null);
-			System.out.println(list.size());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Test
 	public void findActorsByCompanyTest() {
 		try {
 			List<Actor> list = organizeService.findActorsByCompany(null);

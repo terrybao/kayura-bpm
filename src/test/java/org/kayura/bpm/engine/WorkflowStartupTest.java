@@ -34,14 +34,16 @@ public class WorkflowStartupTest {
 
 	private SqlSessionFactory sqlSessionFactory;
 	private SqlSession session;
-
 	private IWorkflowRuntime runtime;
 
-	@Before
-	public void setUp() throws IOException {
-
+	public WorkflowStartupTest() throws IOException {
 		InputStream inputStream = Resources.getResourceAsStream("mybatisConfig.xml");
 		sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+	}
+
+	@Before
+	public void setUp() {
+
 		session = sqlSessionFactory.openSession();
 
 		DefineMapper dmapper = session.getMapper(DefineMapper.class);
@@ -75,7 +77,8 @@ public class WorkflowStartupTest {
 		StartResult startResult = runtime.startup(args);
 
 		System.out.println(startResult.getMessage());
-
 	}
+	
+	
 
 }

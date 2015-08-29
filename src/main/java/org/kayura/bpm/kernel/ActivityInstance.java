@@ -184,10 +184,10 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理员工.
-		List<String> userIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.User)
+		List<String> userIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Actor)
 				.map(s -> s.getActorId()).collect(Collectors.toList());
 		if (userIds.size() > 0) {
-			List<Actor> list = service.findActorsByEmpIds(userIds);
+			List<Actor> list = service.findActorsByIds(userIds);
 			if (list.size() > 0) {
 				actors.addAll(list);
 			}

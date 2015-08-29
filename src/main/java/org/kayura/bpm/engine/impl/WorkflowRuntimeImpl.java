@@ -16,6 +16,7 @@ import org.kayura.bpm.kernel.StartNodeInstance;
 import org.kayura.bpm.kernel.WorkItem.Prioritys;
 import org.kayura.bpm.kernel.WorkItem.TaskTypes;
 import org.kayura.bpm.models.Activity;
+import org.kayura.bpm.organize.IOrganizeService;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.StartArgs;
 import org.kayura.bpm.types.StartResult;
@@ -49,20 +50,22 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 				throw new WorkflowException("必须定义流程的启动参数，不允许为空。");
 			}
 
-			Actor creator = args.getCreator();
-			if (creator == null) {
+			IOrganizeService organizeService = this.context.getOrganizeService();
+
+			if (args.getCreator() == null) {
 				throw new WorkflowException("必须定义流程的启动者。");
 			}
 
+			Map<String, List<Actor>> nextActivities = args.getNextActivities();
+			Actor creator = organizeService.findActorByActor(args.getCreator());
+
 			// 创建工作流实例.
-			ProcessInstance instance = execute(new CreateProcessInstanceExecutor(args.getFlowCode(),
-					args.getBizData(), creator));
+			ProcessInstance instance = execute(
+					new CreateProcessInstanceExecutor(args.getFlowCode(), args.getBizData(), creator));
 
 			// 取得可用的后续活动实例.
 			StartNodeInstance si = instance.getStartNodeInstance();
 			Map<Activity, List<Actor>> activityActors = si.findNextActivityActors(args.getVariables());
-
-			Map<String, List<Actor>> nextActivities = args.getNextActivities();
 			for (Activity nextAct : activityActors.keySet()) {
 
 				if (nextActivities.size() > 0 && !activityActors.keySet().contains(nextAct.getId())) {
@@ -71,7 +74,7 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 
 				CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(instance, nextAct);
 				ae.setCreator(args.getCreator());
-				
+
 				ActivityInstance ai = this.execute(ae);
 
 				List<Actor> actors = activityActors.get(nextAct);

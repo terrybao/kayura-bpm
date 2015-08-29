@@ -3,7 +3,6 @@ package org.kayura.bpm.organize.models;
 public class Employee {
 
 	private String id;
-	private String code;
 	private String displayName;
 	private Integer status;
 
@@ -17,14 +16,6 @@ public class Employee {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
 	}
 
 	public String getDisplayName() {

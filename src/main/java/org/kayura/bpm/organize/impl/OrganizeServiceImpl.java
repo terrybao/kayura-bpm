@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.kayura.bpm.exceptions.WorkflowException;
 import org.kayura.bpm.organize.IOrganizeService;
 import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
 import org.kayura.bpm.organize.models.Company;
@@ -54,8 +55,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	}
 
 	@Override
-	public List<Department> findDepartments(String companyId, String parentId, String keyword,
-			Integer status) {
+	public List<Department> findDepartments(String companyId, String parentId, String keyword, Integer status) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
 
@@ -112,34 +112,6 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	}
 
 	@Override
-	public List<Employee> findEmployees(String companyId, String departmentId, String positionId,
-			String roleId, String keyword, Integer status) {
-
-		Map<String, Object> args = new HashMap<String, Object>();
-
-		if (StringUtils.isEmpty(companyId)) {
-			args.put("companyId", companyId);
-		}
-		if (StringUtils.isEmpty(departmentId)) {
-			args.put("departmentId", departmentId);
-		}
-		if (StringUtils.isEmpty(positionId)) {
-			args.put("positionId", positionId);
-		}
-		if (StringUtils.isEmpty(roleId)) {
-			args.put("roleId", roleId);
-		}
-		if (StringUtils.isEmpty(keyword)) {
-			args.put("keyword", keyword);
-		}
-		if (status != null) {
-			args.put("status", status);
-		}
-
-		return mapper.findEmployees(args);
-	}
-
-	@Override
 	public List<Actor> findActorsByCompany(List<String> companyIds) {
 
 		List<Actor> actors = new ArrayList<Actor>();
@@ -151,7 +123,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put("companyPath", comapny.getPath());
 
-				List<Actor> list = mapper.findActors(args);
+				List<Actor> list = mapper.findActorsByOrganize(args);
 				for (Actor actor : list) {
 					if (!actors.contains(actor)) {
 						actors.add(actor);
@@ -175,7 +147,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put("departmentPath", department.getPath());
 
-				List<Actor> list = mapper.findActors(args);
+				List<Actor> list = mapper.findActorsByOrganize(args);
 				for (Actor actor : list) {
 					if (!actors.contains(actor)) {
 						actors.add(actor);
@@ -195,7 +167,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 			Map<String, Object> args = new HashMap<String, Object>();
 			args.put("positionId", positionId);
 
-			List<Actor> list = mapper.findActors(args);
+			List<Actor> list = mapper.findActorsByOrganize(args);
 			for (Actor actor : list) {
 				if (!actors.contains(actor)) {
 					actors.add(actor);
@@ -217,7 +189,7 @@ public class OrganizeServiceImpl implements IOrganizeService {
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put("rolePath", role.getPath());
 
-				List<Actor> list = mapper.findActors(args);
+				List<Actor> list = mapper.findActorsByRole(args);
 				for (Actor actor : list) {
 					if (!actors.contains(actor)) {
 						actors.add(actor);
@@ -229,8 +201,121 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	}
 
 	@Override
-	public List<Actor> findActorsByEmpIds(List<String> empIds) {
-		return mapper.findActorsByEmpIds(empIds);
+	public List<Actor> findActorsByIds(List<String> actorIds) {
+		List<Actor> actors = mapper.findActorsByIds(actorIds);
+		return actors;
+	}
+
+	@Override
+	public Actor findActorByActor(Actor actor) {
+
+		if (actor == null) {
+			return null;
+		}
+
+		String id = actor.getId();
+		String employeeId = actor.getEmployeeId();
+		String departmentId = actor.getDepartmentId();
+		String positionId = actor.getPositionId();
+
+		Map<String, Object> args = new HashMap<String, Object>();
+
+		if (!StringUtils.isEmpty(id)) {
+			args.put("actorId", id);
+		}
+
+		if (!StringUtils.isEmpty(employeeId)) {
+			args.put("employeeId", employeeId);
+		}
+
+		if (!StringUtils.isEmpty(departmentId)) {
+			args.put("departmentId", departmentId);
+		}
+
+		if (!StringUtils.isEmpty(positionId)) {
+			args.put("positionId", positionId);
+		}
+
+		if (args.size() == 0) {
+			return null;
+		}
+
+		List<Actor> list = mapper.findActorsByActor(args);
+		if (list.size() > 1) {
+			throw new WorkflowException("指定的参与者存在多个岗位。");
+		}
+
+		if (list.size() == 1) {
+			return list.get(0);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public List<Actor> findActorsBySameDepartment(String actorId) {
+
+		List<Actor> actors = new ArrayList<Actor>();
+
+		Actor actor = mapper.getActorById(actorId);
+		if (actor != null && !StringUtils.isEmpty(actor.getDepartmentId())) {
+
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("departmentId", actor.getDepartmentId());
+
+			List<Actor> list = mapper.findActorsByActor(args);
+			for (Actor at : list) {
+				if (!actors.contains(at)) {
+					actors.add(at);
+				}
+			}
+		}
+
+		return actors;
+	}
+
+	@Override
+	public List<Actor> findActorsBySamePosition(String actorId) {
+
+		List<Actor> actors = new ArrayList<Actor>();
+
+		Actor actor = mapper.getActorById(actorId);
+		if (actor != null && !StringUtils.isEmpty(actor.getPositionId())) {
+
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("positionId", actor.getPositionId());
+
+			List<Actor> list = mapper.findActorsByActor(args);
+			for (Actor at : list) {
+				if (!actors.contains(at)) {
+					actors.add(at);
+				}
+			}
+		}
+
+		return actors;
+	}
+
+	@Override
+	public Actor findParentActor(String actorId) {
+
+		Actor actor = mapper.getActorById(actorId);
+		if (actor != null && !StringUtils.isEmpty(actor.getParentId())) {
+
+			Actor parent = mapper.getActorById(actor.getParentId());
+			return parent;
+		}
+		return null;
+	}
+
+	@Override
+	public List<Actor> findChildActors(String actorId) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("parentId", actorId);
+
+		List<Actor> list = mapper.findActorsByActor(args);
+		return list;
 	}
 
 }
