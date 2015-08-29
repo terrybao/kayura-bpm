@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.kayura.bpm.exceptions.WorkflowException;
 import org.kayura.bpm.organize.IOrganizeService;
@@ -242,7 +243,9 @@ public class OrganizeServiceImpl implements IOrganizeService {
 
 		List<Actor> list = mapper.findActorsByActor(args);
 		if (list.size() > 1) {
-			throw new WorkflowException("指定的参与者存在多个岗位。");
+
+			String name = list.get(0).getDisplayName();
+			throw new WorkflowException(String.format("人员 %s 的岗位不明确", name));
 		}
 
 		if (list.size() == 1) {
@@ -255,8 +258,6 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	@Override
 	public List<Actor> findActorsBySameDepartment(String actorId) {
 
-		List<Actor> actors = new ArrayList<Actor>();
-
 		Actor actor = mapper.getActorById(actorId);
 		if (actor != null && !StringUtils.isEmpty(actor.getDepartmentId())) {
 
@@ -264,20 +265,15 @@ public class OrganizeServiceImpl implements IOrganizeService {
 			args.put("departmentId", actor.getDepartmentId());
 
 			List<Actor> list = mapper.findActorsByActor(args);
-			for (Actor at : list) {
-				if (!actors.contains(at)) {
-					actors.add(at);
-				}
-			}
-		}
+			return list;
+		} else {
 
-		return actors;
+			return new ArrayList<Actor>();
+		}
 	}
 
 	@Override
 	public List<Actor> findActorsBySamePosition(String actorId) {
-
-		List<Actor> actors = new ArrayList<Actor>();
 
 		Actor actor = mapper.getActorById(actorId);
 		if (actor != null && !StringUtils.isEmpty(actor.getPositionId())) {
@@ -286,14 +282,11 @@ public class OrganizeServiceImpl implements IOrganizeService {
 			args.put("positionId", actor.getPositionId());
 
 			List<Actor> list = mapper.findActorsByActor(args);
-			for (Actor at : list) {
-				if (!actors.contains(at)) {
-					actors.add(at);
-				}
-			}
-		}
+			return list;
+		} else {
 
-		return actors;
+			return new ArrayList<Actor>();
+		}
 	}
 
 	@Override
@@ -304,8 +297,10 @@ public class OrganizeServiceImpl implements IOrganizeService {
 
 			Actor parent = mapper.getActorById(actor.getParentId());
 			return parent;
+		} else {
+
+			return null;
 		}
-		return null;
 	}
 
 	@Override

@@ -50,12 +50,11 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 				throw new WorkflowException("必须定义流程的启动参数，不允许为空。");
 			}
 
-			IOrganizeService organizeService = this.context.getOrganizeService();
-
 			if (args.getCreator() == null) {
 				throw new WorkflowException("必须定义流程的启动者。");
 			}
 
+			IOrganizeService organizeService = this.context.getOrganizeService();
 			Map<String, List<Actor>> nextActivities = args.getNextActivities();
 			Actor creator = organizeService.findActorByActor(args.getCreator());
 
@@ -73,7 +72,7 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 				}
 
 				CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(instance, nextAct);
-				ae.setCreator(args.getCreator());
+				ae.setCreator(creator);
 
 				ActivityInstance ai = this.execute(ae);
 
@@ -81,7 +80,7 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 				for (Actor actor : actors) {
 
 					CreateWorkItemExecutor we = new CreateWorkItemExecutor(ai, creator, actor);
-					we.setPriority(Prioritys.Lower);
+					we.setPriority(Prioritys.Medium);
 					we.setTaskType(TaskTypes.Task);
 					we.setSn(0);
 

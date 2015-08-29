@@ -173,21 +173,21 @@ public class ActivityInstance extends AbsNodeInstance {
 			}
 		}
 
-		// 处理特殊人员.
-		List<String> specials = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Special)
+		// 处理与参者.
+		List<String> actorIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Actor)
 				.map(s -> s.getActorId()).collect(Collectors.toList());
-		if (specials.size() > 0) {
-			List<Actor> list = findSpecialUsers(specials);
+		if (actorIds.size() > 0) {
+			List<Actor> list = service.findActorsByIds(actorIds);
 			if (list.size() > 0) {
 				actors.addAll(list);
 			}
 		}
 
-		// 处理员工.
-		List<String> userIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Actor)
+		// 处理特殊人员.
+		List<String> specials = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Special)
 				.map(s -> s.getActorId()).collect(Collectors.toList());
-		if (userIds.size() > 0) {
-			List<Actor> list = service.findActorsByIds(userIds);
+		if (specials.size() > 0) {
+			List<Actor> list = findSpecialUsers(specials);
 			if (list.size() > 0) {
 				actors.addAll(list);
 			}

@@ -16,12 +16,12 @@ public class Actor {
 
 	}
 
-	public Actor(String id) {
-		this.id = id;
+	public Actor(String employeeId) {
+		this.employeeId = employeeId;
 	}
 
-	public Actor(String id, String displayName) {
-		this.id = id;
+	public Actor(String employeeId, String displayName) {
+		this.employeeId = employeeId;
 		this.displayName = displayName;
 	}
 

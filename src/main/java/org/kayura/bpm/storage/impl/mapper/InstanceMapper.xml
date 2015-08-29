@@ -2,6 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.kayura.bpm.storage.impl.mapper.InstanceMapper">
 
+	<resultMap id="actorMap" type="org.kayura.bpm.types.Actor">
+		<id property="id" column="Acotr_Id" />
+		<result property="parentId" column="Parent_Id" />
+		<result property="employeeId" column="Employee_Id" />
+		<result property="displayName" column="DisplayName" />
+		<result property="departmentId" column="Department_Id" />
+		<result property="companyId" column="Company_Id" />
+		<result property="positionId" column="Position_Id" />
+	</resultMap>
+	
 	<!-- 过程实例 ProcessInstance -->
 
 	<resultMap id="processInstanceMap" type="org.kayura.bpm.kernel.ProcessInstance">
@@ -12,32 +22,32 @@
 		<result property="createdTime" column="CreatedTime" />
 		<result property="completedTime" column="CompletedTime" />
 		<result property="status" column="Status" />
-		<association property="process" column="Process_Id" select="selectWorkflowProcessById" />
-		<association property="creator" javaType="org.kayura.bpm.types.Actor">
-			<id property="id" column="Creater_Id" />
-			<result property="departId" column="CreaterDept_Id" />
-		</association>
+		<association property="process" column="Process_Id"
+			select="selectWorkflowProcessById" />
+		<association property="creator" javaType="org.kayura.bpm.types.Actor"
+			columnPrefix="Creator_" resultMap="actorMap" />
 	</resultMap>
 	
-	<sql id="processInstance_Columns">
-		${alias}.ProcessInstance_Id,
-		${alias}.Parent_Id,
-		${alias}.Process_Id,
-		${alias}.Title,
-		${alias}.BizData_Id,
-		${alias}.Creator_Id,
-		${alias}.CreatorDept_Id,
-		${alias}.CreatedTime,
-		${alias}.CompletedTime,
-		${alias}.Status
-	</sql>
-
-	<select id="getProcessInstanceById" parameterType="string">
+	<select id="getProcessInstanceById" parameterType="string" resultMap="processInstanceMap">
 		SELECT
-			<include refid="processInstance_Columns">
-				<property name="alias" value="t"/>
-			</include>
-		FROM Bpm_ProcessInstance t
+			t.ProcessInstance_Id,
+			t.Parent_Id,
+			t.Process_Id,
+			t.Title,
+			t.BizData_Id,
+			t.CreatedTime,
+			t.CompletedTime,
+			t.Status,
+			a.Actor_Id AS Creator_Actor_Id,
+			a.Parent_Id AS Creator_Parent_Id,
+			a.Employee_Id AS Creator_Employee_Id,
+			e.DisplayName AS Creator_DisplayName,
+			a.Department_Id AS Creator_Department_Id,
+			a.Position_Id AS Creator_Position_Id
+		FROM
+			bpm_processinstance AS t
+			INNER JOIN bpm_actors AS a ON a.Actor_Id = t.Creator_Id
+			INNER JOIN bpm_employees AS e ON e.Employee_Id = a.Employee_Id
 		WHERE t.ProcessInstance_Id = #{id}
 	</select>
 	
@@ -55,7 +65,6 @@
 			Title,
 			BizData_Id,
 			Creator_Id,
-			CreatorDept_Id,
 			CreatedTime,
 			CompletedTime,
 			Status
@@ -66,7 +75,6 @@
 			#{title},
 			#{bizDataId},
 			#{creator.id},
-			#{creator.departId},
 			#{createdTime},
 			#{completedTime},
 			#{status}
@@ -80,7 +88,6 @@
 			Title = #{title},
 			BizData_Id = #{bizDataId},
 			Creater_Id = #{creater.id},
-			CreaterDept_Id = #{creater.departId},
 			CreatedTime = #{createdTime},
 			CompletedTime = #{completedTime},
 			Status = #{status}
@@ -142,9 +149,7 @@
 			ActivityInstance_Id,
 			<if test="parent != null ">Parent_Id,</if>
 			Sender_Id,
-			SenderDept_Id,
 			Owner_Id,
-			OwnerDept_Id,
 			Sn,
 			Priority,
 			AlarmTime,
@@ -156,9 +161,7 @@
 			#{activityInstance.id},
 			<if test="parent != null ">#{parent.id},</if>
 			#{sender.id},
-			#{sender.departId},
 			#{owner.id},
-			#{owner.departId},
 			#{sn},
 			#{priority},
 			#{alarmTime},

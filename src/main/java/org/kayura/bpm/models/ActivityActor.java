@@ -4,16 +4,17 @@ import org.kayura.utils.KeyUtils;
 
 public class ActivityActor {
 
-	/*
-	 * user, role, depart, special
+	/**
+	 * Actor = 0, Company = 1, depart = 2, Position = 3, Role = 4, Special = 5
 	 */
 	public static class ActorTypes {
 		public final static Integer Actor = 0;
 		public final static Integer Company = 1;
 		public final static Integer Depart = 2;
 		public final static Integer Position = 3;
-		public final static Integer Role = 4;
-		public final static Integer Special = 5;
+		public final static Integer Employee = 4;
+		public final static Integer Role = 5;
+		public final static Integer Special = 6;
 	}
 
 	private String id;

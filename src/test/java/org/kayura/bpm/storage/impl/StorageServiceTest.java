@@ -71,9 +71,11 @@ public class StorageServiceTest {
 	@Test
 	public void syncLineWorkflowProcess() {
 		try {
+			
 			WorkflowProcess wp = WorkflowProcessSimple.getLineProcess();
 
 			BizForm bizForm = storageService.getBizFormById("74C741FD-1A93-4431-B85B-5111D632073B");
+			wp.setModifier("xialiang");
 			wp.setBizForm(bizForm);
 			wp.setStatus(DefineStatus.Release);
 			

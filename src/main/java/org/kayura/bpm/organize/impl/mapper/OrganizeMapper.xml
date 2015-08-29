@@ -142,7 +142,7 @@
 	<!--  >>>>>>>>>>>>>>>>>>>  Actors  <<<<<<<<<<<<<<<<<<<< -->
 	
 	<resultMap id="actorMap" type="org.kayura.bpm.types.Actor">
-		<id property="id" column="Acotr_Id" />
+		<id property="id" column="Actor_Id" />
 		<result property="parentId" column="Parent_Id" />
 		<result property="employeeId" column="Employee_Id" />
 		<result property="displayName" column="DisplayName" />
