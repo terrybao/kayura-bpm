@@ -14,10 +14,10 @@ import org.kayura.bpm.builder.WorkflowProcessBuilder;
 import org.kayura.bpm.engine.WorkflowProcessSimple;
 import org.kayura.bpm.models.BizForm;
 import org.kayura.bpm.models.DefineStatus;
+import org.kayura.bpm.models.WorkItem;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.models.WorkflowProcessTest;
-import org.kayura.bpm.storage.impl.mapper.DefineMapper;
-import org.kayura.utils.KeyUtils;
+import org.kayura.bpm.storage.impl.mapper.StorageMapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,9 +34,8 @@ public class StorageServiceTest {
 		InputStream inputStream = Resources.getResourceAsStream("mybatisConfig.xml");
 		sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 		session = sqlSessionFactory.openSession();
-		DefineMapper mapper = session.getMapper(DefineMapper.class);
-		storageService = new StorageServiceImpl();
-		storageService.setDefineMapper(mapper);
+		StorageMapper mapper = session.getMapper(StorageMapper.class);
+		storageService = new StorageServiceImpl(mapper);
 	}
 
 	@After
@@ -71,14 +70,14 @@ public class StorageServiceTest {
 	@Test
 	public void syncLineWorkflowProcess() {
 		try {
-			
+
 			WorkflowProcess wp = WorkflowProcessSimple.getLineProcess();
 
 			BizForm bizForm = storageService.getBizFormById("74C741FD-1A93-4431-B85B-5111D632073B");
 			wp.setModifier("xialiang");
 			wp.setBizForm(bizForm);
 			wp.setStatus(DefineStatus.Release);
-			
+
 			storageService.syncWorkflowProcess(wp);
 
 			session.commit();
@@ -110,6 +109,17 @@ public class StorageServiceTest {
 			WorkflowProcess wp = storageService.getWorkflowProcess("A2E467A4-8BA0-4BC3-B192-56475E1A01E0");
 
 			System.out.println(wp);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void getWorkItemByFirstTest() {
+		try {
+			WorkItem task = storageService.findWorkItemByFirst("4588F8DC-4DF8-11E5-9FEC-10BF48BBBEC9");
+
+			System.out.println(task);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

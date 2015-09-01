@@ -4,9 +4,9 @@ import java.util.Map;
 
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
-import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.models.BizForm;
 import org.kayura.bpm.models.DefineStatus;
+import org.kayura.bpm.models.WorkItem;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.type.PageList;
 import org.kayura.type.PageParams;
@@ -108,5 +108,9 @@ public interface IStorageService {
 	 * @param workItem 工作项对象.
 	 */
 	void insertWorkItem(WorkItem workItem);
+
+	WorkItem findWorkItemByFirst(String actorId);
+
+	WorkItem getWorkItemById(String workItemId);
 
 }

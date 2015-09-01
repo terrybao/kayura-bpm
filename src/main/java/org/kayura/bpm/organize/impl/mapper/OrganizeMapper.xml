@@ -147,7 +147,6 @@
 		<result property="employeeId" column="Employee_Id" />
 		<result property="displayName" column="DisplayName" />
 		<result property="departmentId" column="Department_Id" />
-		<result property="companyId" column="Company_Id" />
 		<result property="positionId" column="Position_Id" />
 	</resultMap>
 
@@ -156,8 +155,7 @@
 			t.Actor_Id,
 			t.Parent_Id,
 			t.Employee_Id,
-			e.DisplayName,
-			d.Company_Id,
+			t.DisplayName,
 			t.Department_Id,
 			t.Position_Id
 		FROM
@@ -188,14 +186,12 @@
 			t.Actor_Id,
 			t.Parent_Id,
 			t.Employee_Id,
-			e.DisplayName,
-			d.Company_Id,
+			t.DisplayName,
 			t.Department_Id,
 			t.Position_Id
 		FROM
 			bpm_actors AS t
 			INNER JOIN bpm_employees AS e ON e.Employee_Id = t.Employee_Id
-			INNER JOIN bpm_departments AS d ON d.Department_Id = t.Department_Id
 			INNER JOIN bpm_roleactor AS ra ON ra.Actor_Id = t.Actor_Id
 			INNER JOIN bpm_roles AS r ON r.Role_Id = ra.Role_Id
 		<where>
@@ -213,14 +209,11 @@
 			t.Actor_Id,
 			t.Parent_Id,
 			t.Employee_Id,
-			e.DisplayName,
+			t.DisplayName,
 			t.Department_Id,
-			d.Company_Id,
 			t.Position_Id
 		FROM
 			bpm_actors AS t
-			INNER JOIN bpm_departments AS d ON d.Department_Id = t.Department_Id
-			INNER JOIN bpm_employees AS e ON e.Employee_Id = t.Employee_Id
 		<where>
 			<choose>
 				<when test="actorId != null">
@@ -249,14 +242,11 @@
 			t.Actor_Id,
 			t.Parent_Id,
 			t.Employee_Id,
-			e.DisplayName,
+			t.DisplayName,
 			t.Department_Id,
-			d.Company_Id,
 			t.Position_Id
 		FROM 
 			bpm_actors AS t
-			INNER JOIN bpm_departments AS d ON d.Department_Id = t.Department_Id
-			INNER JOIN bpm_employees AS e ON e.Employee_Id = t.Employee_Id
 		WHERE ( t.Actor_Id = #{actorId} )
 	</select>
 
@@ -265,9 +255,8 @@
 			t.Actor_Id,
 			t.Parent_Id,
 			t.Employee_Id,
-			e.DisplayName,
+			t.DisplayName,
 			t.Department_Id,
-			d.Company_Id,
 			t.Position_Id
 		FROM 
 			bpm_actors AS t

@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
-import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.BizForm;
@@ -16,11 +15,12 @@ import org.kayura.bpm.models.EndNode;
 import org.kayura.bpm.models.Route;
 import org.kayura.bpm.models.StartNode;
 import org.kayura.bpm.models.Transition;
+import org.kayura.bpm.models.WorkItem;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.storage.IStorageService;
-import org.kayura.bpm.storage.impl.mapper.DefineMapper;
-import org.kayura.bpm.storage.impl.mapper.InstanceMapper;
+import org.kayura.bpm.storage.impl.mapper.StorageMapper;
 import org.kayura.bpm.storage.impl.po.IdNodeType;
+import org.kayura.bpm.types.TaskListItem;
 import org.kayura.mybatis.type.PageBounds;
 import org.kayura.type.PageList;
 import org.kayura.type.PageParams;
@@ -28,54 +28,44 @@ import org.kayura.utils.StringUtils;
 
 public class StorageServiceImpl implements IStorageService {
 
-	private DefineMapper defineMapper;
-	private InstanceMapper instanceMapper;
+	private StorageMapper mapper;
 
 	public StorageServiceImpl() {
 
 	}
 
-	public StorageServiceImpl(DefineMapper defineMapper, InstanceMapper instanceMapper) {
-		this.defineMapper = defineMapper;
-		this.instanceMapper = instanceMapper;
+	public StorageServiceImpl(StorageMapper mapper) {
+		this.mapper = mapper;
 	}
 
-	public void setDefineMapper(DefineMapper defineMapper) {
-		this.defineMapper = defineMapper;
-	}
-
-	public void setInstanceMapper(InstanceMapper instanceMapper) {
-		this.instanceMapper = instanceMapper;
-	}
-
-	// 工作流表单 BizForm
+	/* BizForm */
 
 	public BizForm getBizFormById(String id) {
-		return defineMapper.getBizFormById(id);
+		return mapper.getBizFormById(id);
 	}
 
 	public PageList<BizForm> findBizForms(Map<String, Object> args, PageParams pageParams) {
-		return defineMapper.findBizForms(args, new PageBounds(pageParams));
+		return mapper.findBizForms(args, new PageBounds(pageParams));
 	}
 
 	public void saveOrUpdateBizForm(BizForm bizForm) {
 
-		if (defineMapper.bizFormExists(bizForm.getId())) {
-			defineMapper.updateBizForm(bizForm);
+		if (mapper.bizFormExists(bizForm.getId())) {
+			mapper.updateBizForm(bizForm);
 		} else {
-			defineMapper.insertBizForm(bizForm);
+			mapper.insertBizForm(bizForm);
 		}
 	}
 
 	public void updateBizFormForStatus(String id, Integer status) {
-		defineMapper.updateBizFormForStatus(id, status);
+		mapper.updateBizFormForStatus(id, status);
 	}
 
-	// 工作流定义
+	/* WorkflowProcess */
 
 	public WorkflowProcess getWorkflowProcess(String id) {
 
-		WorkflowProcess workflowProcess = defineMapper.selectWorkflowProcessById(id);
+		WorkflowProcess workflowProcess = mapper.selectWorkflowProcessById(id);
 		return workflowProcess;
 	}
 
@@ -89,9 +79,9 @@ public class StorageServiceImpl implements IStorageService {
 		}
 
 		WorkflowProcess workflowProcess = null;
-		String id = defineMapper.getWorkflowProcessIdByMap(args);
+		String id = mapper.getWorkflowProcessIdByMap(args);
 		if (!StringUtils.isEmpty(id)) {
-			workflowProcess = defineMapper.selectWorkflowProcessById(id);
+			workflowProcess = mapper.selectWorkflowProcessById(id);
 		}
 		return workflowProcess;
 	}
@@ -99,7 +89,7 @@ public class StorageServiceImpl implements IStorageService {
 	public void syncWorkflowProcess(WorkflowProcess workflowProcess) {
 
 		String processId = workflowProcess.getId();
-		Boolean newProcess = defineMapper.workflowProcessExists(processId);
+		Boolean newProcess = mapper.workflowProcessExists(processId);
 
 		// workflowProcess
 		if (newProcess == true) {
@@ -107,27 +97,27 @@ public class StorageServiceImpl implements IStorageService {
 			BizForm bizForm = workflowProcess.getBizForm();
 			String bizFormId = bizForm != null ? bizForm.getId() : null;
 
-			Integer maxValue = defineMapper.getWorkflowProcessMaxVersion(bizFormId);
+			Integer maxValue = mapper.getWorkflowProcessMaxVersion(bizFormId);
 			Integer newVersion = maxValue != null ? (maxValue + 1) : 1;
 
 			workflowProcess.setVersion(newVersion);
 
-			defineMapper.insertWorkflowProcess(workflowProcess);
+			mapper.insertWorkflowProcess(workflowProcess);
 		} else {
-			defineMapper.updateWorkflowProcess(workflowProcess);
+			mapper.updateWorkflowProcess(workflowProcess);
 		}
 
 		// idNodeTypes
-		List<IdNodeType> idNodeTypes = defineMapper.findNodeIdsNodeType(processId);
+		List<IdNodeType> idNodeTypes = mapper.findNodeIdsNodeType(processId);
 
 		// startNode
 		StartNode startNode = workflowProcess.getStartNode();
 		boolean exists = idNodeTypes.stream().anyMatch(s -> s.getId().equals(startNode.getId()));
 		if (exists) {
 			idNodeTypes.removeIf(s -> s.getId().equals(startNode.getId()));
-			defineMapper.updateNodeStartNode(startNode);
+			mapper.updateNodeStartNode(startNode);
 		} else {
-			defineMapper.insertNodeStartNode(startNode);
+			mapper.insertNodeStartNode(startNode);
 		}
 
 		// activity
@@ -136,9 +126,9 @@ public class StorageServiceImpl implements IStorageService {
 			exists = idNodeTypes.stream().anyMatch(s -> s.getId().equals(activity.getId()));
 			if (exists) {
 				idNodeTypes.removeIf(s -> s.getId().equals(activity.getId()));
-				defineMapper.updateNodeActivity(activity);
+				mapper.updateNodeActivity(activity);
 			} else {
-				defineMapper.insertNodeActivity(activity);
+				mapper.insertNodeActivity(activity);
 			}
 		}
 
@@ -148,9 +138,9 @@ public class StorageServiceImpl implements IStorageService {
 			exists = idNodeTypes.stream().anyMatch(s -> s.getId().equals(route.getId()));
 			if (exists) {
 				idNodeTypes.removeIf(s -> s.getId().equals(route.getId()));
-				defineMapper.updateNodeRoute(route);
+				mapper.updateNodeRoute(route);
 			} else {
-				defineMapper.insertNodeRoute(route);
+				mapper.insertNodeRoute(route);
 			}
 		}
 
@@ -160,51 +150,78 @@ public class StorageServiceImpl implements IStorageService {
 			exists = idNodeTypes.stream().anyMatch(s -> s.getId().equals(endNode.getId()));
 			if (exists) {
 				idNodeTypes.removeIf(s -> s.getId().equals(endNode.getId()));
-				defineMapper.updateNodeEndNode(endNode);
+				mapper.updateNodeEndNode(endNode);
 			} else {
-				defineMapper.insertNodeEndNode(endNode);
+				mapper.insertNodeEndNode(endNode);
 			}
 		}
 
 		// ActivityActor
-		List<String> activityIds = activities.stream().map(s -> s.getId())
-				.collect(Collectors.toList());
-		defineMapper.deleteActivityActorByActivityIds(activityIds);
+		List<String> activityIds = activities.stream().map(s -> s.getId()).collect(Collectors.toList());
+		mapper.deleteActivityActorByActivityIds(activityIds);
 
 		List<ActivityActor> actors = new ArrayList<ActivityActor>();
 		activities.stream().map(s -> s.getActors()).forEach(a -> actors.addAll(a));
 
 		for (ActivityActor actor : actors) {
-			defineMapper.insertActivityActor(actor);
+			mapper.insertActivityActor(actor);
 		}
 
 		// transition
 		List<Transition> transitions = workflowProcess.getTransitions();
-		defineMapper.deleteTransitionByProcess(processId);
+		mapper.deleteTransitionByProcess(processId);
 		for (Transition t : transitions) {
-			defineMapper.insertTransition(t);
+			mapper.insertTransition(t);
 		}
 	}
 
+	/* ProcessInstance */
+
 	@Override
 	public void saveOrUpdateProcessInstance(ProcessInstance instance) {
-		if (instanceMapper.processInstanceExists(instance.getId())) {
-			instanceMapper.updateProcessInstance(instance);
+		if (mapper.processInstanceExists(instance.getId())) {
+			mapper.updateProcessInstance(instance);
 		} else {
-			instanceMapper.insertProcessInstance(instance);
+			mapper.insertProcessInstance(instance);
 		}
 	}
 
 	public void deleteProcessInstance(String id) {
-		instanceMapper.deleteProcessInstance(id);
+		mapper.deleteProcessInstance(id);
 	}
 
+	/* ActivityInstance */
+
 	public void insertActivityInstance(ActivityInstance instance) {
-		instanceMapper.insertActivityInstance(instance);
+		mapper.insertActivityInstance(instance);
+	}
+
+	/* WorkItem */
+
+	public WorkItem getWorkItemById(String workItemId) {
+		WorkItem workItem = mapper.getWorkItemById(workItemId);
+		return workItem;
+	}
+
+	public WorkItem findWorkItemByFirst(String actorId) {
+		WorkItem workItem = mapper.findWorkItemByFirst(actorId);
+		return workItem;
+	}
+
+	public PageList<TaskListItem> findWorkItems(String keyword, String actorId, String status, Integer pageNum,
+			Integer pageSize) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("keyword", keyword);
+		args.put("actorId", actorId);
+		args.put("status", status);
+
+		PageList<TaskListItem> list = mapper.findWorkItems(args, new PageBounds(pageNum, pageSize));
+		return list;
 	}
 
 	public void insertWorkItem(WorkItem workItem) {
-		instanceMapper.insertWorkItem(workItem);
+		mapper.insertWorkItem(workItem);
 	}
-	
+
 }

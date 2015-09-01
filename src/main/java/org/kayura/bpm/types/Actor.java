@@ -9,7 +9,6 @@ public class Actor {
 	private String employeeId;
 	private String displayName;
 	private String departmentId;
-	private String companyId;
 	private String positionId;
 
 	public Actor() {
@@ -20,9 +19,9 @@ public class Actor {
 		this.employeeId = employeeId;
 	}
 
-	public Actor(String employeeId, String displayName) {
+	public Actor(String employeeId, String departmentId) {
 		this.employeeId = employeeId;
-		this.displayName = displayName;
+		this.departmentId = departmentId;
 	}
 
 	@Override
@@ -89,14 +88,6 @@ public class Actor {
 
 	public void setDepartmentId(String departId) {
 		this.departmentId = departId;
-	}
-
-	public String getCompanyId() {
-		return companyId;
-	}
-
-	public void setCompanyId(String companyId) {
-		this.companyId = companyId;
 	}
 
 	public String getPositionId() {

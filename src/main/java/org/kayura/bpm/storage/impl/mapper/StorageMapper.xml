@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.kayura.bpm.storage.impl.mapper.DefineMapper">
+<mapper namespace="org.kayura.bpm.storage.impl.mapper.StorageMapper">
 
-	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流业务表单. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+	<!-- ************************************************************ -->
+	<!-- ********************  工作流定义   *************************** -->
+	<!-- ************************************************************ -->
+
+	<!-- 工作流业务表单 BizForm -->
 
     <resultMap id="bizFormMap" type="org.kayura.bpm.models.BizForm">
         <id column="BizForm_Id" property="id" />
@@ -97,7 +101,7 @@
         WHERE BizForm_Id = #{id}
     </delete>
     
-	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流过程定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+	<!-- 工作流过程定义 WorkflowProcess -->
 
 	<resultMap id="workflowPorcessMap" type="org.kayura.bpm.models.WorkflowProcess">
 		<id property="id" column="Process_Id" />
@@ -252,7 +256,7 @@
 	    DELETE FROM Bpm_Process WHERE BizFrom_Id = #{bizFromId}
 	</delete>
 	
-	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流环节定义SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+	<!-- WorkflowProcess.Node -->
 
 	<resultMap id="nodeMap" type="org.kayura.bpm.models.Node">
 		<id column="Node_Id" property="id" />
@@ -306,9 +310,7 @@
 		<association property="fromNode" column="FromNode_Id" select="selectActivityById"/>
 		<association property="toNode" column="ToNode_Id" select="selectActivityById"/>
 	</resultMap>
-
-	<!--  SQL 片段 -->
-
+	
 	<sql id="nodeColumns">
     	${alias}.Node_Id, 
     	${alias}.Process_Id, 
@@ -453,8 +455,6 @@
 		WHERE t.Node_Id = #{value}
 	</select>
 	
-	<!-- >>>> INSERT <<<< -->
-
 	<insert id="insertNodeStartNode" parameterType="org.kayura.bpm.models.StartNode">
 	    INSERT Bpm_Nodes (
 	    	<include refid="insertNodeColumns" />
@@ -490,8 +490,6 @@
 	    	<include refid="insertNodeValues" />
 	    )
 	</insert>
-	
-	<!-- >>>> UPDATE <<<< -->
 
 	<update id="updateNodeStartNode" parameterType="org.kayura.bpm.models.StartNode">
 	    UPDATE Bpm_Nodes
@@ -519,8 +517,6 @@
 		WHERE Node_Id = #{id}
 	</update>
 	
-	<!-- >>>> DELETE <<<< -->
-
 	<delete id="deleteNodeByIds" parameterType="list">
 		DELETE FROM Bpm_Nodes
 		WHERE Node_Id IN
@@ -529,7 +525,7 @@
 		</foreach>
 	</delete>
 
-	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流环节转移线SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+	<!-- WorkflowProcess.Transitions -->
 
 	<select id="selectTransitionByProcess" parameterType="string" resultMap="transitionMap">
 	    SELECT 
@@ -593,7 +589,7 @@
 	    WHERE Process_Id = #{processId}
 	</delete>
 	
-	<!-- >>>>>>>>>>>>>>>>>>>>>>> 工作流活动参与者SQL块. <<<<<<<<<<<<<<<<<<<<<<<<< -->
+	<!-- WorkflowProcess.ActivityActors -->
 
 	<sql id="activityActorColumns">
 		${alias}.ActivityActor_Id,
@@ -638,5 +634,216 @@
 			#{item}
 		</foreach>
 	</delete>
+	
+	<!-- ************************************************************ -->
+	<!-- ********************  工作流实例   *************************** -->
+	<!-- ************************************************************ -->
+	
+	<!-- 过程实例 ProcessInstance -->
+
+	<resultMap id="processInstanceMap" type="org.kayura.bpm.kernel.ProcessInstance">
+		<id property="id" column="ProcessInstance_Id" />
+		<result property="parentId" column="Parent_Id" />
+		<result property="title" column="Title" />
+		<result property="bizDataId" column="BizData_Id" />
+		<result property="createdTime" column="CreatedTime" />
+		<result property="completedTime" column="CompletedTime" />
+		<result property="status" column="Status" />
+		<association property="process" column="Process_Id"
+			select="selectWorkflowProcessById" />
+		<association property="creator" javaType="org.kayura.bpm.types.Actor"
+			columnPrefix="Creator_" resultMap="actorMap" />
+	</resultMap>
+	
+	<select id="getProcessInstanceById" parameterType="string" resultMap="processInstanceMap">
+		SELECT
+			t.ProcessInstance_Id,
+			t.Parent_Id,
+			t.Process_Id,
+			t.Title,
+			t.BizData_Id,
+			t.CreatedTime,
+			t.CompletedTime,
+			t.Status,
+			cr.Actor_Id AS Creator_Actor_Id,
+			cr.Parent_Id AS Creator_Parent_Id,
+			cr.Employee_Id AS Creator_Employee_Id,
+			cr.DisplayName AS Creator_DisplayName,
+			cr.Department_Id AS Creator_Department_Id,
+			cr.Position_Id AS Creator_Position_Id
+		FROM
+			bpm_processinstance AS t
+			INNER JOIN bpm_actors AS cr ON cr.Actor_Id = t.Creator_Id
+		WHERE t.ProcessInstance_Id = #{id}
+	</select>
+	
+	<select id="processInstanceExists" parameterType="string" resultType="boolean">
+		SELECT COUNT(1) > 0
+		FROM Bpm_ProcessInstance t
+		WHERE t.ProcessInstance_Id = #{id}
+	</select>
+
+	<insert id="insertProcessInstance" parameterType="org.kayura.bpm.kernel.ProcessInstance">
+		INSERT Bpm_ProcessInstance (
+			ProcessInstance_Id,
+			Parent_Id,
+			Process_Id,
+			Title,
+			BizData_Id,
+			Creator_Id,
+			CreatedTime,
+			CompletedTime,
+			Status
+		) Values (
+			#{id},
+			#{parentId},
+			#{process.id},
+			#{title},
+			#{bizDataId},
+			#{creator.id},
+			#{createdTime},
+			#{completedTime},
+			#{status}
+		)
+	</insert>
+	
+	<update id="updateProcessInstance" parameterType="org.kayura.bpm.kernel.ProcessInstance">
+		UPDATE Bpm_ProcessInstance
+		SET	Parent_Id = #{parentId},
+			Process_Id = #{process.id},
+			Title = #{title},
+			BizData_Id = #{bizDataId},
+			Creater_Id = #{creater.id},
+			CreatedTime = #{createdTime},
+			CompletedTime = #{completedTime},
+			Status = #{status}
+		WHERE ProcessInstance_Id = #{id}
+	</update>
+	
+	<delete id="deleteProcessInstance" parameterType="string">
+		DELETE FROM Bpm_ProcessInstance
+		WHERE ProcessInstance_Id = #{id}
+	</delete>
+	
+	<!--  ActivityInstance  -->
+	
+	<select id="insertActivityInstance" parameterType="org.kayura.bpm.kernel.ActivityInstance">
+		INSERT Bpm_ActivityInstance (
+			ActivityInstance_Id,
+			ProcessInstance_Id,
+			Activity_Id,
+			DisplayName,
+			Creator_Id,
+			CreatedTime,
+			CompletedTime,
+			PreActInstance_Id,
+			Status,
+			ExecuteType
+		) Values (
+			#{id},
+			#{processInstance.id},
+			#{activity.id},
+			#{displayName},
+			#{creator.id},
+			#{createdTime},
+			#{completedTime},
+			#{preActInstanceId},
+			#{status},
+			#{executeType}
+		)
+	</select>
+	
+	<select id="updateActivityInstance" parameterType="org.kayura.bpm.kernel.ActivityInstance">
+		UPDATE Bpm_ActivityInstance
+		SET ProcessInstance_Id = #{processInstance.id},
+			Activity_Id = #{activity.id},
+			DisplayName = #{displayName},
+			Creator_Id = #{creator.id},
+			CreatedTime = #{createdTime},
+			CompletedTime = #{completedTime},
+			PreActInstance_Id = #{preActInstanceId},
+			Status = #{status},
+			ExecuteType = #{executeType}
+		WHERE ActivityInstance_Id = #{id},
+	</select>
+	
+	<!-- WorkItems -->
+	
+	<resultMap id="workItemMap" type="org.kayura.bpm.kernel.WorkItem">
+		
+	</resultMap>
+	
+	<sql id="workItemColumns">
+		${alias}.WorkItem_Id,
+		${alias}.ActivityInstance_Id,
+		${alias}.Parent_Id,
+		${alias}.Sender_Id,
+		${alias}.Owner_Id,
+		${alias}.Sn,
+		${alias}.Priority,
+		${alias}.CreatedTime,
+		${alias}.AlarmTime,
+		${alias}.Depth,
+		${alias}.TaskType,
+		${alias}.Status,
+		${alias}.Handler_Id,
+		${alias}.Comment,
+		${alias}.CompletedTime
+	</sql>
+	
+	<select id="getWorkItemById" parameterType="string" resultMap="workItemMap">
+		SELECT
+			<include refid="workItemColumns">
+				<property name="alias" value="t"/>
+			</include>
+		FROM
+			bpm_workitems AS t
+		WHERE t.WorkItem_Id = #{value}
+	</select>
+	
+	<select id="findWorkItemByFirst" parameterType="string" resultMap="workItemMap">
+		SELECT
+			<include refid="workItemColumns">
+				<property name="alias" value="t"/>
+			</include>
+		FROM
+			bpm_workitems AS t
+		WHERE
+			( t.Owner_Id = #{value} ) AND ( t.Status IN (0, 2) ) 
+		ORDER BY t.Status, t.TaskType, t.CreatedTime DESC
+		LIMIT 1
+	</select>
+		
+	
+	<insert id="insertWorkItem" parameterType="org.kayura.bpm.kernel.WorkItem">
+		INSERT INTO bpm_workitems (
+			WorkItem_Id,
+			ActivityInstance_Id,
+			<if test="parent != null ">Parent_Id,</if>
+			Sender_Id,
+			Owner_Id,
+			Sn,
+			Priority,
+			CreatedTime,
+			AlarmTime,
+			Depth,
+			TaskType,
+			Status
+		) VALUES (
+			#{id},
+			#{activityInstance.id},
+			<if test="parent != null ">#{parent.id},</if>
+			#{sender.id},
+			#{owner.id},
+			#{sn},
+			#{priority},
+			#{createdTime},
+			#{alarmTime},
+			#{depth},
+			#{taskType},
+			#{status}
+		)
+	</insert>
+
 
 </mapper>

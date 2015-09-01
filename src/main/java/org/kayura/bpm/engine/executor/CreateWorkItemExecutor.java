@@ -7,9 +7,10 @@ package org.kayura.bpm.engine.executor;
 import org.kayura.bpm.engine.IWorkflowContext;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.InstanceStatus;
-import org.kayura.bpm.kernel.WorkItem;
+import org.kayura.bpm.models.WorkItem;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.types.Actor;
+import org.kayura.utils.DateUtils;
 import org.kayura.utils.KeyUtils;
 
 /**
@@ -64,6 +65,7 @@ public class CreateWorkItemExecutor extends Executor<WorkItem> {
 		task.setDepth(depth);
 		task.setSender(this.sender);
 		task.setOwner(this.owner);
+		task.setCreatedTime(DateUtils.now());
 		task.setStatus(InstanceStatus.Running);
 		task.setPriority(this.priority);
 		task.setTaskType(this.taskType);

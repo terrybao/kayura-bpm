@@ -17,8 +17,7 @@ import org.kayura.bpm.organize.impl.OrganizeServiceImpl;
 import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.storage.impl.StorageServiceImpl;
-import org.kayura.bpm.storage.impl.mapper.DefineMapper;
-import org.kayura.bpm.storage.impl.mapper.InstanceMapper;
+import org.kayura.bpm.storage.impl.mapper.StorageMapper;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.BizData;
 import org.kayura.bpm.types.StartArgs;
@@ -46,12 +45,11 @@ public class WorkflowStartupTest {
 
 		session = sqlSessionFactory.openSession();
 
-		DefineMapper dmapper = session.getMapper(DefineMapper.class);
-		InstanceMapper imapper = session.getMapper(InstanceMapper.class);
-		OrganizeMapper omapper = session.getMapper(OrganizeMapper.class);
+		StorageMapper dMapper = session.getMapper(StorageMapper.class);
+		OrganizeMapper oMapper = session.getMapper(OrganizeMapper.class);
 
-		IStorageService storageService = new StorageServiceImpl(dmapper, imapper);
-		IOrganizeService organizeService = new OrganizeServiceImpl(omapper);
+		IStorageService storageService = new StorageServiceImpl(dMapper);
+		IOrganizeService organizeService = new OrganizeServiceImpl(oMapper);
 
 		IWorkflowContext context = new WorkflowContextImpl(storageService, organizeService);
 
@@ -70,7 +68,7 @@ public class WorkflowStartupTest {
 	public void startupTest() {
 
 		StartArgs args = new StartArgs();
-		args.setCreator(new Actor("xialiang", "夏亮"));
+		args.setCreator(new Actor("xialiang"));
 		args.setBizData(new BizData(bizDataId, "测试流程"));
 		args.setFlowCode("UnitTest");
 
@@ -78,7 +76,5 @@ public class WorkflowStartupTest {
 
 		System.out.println(startResult.getMessage());
 	}
-	
-	
 
 }

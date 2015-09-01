@@ -16,7 +16,7 @@ import org.kayura.bpm.types.DataStatus;
  */
 public interface OrganizeMapper {
 
-	/*  >>>>>>>>>>>>>>>  Company  <<<<<<<<<<<<<<<<< */
+	/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 组织机构-公司 Company <<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 	
 	/**
 	 * 查询符合条件的公司集合.
@@ -37,7 +37,7 @@ public interface OrganizeMapper {
 	 */
 	Company getCompanyById(String companyId);
 
-	/*  >>>>>>>>>>>>>>>  Department  <<<<<<<<<<<<<<<<< */
+	/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>> 组织机构-部门 Department <<<<<<<<<<<<<<<<<<<<<<<<<< */
 	
 	/**
 	 * 查询符合条件的部门集合.
@@ -59,7 +59,7 @@ public interface OrganizeMapper {
 	 */
 	Department getDepartmentById(String departmentId);
 
-	/*  >>>>>>>>>>>>>>>  Position  <<<<<<<<<<<<<<<<< */
+	/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>> 组织机构-岗位 Position <<<<<<<<<<<<<<<<<<<<<<<<<< */
 	
 	/**
 	 * 查询符合条件的岗位集合.
@@ -72,7 +72,7 @@ public interface OrganizeMapper {
 	 */
 	List<Position> findPositions(Map<String, Object> args);
 
-	/*  >>>>>>>>>>>>>>>  Actor  <<<<<<<<<<<<<<<<< */
+	/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>> 组织机构-参与者 Actor <<<<<<<<<<<<<<<<<<<<<<<<<< */
 
 	/**
 	 * 查询指定组织下的参与者信息.
@@ -125,7 +125,7 @@ public interface OrganizeMapper {
 	 */
 	List<Actor> findActorsByIds(List<String> actorIds);
 
-	/*  >>>>>>>>>>>>>>>  Role  <<<<<<<<<<<<<<<<< */
+	/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 组织机构-角色 Role <<<<<<<<<<<<<<<<<<<<<<<<<<< */
 	
 	/**
 	 * 查询符合条件的角色列表.

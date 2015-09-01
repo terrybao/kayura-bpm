@@ -1,7 +1,8 @@
-package org.kayura.bpm.kernel;
+package org.kayura.bpm.models;
 
 import java.util.Date;
 
+import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.types.Actor;
 
 public class WorkItem {
@@ -18,28 +19,29 @@ public class WorkItem {
 	}
 
 	/**
-	 *  0 正常、1 挂起、2 完成、3 终止
+	 * 0 正常、1 挂起、2 完成、3 终止
 	 */
 	public static class TaskStatus {
 		public final static Integer Running = 0;
 		public final static Integer Hang = 1;
-		public final static Integer Completed = 2;		
-		public final static Integer End = 3;	
+		public final static Integer Completed = 2;
+		public final static Integer End = 3;
 	}
-	
+
 	private String id;
 	private WorkItem parent;
 	private ActivityInstance activityInstance;
 	private Actor sender;
 	private Actor owner;
-	private Actor handler;
+	private Date createdTime;
 	private Date alarmTime;
 	private Integer sn;
 	private Integer priority;
 	private Integer depth;
 	private Integer taskType;
 	private Integer status;
-	private String commint;
+	private Actor handler;
+	private String comment;
 	private String completedTime;
 
 	public WorkItem() {
@@ -84,6 +86,14 @@ public class WorkItem {
 
 	public void setOwner(Actor owner) {
 		this.owner = owner;
+	}
+
+	public Date getCreatedTime() {
+		return createdTime;
+	}
+
+	public void setCreatedTime(Date createdTime) {
+		this.createdTime = createdTime;
 	}
 
 	public Actor getHandler() {
@@ -142,12 +152,12 @@ public class WorkItem {
 		this.status = status;
 	}
 
-	public String getCommint() {
-		return commint;
+	public String getComment() {
+		return comment;
 	}
 
-	public void setCommint(String commint) {
-		this.commint = commint;
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public String getCompletedTime() {
