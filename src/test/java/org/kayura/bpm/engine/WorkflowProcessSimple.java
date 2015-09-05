@@ -4,6 +4,8 @@
  */
 package org.kayura.bpm.engine;
 
+import org.junit.Test;
+import org.kayura.bpm.builder.WorkflowProcessBuilder;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor.ActorTypes;
 import org.kayura.bpm.models.EndNode;
@@ -30,6 +32,14 @@ public class WorkflowProcessSimple {
 		process.createTransition(shenpi, endNode);
 
 		return process;
+	}
+
+	@Test
+	public void outputLineProcessTest() {
+		WorkflowProcess wp = getLineProcess();
+
+		WorkflowProcessBuilder builder = new WorkflowProcessBuilder(wp);
+		System.out.println(builder.exportXml());
 	}
 
 }

@@ -22,7 +22,7 @@ public class WorkflowProcessBuilderTest {
 
 		WorkflowProcessBuilder builder = new WorkflowProcessBuilder(process);
 
-		System.out.println(builder.formatXml());
+		System.out.println(builder.exportXml());
 	}
 
 	@Test

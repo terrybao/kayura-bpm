@@ -83,7 +83,7 @@ public class StorageServiceTest {
 			session.commit();
 
 			WorkflowProcessBuilder builder = new WorkflowProcessBuilder(wp);
-			System.out.println(builder.formatXml());
+			System.out.println(builder.exportXml());
 
 		} catch (Exception e) {
 			e.printStackTrace();

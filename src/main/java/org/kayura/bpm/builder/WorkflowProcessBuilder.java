@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import javax.xml.transform.OutputKeys;
+
 import org.kayura.bpm.exceptions.WorkflowException;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
@@ -223,7 +225,7 @@ public class WorkflowProcessBuilder {
 		}
 	}
 
-	public String formatXml() {
+	public String exportXml() {
 
 		this.document = new XDocument();
 		XNode root = this.document.createChildNode("workflowProcess");
@@ -234,8 +236,12 @@ public class WorkflowProcessBuilder {
 		formatActivities(root);
 		formatRoutes(root);
 		formatTransitions(root);
+		
+		Properties attrs = new Properties();
+		attrs.setProperty(OutputKeys.DOCTYPE_SYSTEM, "http://www.kayura.org/dtd/workflow-process.dtd");
+		attrs.setProperty(OutputKeys.DOCTYPE_PUBLIC, "-//kayura.org//DTD Process 1.0//EN");
 
-		return this.document.toString();
+		return this.document.exportXml(attrs);
 	}
 
 	private void formatTransitions(XNode root) {
