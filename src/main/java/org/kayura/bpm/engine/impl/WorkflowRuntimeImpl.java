@@ -9,22 +9,20 @@ import org.kayura.bpm.engine.executor.CreateActivityInstanceExecutor;
 import org.kayura.bpm.engine.executor.CreateProcessInstanceExecutor;
 import org.kayura.bpm.engine.executor.CreateWorkItemExecutor;
 import org.kayura.bpm.engine.executor.Executor;
-import org.kayura.bpm.engine.executor.FindWorkItemExecutor;
 import org.kayura.bpm.exceptions.WorkflowException;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.StartNodeInstance;
+import org.kayura.bpm.kernel.WorkItem;
+import org.kayura.bpm.kernel.WorkItem.Prioritys;
+import org.kayura.bpm.kernel.WorkItem.TaskTypes;
 import org.kayura.bpm.models.Activity;
-import org.kayura.bpm.models.WorkItem;
-import org.kayura.bpm.models.WorkItem.Prioritys;
-import org.kayura.bpm.models.WorkItem.TaskTypes;
 import org.kayura.bpm.organize.IOrganizeService;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.StartArgs;
 import org.kayura.bpm.types.StartResult;
 import org.kayura.bpm.types.TaskArgs;
-import org.kayura.bpm.types.TaskInfo;
 import org.kayura.bpm.types.TaskResult;
 
 public class WorkflowRuntimeImpl implements IWorkflowRuntime {
@@ -101,7 +99,7 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 		return result;
 	}
 
-	public TaskInfo findWorkItemByFirst(Actor user) {
+	public WorkItem findWorkItemByFirst(Actor user) {
 
 		IStorageService storageService = context.getStorageService();
 		IOrganizeService organizeService = context.getOrganizeService();
@@ -109,12 +107,19 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 		Actor byActor = organizeService.findActorByActor(user);
 		WorkItem byFirst = storageService.findWorkItemByFirst(byActor.getId());
 
-		return null;
+		return byFirst;
 	}
 
 	public TaskResult completeWorkItem(TaskArgs args) {
+		
+		// 检查参数是否满足.
 
-		WorkItem workItem = this.execute(new FindWorkItemExecutor(args.getWorkItemId()));
+		// 获取任务对象.
+		
+		// 
+		
+		
+		//WorkItem workItem = this.execute(new FindWorkItemExecutor(args.getWorkItemId()));
 
 		return null;
 	}

@@ -1,20 +1,45 @@
-package org.kayura.bpm.models;
+package org.kayura.bpm.kernel;
 
 import java.util.Date;
 
-import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.types.Actor;
 
+/**
+ * 工作流执行过程中产生的工作项,由人工处理的任务.
+ * 
+ * @author liangxia@live.com
+ */
 public class WorkItem {
 
+	/**
+	 * 任务的优先级,数字越大优先级越高.
+	 */
 	public static class Prioritys {
-		public final static Integer Lower = -1;
-		public final static Integer Medium = 0;
-		public final static Integer High = 1;
+		/**
+		 * 0 低优先级.
+		 */
+		public final static Integer Lower = 0;
+		/**
+		 * 1 中优先级.
+		 */
+		public final static Integer Medium = 1;
+		/**
+		 * 2 高优先级.
+		 */
+		public final static Integer High = 2;
 	}
 
+	/**
+	 * 工作项类型：0 任务；1 查阅.
+	 */
 	public static class TaskTypes {
+		/**
+		 * 0 任务.
+		 */
 		public final static Integer Task = 0;
+		/**
+		 * 1 查阅.
+		 */
 		public final static Integer Read = 1;
 	}
 
@@ -22,9 +47,21 @@ public class WorkItem {
 	 * 0 正常、1 挂起、2 完成、3 终止
 	 */
 	public static class TaskStatus {
-		public final static Integer Running = 0;
-		public final static Integer Hang = 1;
+		/**
+		 * 0 正常（运行中）.
+		 */
+		public final static Integer Todo = 0;
+		/**
+		 * 1 挂起（表示该任务不可处理）.
+		 */
+		public final static Integer Suspend = 1;
+		/**
+		 * 2 完成（正常处理完成的任务）.
+		 */
 		public final static Integer Completed = 2;
+		/**
+		 * 3 结束（表示非正常处理完成的任务）.
+		 */
 		public final static Integer End = 3;
 	}
 
@@ -42,7 +79,7 @@ public class WorkItem {
 	private Integer status;
 	private Actor handler;
 	private String comment;
-	private String completedTime;
+	private Date completedTime;
 
 	public WorkItem() {
 
@@ -160,11 +197,11 @@ public class WorkItem {
 		this.comment = comment;
 	}
 
-	public String getCompletedTime() {
+	public Date getCompletedTime() {
 		return completedTime;
 	}
 
-	public void setCompletedTime(String completedTime) {
+	public void setCompletedTime(Date completedTime) {
 		this.completedTime = completedTime;
 	}
 

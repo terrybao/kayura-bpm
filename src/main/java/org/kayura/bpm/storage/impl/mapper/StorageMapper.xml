@@ -3,7 +3,29 @@
 <mapper namespace="org.kayura.bpm.storage.impl.mapper.StorageMapper">
 
 	<!-- ************************************************************ -->
-	<!-- ********************  工作流定义   *************************** -->
+	<!-- *******************  引用组织机构  ************************** -->
+	<!-- ************************************************************ -->
+	
+	<resultMap id="actorMap" type="org.kayura.bpm.types.Actor">
+		<id property="id" column="Actor_Id" />
+		<result property="parentId" column="Parent_Id" />
+		<result property="employeeId" column="Employee_Id" />
+		<result property="displayName" column="DisplayName" />
+		<result property="departmentId" column="Department_Id" />
+		<result property="positionId" column="Position_Id" />
+	</resultMap>
+	
+	<sql id="actorColumns">
+		${alias}.Actor_Id AS ${prefix}Actor_Id,
+		${alias}.Parent_Id AS ${prefix}Parent_Id,
+		${alias}.Employee_Id AS ${prefix}Employee_Id,
+		${alias}.DisplayName AS ${prefix}DisplayName,
+		${alias}.Department_Id AS ${prefix}Department_Id,
+		${alias}.Position_Id AS ${prefix}Position_Id
+	</sql>
+
+	<!-- ************************************************************ -->
+	<!-- *******************  工作流定义   ************************** -->
 	<!-- ************************************************************ -->
 
 	<!-- 工作流业务表单 BizForm -->
@@ -636,10 +658,10 @@
 	</delete>
 	
 	<!-- ************************************************************ -->
-	<!-- ********************  工作流实例   *************************** -->
+	<!-- ********************  工作流实例   ************************** -->
 	<!-- ************************************************************ -->
 	
-	<!-- 过程实例 ProcessInstance -->
+	<!-- ProcessInstance -->
 
 	<resultMap id="processInstanceMap" type="org.kayura.bpm.kernel.ProcessInstance">
 		<id property="id" column="ProcessInstance_Id" />
@@ -649,31 +671,33 @@
 		<result property="createdTime" column="CreatedTime" />
 		<result property="completedTime" column="CompletedTime" />
 		<result property="status" column="Status" />
-		<association property="process" column="Process_Id"
-			select="selectWorkflowProcessById" />
-		<association property="creator" javaType="org.kayura.bpm.types.Actor"
-			columnPrefix="Creator_" resultMap="actorMap" />
+		<association property="process" column="Process_Id" select="selectWorkflowProcessById" />
+		<association property="creator" columnPrefix="Creator_" resultMap="actorMap" />
 	</resultMap>
+	
+	<sql id="processInstanceColumns">
+		${alias}.ProcessInstance_Id,
+		${alias}.Parent_Id,
+		${alias}.Process_Id,
+		${alias}.Title,
+		${alias}.BizData_Id,
+		${alias}.CreatedTime,
+		${alias}.CompletedTime,
+		${alias}.Status
+	</sql>
 	
 	<select id="getProcessInstanceById" parameterType="string" resultMap="processInstanceMap">
 		SELECT
-			t.ProcessInstance_Id,
-			t.Parent_Id,
-			t.Process_Id,
-			t.Title,
-			t.BizData_Id,
-			t.CreatedTime,
-			t.CompletedTime,
-			t.Status,
-			cr.Actor_Id AS Creator_Actor_Id,
-			cr.Parent_Id AS Creator_Parent_Id,
-			cr.Employee_Id AS Creator_Employee_Id,
-			cr.DisplayName AS Creator_DisplayName,
-			cr.Department_Id AS Creator_Department_Id,
-			cr.Position_Id AS Creator_Position_Id
+			<include refid="processInstanceColumns">
+				<property name="alias" value="t"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="ca"/>
+				<property name="prefix" value="Creator_"/>
+			</include>
 		FROM
 			bpm_processinstance AS t
-			INNER JOIN bpm_actors AS cr ON cr.Actor_Id = t.Creator_Id
+			INNER JOIN bpm_actors AS ca ON ca.Actor_Id = t.Creator_Id
 		WHERE t.ProcessInstance_Id = #{id}
 	</select>
 	
@@ -726,6 +750,46 @@
 	</delete>
 	
 	<!--  ActivityInstance  -->
+
+	<resultMap id="activityInstanceMap" type="org.kayura.bpm.kernel.ActivityInstance">
+		<id property="id" column="ActivityInstance_Id" />
+		<result property="displayName" column="DisplayName" />
+		<result property="createdTime" column="CreatedTime" />
+		<result property="completedTime" column="CompletedTime" />
+		<result property="preActInstanceId" column="PreActInstance_Id" />
+		<result property="status" column="Status" />
+		<result property="executeType" column="ExecuteType" />
+		<association property="creator" resultMap="actorMap" columnPrefix="Creator_" />
+		<association property="processInstance" column="ProcessInstance_Id" select="getProcessInstanceById" />
+		<association property="activity" column="Activity_Id" select="selectActivityById" />
+	</resultMap>
+	
+	<sql id="activityInstanceColumns">
+		${alias}.ActivityInstance_Id,
+		${alias}.ProcessInstance_Id,
+		${alias}.Activity_Id,
+		${alias}.DisplayName,
+		${alias}.Creator_Id,
+		${alias}.CreatedTime,
+		${alias}.CompletedTime,
+		${alias}.PreActInstance_Id,
+		${alias}.Status,
+		${alias}.ExecuteType
+	</sql>
+	
+	<select id="getActivityInstanceById" parameterType="string" resultMap="activityInstanceMap">
+		SELECT 
+			<include refid="activityInstanceColumns">
+				<property name="alias" value="t"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="ca"/>
+				<property name="prefix" value="Creator_"/>
+			</include>
+		FROM Bpm_ActivityInstance t
+			LEFT JOIN bpm_actors AS ca ON ca.Actor_Id = t.Creator_Id
+		WHERE t.ActivityInstance_Id = #{value}
+	</select>
 	
 	<select id="insertActivityInstance" parameterType="org.kayura.bpm.kernel.ActivityInstance">
 		INSERT Bpm_ActivityInstance (
@@ -770,7 +834,22 @@
 	<!-- WorkItems -->
 	
 	<resultMap id="workItemMap" type="org.kayura.bpm.kernel.WorkItem">
+		<id property="id" column="WorkItem_Id" />
+		<result property="sn" column="Sn" />
+		<result property="priority" column="Priority" />
+		<result property="createdTime" column="CreatedTime" />
+		<result property="alarmTime" column="AlarmTime" />
+		<result property="depth" column="Depth" />
+		<result property="taskType" column="TaskType" />
+		<result property="status" column="Status" />
+		<result property="comment" column="Comment" />
+		<result property="completedTime" column="CompletedTime" />
 		
+		<association property="parent" column="Parent_Id" select="getWorkItemById" />
+		<association property="activityInstance" column="ActivityInstance_Id" select="getActivityInstanceById" />
+		<association property="sender" resultMap="actorMap" columnPrefix="Sender_" />
+		<association property="owner" resultMap="actorMap" columnPrefix="Owner_" />
+		<association property="handler" resultMap="actorMap" columnPrefix="Handler_" />
 	</resultMap>
 	
 	<sql id="workItemColumns">
@@ -795,9 +874,24 @@
 		SELECT
 			<include refid="workItemColumns">
 				<property name="alias" value="t"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="sa"/>
+				<property name="prefix" value="Sender_"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="oa"/>
+				<property name="prefix" value="Owner_"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="ha"/>
+				<property name="prefix" value="Handler_"/>
 			</include>
 		FROM
 			bpm_workitems AS t
+			LEFT JOIN bpm_actors AS sa ON sa.Actor_Id = t.Sender_Id
+			LEFT JOIN bpm_actors AS oa ON oa.Actor_Id = t.Owner_Id
+			LEFT JOIN bpm_actors AS ha ON ha.Actor_Id = t.Handler_Id
 		WHERE t.WorkItem_Id = #{value}
 	</select>
 	
@@ -805,12 +899,26 @@
 		SELECT
 			<include refid="workItemColumns">
 				<property name="alias" value="t"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="sa"/>
+				<property name="prefix" value="Sender_"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="oa"/>
+				<property name="prefix" value="Owner_"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="ha"/>
+				<property name="prefix" value="Handler_"/>
 			</include>
 		FROM
 			bpm_workitems AS t
-		WHERE
-			( t.Owner_Id = #{value} ) AND ( t.Status IN (0, 2) ) 
-		ORDER BY t.Status, t.TaskType, t.CreatedTime DESC
+			LEFT JOIN bpm_actors AS sa ON sa.Actor_Id = t.Sender_Id
+			LEFT JOIN bpm_actors AS oa ON oa.Actor_Id = t.Owner_Id
+			LEFT JOIN bpm_actors AS ha ON ha.Actor_Id = t.Handler_Id
+		WHERE ( t.Owner_Id = #{value} ) AND ( t.Status IN (0, 2) ) 
+		ORDER BY t.Status, t.TaskType, t.Priority DESC, t.CreatedTime DESC
 		LIMIT 1
 	</select>
 		
@@ -844,6 +952,44 @@
 			#{status}
 		)
 	</insert>
+	
+	<update id="updateWorkItemByMap" parameterType="map">
+		UPDATE bpm_workitems (
+		<set>
+			<if test="priority != null">Priority = #{priority},</if>
+			<if test="alarmTime != null">AlarmTime = #{alarmTime},</if>
+			<if test="sn != null">Sn = #{sn},</if>
+			<if test="handlerId != null">Handler_Id = #{handlerId},</if>
+			<if test="comment != null">Comment = #{comment},</if>
+			<if test="completedTime != null">CompletedTime = #{completedTime},</if>
+			<if test="status != null">Status = #{status}</if>
+		</set>
+		WHERE WorkItem_Id = #{id}
+	</update>
 
+	<select id="workItemCountByMap" parameterType="map" resultType="int">
+		SELECT COUNT(1)
+		FROM bpm_workitems AS t
+		<where>
+			<if test="activityInstanceId != null">
+				AND t.ActivityInstance_Id = #{activityInstanceId}
+			</if>
+			<if test="sn != null">
+				AND t.SN = #{sn} -- 指定的相同序号.
+			</if>
+			<if test="excludeId != null">
+				AND t.WorkItem_Id != #{excludeId}  -- 排除掉的 WorkItemId.
+			</if>
+			<if test="parentId != null">
+				AND t.Parent_Id = #{parentId}
+			</if>
+			<if test="taskType != null">
+				AND t.TaskType = #{taskType} 
+			</if>
+			<if test="status != null">
+				AND t.Status IN ( ${status} )
+			</if>
+		</where>		
+	</select>
 
 </mapper>

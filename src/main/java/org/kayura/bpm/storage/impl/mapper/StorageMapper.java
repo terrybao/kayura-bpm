@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
+import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.BizForm;
@@ -13,7 +14,6 @@ import org.kayura.bpm.models.EndNode;
 import org.kayura.bpm.models.Route;
 import org.kayura.bpm.models.StartNode;
 import org.kayura.bpm.models.Transition;
-import org.kayura.bpm.models.WorkItem;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.storage.impl.po.IdNodeType;
 import org.kayura.bpm.types.TaskListItem;
@@ -126,4 +126,26 @@ public interface StorageMapper {
 
 	PageList<TaskListItem> findWorkItems(Map<String, Object> args, PageBounds pageBounds);
 
+	/**
+	 * 动态更新指定列的工作项.
+	 * 
+	 * @param args 可更新列键值.
+	 * <p>priority,alarmTime,sn,handlerId,comment,completedTime,status 最少需要指定一个.
+	 * <p>id 为必需参数，工作项主键值.
+	 */
+	void updateWorkItemByMap(Map<String, Object> args);
+
+	/**
+	 * 根据条件查询出符合条件的工作项计数.
+	 * 
+	 * @param args 可选条件参数:
+	 * <p>activityInstanceId 活动实例 Id
+	 * <p>sn 指定的处理顺号
+	 * <p>excludeId 排除掉的工作项Id 
+	 * <p>parentId 父级工作项Id
+	 * <p>taskType 工作项类型.
+	 * <p>status 工作项状态.
+	 * @return 返回工作项计数.
+	 */
+	Integer workItemCountByMap(Map<String, Object> args);
 }

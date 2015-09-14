@@ -10,6 +10,7 @@ public class TaskArgs {
 
 	private String workItemId;
 	private Actor handler;
+	private String comment;
 	private List<Actor> copyTo = new ArrayList<Actor>();
 	private Map<String, List<Actor>> targetActivities = new HashMap<String, List<Actor>>();
 	private Properties variables = new Properties();
@@ -37,6 +38,14 @@ public class TaskArgs {
 
 	public void setHandler(Actor handler) {
 		this.handler = handler;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public List<Actor> getCopyTo() {

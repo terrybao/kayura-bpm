@@ -4,9 +4,10 @@ import java.util.Map;
 
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
+import org.kayura.bpm.kernel.WorkItem;
+import org.kayura.bpm.kernel.WorkItem.TaskStatus;
 import org.kayura.bpm.models.BizForm;
 import org.kayura.bpm.models.DefineStatus;
-import org.kayura.bpm.models.WorkItem;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.type.PageList;
 import org.kayura.type.PageParams;
@@ -109,8 +110,51 @@ public interface IStorageService {
 	 */
 	void insertWorkItem(WorkItem workItem);
 
+	/**
+	 * 查询参与者的第一条待办.
+	 * 
+	 * @param actorId 参与者 Id.
+	 * @return 返回该工作项对象.
+	 */
 	WorkItem findWorkItemByFirst(String actorId);
 
+	/**
+	 * 获取一个工作项.
+	 * 
+	 * @param workItemId 工作项 Id.
+	 * @return 返回该工作项对象.
+	 */
 	WorkItem getWorkItemById(String workItemId);
+
+	/**
+	 * 更新一个工作项状态.
+	 * 
+	 * @param workItem
+	 */
+	void updateWorkItemStatus(WorkItem workItem);
+
+	/**
+	 * 完成一个工作项任务.
+	 * 
+	 * @param workItem 工作项任务对象.
+	 */
+	void completedWorkItem(WorkItem workItem);
+
+	/**
+	 * 查询指定状态的子工作项计数.
+	 * 
+	 * @param parentWorkItemId 父级任务 Id.
+	 * @param status 可指定的多个状态 {@link TaskStatus}.
+	 * @return 返回工作项计数.
+	 */
+	Integer childTaskCount(String parentId, Integer[] status);
+
+	/**
+	 * 检查某个活动下的工作项是否均已经完成.
+	 * 
+	 * @param activityInstanceId 活动实例Id.
+	 * @return 如果均已经完成返回 true, 否则返回 false.
+	 */
+	Integer taskCountByActivity(String parentId, Integer sn, Integer[] status);
 
 }

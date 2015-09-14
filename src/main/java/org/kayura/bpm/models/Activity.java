@@ -12,10 +12,28 @@ import org.kayura.utils.StringUtils;
  */
 public class Activity extends Node {
 
+	/**
+	 * 0 任意人处理(Single).
+	 * <p>1 按顺序处理(Sequence).
+	 * <p>2 所有人处理(All).
+	 * <p>3 按比例处理(Scale).
+	 */
 	public static class HandleTypes {
+		/**
+		 * 0 任意人处理.
+		 */
 		public final static Integer Single = 0;
+		/**
+		 * 1 按顺序处理.
+		 */
 		public final static Integer Sequence = 1;
+		/**
+		 * 2 所有人处理.
+		 */
 		public final static Integer All = 2;
+		/**
+		 * 3 按比例处理.
+		 */
 		public final static Integer Scale = 3;
 	}
 

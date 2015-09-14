@@ -1,23 +1,8 @@
 package org.kayura.bpm.engine;
 
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.kayura.bpm.engine.impl.WorkflowContextImpl;
-import org.kayura.bpm.engine.impl.WorkflowRuntimeImpl;
-import org.kayura.bpm.organize.IOrganizeService;
-import org.kayura.bpm.organize.impl.OrganizeServiceImpl;
-import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
-import org.kayura.bpm.storage.IStorageService;
-import org.kayura.bpm.storage.impl.StorageServiceImpl;
-import org.kayura.bpm.storage.impl.mapper.StorageMapper;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.BizData;
 import org.kayura.bpm.types.StartArgs;
@@ -29,37 +14,10 @@ import org.kayura.utils.KeyUtils;
  * 
  * @author liangxia@live.com
  */
-public class WorkflowStartupTest {
-
-	private SqlSessionFactory sqlSessionFactory;
-	private SqlSession session;
-	private IWorkflowRuntime runtime;
+public class WorkflowStartupTest extends WorkflowEngineTest {
 
 	public WorkflowStartupTest() throws IOException {
-		InputStream inputStream = Resources.getResourceAsStream("mybatisConfig.xml");
-		sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-	}
-
-	@Before
-	public void setUp() {
-
-		session = sqlSessionFactory.openSession();
-
-		StorageMapper dMapper = session.getMapper(StorageMapper.class);
-		OrganizeMapper oMapper = session.getMapper(OrganizeMapper.class);
-
-		IStorageService storageService = new StorageServiceImpl(dMapper);
-		IOrganizeService organizeService = new OrganizeServiceImpl(oMapper);
-
-		IWorkflowContext context = new WorkflowContextImpl(storageService, organizeService);
-
-		runtime = new WorkflowRuntimeImpl(context);
-	}
-
-	@After
-	public void setDown() {
-		session.commit();
-		session.close();
+		super();
 	}
 
 	private String bizDataId = KeyUtils.newId();
@@ -68,7 +26,7 @@ public class WorkflowStartupTest {
 	public void startupTest() {
 
 		StartArgs args = new StartArgs();
-		args.setCreator(new Actor("xialiang"));
+		args.setCreator(new Actor("luirenjia"));
 		args.setBizData(new BizData(bizDataId, "测试流程"));
 		args.setFlowCode("UnitTest");
 

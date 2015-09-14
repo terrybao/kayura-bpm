@@ -1,7 +1,7 @@
 package org.kayura.bpm.engine.executor;
 
 import org.kayura.bpm.engine.IWorkflowContext;
-import org.kayura.bpm.models.WorkItem;
+import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.storage.IStorageService;
 
 public class FindWorkItemExecutor extends Executor<WorkItem> {

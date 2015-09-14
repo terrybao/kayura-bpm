@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
+import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.BizForm;
@@ -15,7 +16,6 @@ import org.kayura.bpm.models.EndNode;
 import org.kayura.bpm.models.Route;
 import org.kayura.bpm.models.StartNode;
 import org.kayura.bpm.models.Transition;
-import org.kayura.bpm.models.WorkItem;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.storage.impl.mapper.StorageMapper;
@@ -40,14 +40,17 @@ public class StorageServiceImpl implements IStorageService {
 
 	/* BizForm */
 
+	@Override
 	public BizForm getBizFormById(String id) {
 		return mapper.getBizFormById(id);
 	}
 
+	@Override
 	public PageList<BizForm> findBizForms(Map<String, Object> args, PageParams pageParams) {
 		return mapper.findBizForms(args, new PageBounds(pageParams));
 	}
 
+	@Override
 	public void saveOrUpdateBizForm(BizForm bizForm) {
 
 		if (mapper.bizFormExists(bizForm.getId())) {
@@ -57,18 +60,21 @@ public class StorageServiceImpl implements IStorageService {
 		}
 	}
 
+	@Override
 	public void updateBizFormForStatus(String id, Integer status) {
 		mapper.updateBizFormForStatus(id, status);
 	}
 
 	/* WorkflowProcess */
 
+	@Override
 	public WorkflowProcess getWorkflowProcess(String id) {
 
 		WorkflowProcess workflowProcess = mapper.selectWorkflowProcessById(id);
 		return workflowProcess;
 	}
 
+	@Override
 	public WorkflowProcess getWorkflowProcess(String flowCode, Integer version) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
@@ -86,6 +92,7 @@ public class StorageServiceImpl implements IStorageService {
 		return workflowProcess;
 	}
 
+	@Override
 	public void syncWorkflowProcess(WorkflowProcess workflowProcess) {
 
 		String processId = workflowProcess.getId();
@@ -157,7 +164,8 @@ public class StorageServiceImpl implements IStorageService {
 		}
 
 		// ActivityActor
-		List<String> activityIds = activities.stream().map(s -> s.getId()).collect(Collectors.toList());
+		List<String> activityIds = activities.stream().map(s -> s.getId())
+				.collect(Collectors.toList());
 		mapper.deleteActivityActorByActivityIds(activityIds);
 
 		List<ActivityActor> actors = new ArrayList<ActivityActor>();
@@ -186,30 +194,34 @@ public class StorageServiceImpl implements IStorageService {
 		}
 	}
 
+	@Override
 	public void deleteProcessInstance(String id) {
 		mapper.deleteProcessInstance(id);
 	}
 
 	/* ActivityInstance */
 
+	@Override
 	public void insertActivityInstance(ActivityInstance instance) {
 		mapper.insertActivityInstance(instance);
 	}
 
 	/* WorkItem */
 
+	@Override
 	public WorkItem getWorkItemById(String workItemId) {
 		WorkItem workItem = mapper.getWorkItemById(workItemId);
 		return workItem;
 	}
 
+	@Override
 	public WorkItem findWorkItemByFirst(String actorId) {
 		WorkItem workItem = mapper.findWorkItemByFirst(actorId);
 		return workItem;
 	}
 
-	public PageList<TaskListItem> findWorkItems(String keyword, String actorId, String status, Integer pageNum,
-			Integer pageSize) {
+	public PageList<TaskListItem> findWorkItems(String keyword, String actorId, String status,
+			Integer pageNum, Integer pageSize) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("keyword", keyword);
@@ -220,8 +232,63 @@ public class StorageServiceImpl implements IStorageService {
 		return list;
 	}
 
+	@Override
 	public void insertWorkItem(WorkItem workItem) {
 		mapper.insertWorkItem(workItem);
+	}
+
+	@Override
+	public void updateWorkItemStatus(WorkItem workItem) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("status", workItem.getStatus());
+		args.put("id", workItem.getId());
+
+		mapper.updateWorkItemByMap(args);
+	}
+
+	@Override
+	public void completedWorkItem(WorkItem workItem) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("handlerId", workItem.getHandler().getId());
+		args.put("comment", workItem.getComment());
+		args.put("completedTime", workItem.getCompletedTime());
+		args.put("status", workItem.getStatus());
+		args.put("id", workItem.getId());
+
+		mapper.updateWorkItemByMap(args);
+	}
+
+	@Override
+	public Integer childTaskCount(String parentId, Integer[] status) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("parentId", parentId);
+		args.put("taskType", 0);
+		if (status.length > 0) {
+			args.put("status", StringUtils.join(",", status));
+		}
+
+		Integer count = mapper.workItemCountByMap(args);
+		return count;
+	}
+
+	@Override
+	public Integer taskCountByActivity(String activityInstanceId, Integer sn, Integer[] status) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("activityInstanceId", activityInstanceId);
+		args.put("taskType", 0);
+		if (sn != null) {
+			args.put("sn ", sn);
+		}
+		if (status.length > 0) {
+			args.put("status", StringUtils.join(",", status));
+		}
+
+		Integer count = mapper.workItemCountByMap(args);
+		return count;
 	}
 
 }
