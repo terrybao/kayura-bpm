@@ -54,7 +54,8 @@ public class OrganizeServiceImpl implements IOrganizeService {
 	}
 
 	@Override
-	public List<Department> findDepartments(String companyId, String parentId, String keyword, Integer status) {
+	public List<Department> findDepartments(String companyId, String parentId, String keyword,
+			Integer status) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
 
@@ -251,6 +252,23 @@ public class OrganizeServiceImpl implements IOrganizeService {
 		} else {
 			return null;
 		}
+	}
+
+	@Override
+	public List<Actor> findActorsByActors(List<Actor> actors) {
+
+		List<Actor> resultActors = new ArrayList<Actor>();
+
+		if (actors != null) {
+			for (Actor actor : actors) {
+				Actor a = findActorByActor(actor);
+				if (a != null) {
+					resultActors.add(a);
+				}
+			}
+		}
+
+		return resultActors;
 	}
 
 	@Override

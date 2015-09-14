@@ -9,11 +9,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.kayura.bpm.kernel.ActivityInstance.ExecuteTypes;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.ActivityActor.ActorTypes;
 import org.kayura.bpm.organize.IOrganizeService;
 import org.kayura.bpm.types.Actor;
+import org.kayura.utils.DateUtils;
 
 public class ActivityInstance extends AbsNodeInstance {
 
@@ -134,8 +136,9 @@ public class ActivityInstance extends AbsNodeInstance {
 		List<Actor> actors = new ArrayList<Actor>();
 
 		// 处理公司.
-		List<String> companyIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Company)
-				.map(s -> s.getActorId()).collect(Collectors.toList());
+		List<String> companyIds = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Company).map(s -> s.getActorId())
+				.collect(Collectors.toList());
 		if (companyIds.size() > 0) {
 			List<Actor> list = service.findActorsByCompany(companyIds);
 			if (list.size() > 0) {
@@ -144,8 +147,9 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理部门人员.
-		List<String> departIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Depart)
-				.map(s -> s.getActorId()).collect(Collectors.toList());
+		List<String> departIds = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Depart).map(s -> s.getActorId())
+				.collect(Collectors.toList());
 		if (departIds.size() > 0) {
 			List<Actor> list = service.findActorsByDepartment(departIds);
 			if (list.size() > 0) {
@@ -154,8 +158,9 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理岗位人员.
-		List<String> positionIds = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Position)
-				.map(s -> s.getActorId()).collect(Collectors.toList());
+		List<String> positionIds = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Position).map(s -> s.getActorId())
+				.collect(Collectors.toList());
 		if (positionIds.size() > 0) {
 			List<Actor> list = service.findActorsByPosition(positionIds);
 			if (list.size() > 0) {
@@ -184,8 +189,9 @@ public class ActivityInstance extends AbsNodeInstance {
 		}
 
 		// 处理特殊人员.
-		List<String> specials = actActors.stream().filter(s -> s.getActorType() == ActorTypes.Special)
-				.map(s -> s.getActorId()).collect(Collectors.toList());
+		List<String> specials = actActors.stream()
+				.filter(s -> s.getActorType() == ActorTypes.Special).map(s -> s.getActorId())
+				.collect(Collectors.toList());
 		if (specials.size() > 0) {
 			List<Actor> list = findSpecialUsers(specials);
 			if (list.size() > 0) {
@@ -201,6 +207,13 @@ public class ActivityInstance extends AbsNodeInstance {
 		List<Actor> actors = new ArrayList<Actor>();
 
 		return actors;
+	}
+
+	public void completed() {
+		this.setStatus(InstanceStatus.Complete);
+		this.setCompletedTime(DateUtils.now());
+		this.setExecuteType(ExecuteTypes.Normal);
+		context.getStorageService().updateActivityInstance(this);
 	}
 
 }

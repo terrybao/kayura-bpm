@@ -206,6 +206,22 @@ public class StorageServiceImpl implements IStorageService {
 		mapper.insertActivityInstance(instance);
 	}
 
+	@Override
+	public void updateActivityInstance(ActivityInstance instance) {
+		mapper.updateActivityInstance(instance);
+	}
+
+	@Override
+	public Integer activityInstanceCount(String processInstanceId, Integer[] status) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("processInstanceId", processInstanceId);
+		args.put("status", StringUtils.join(",", status));
+
+		Integer count = mapper.activityInstanceCountByMap(args);
+		return count;
+	}
+
 	/* WorkItem */
 
 	@Override
@@ -230,6 +246,24 @@ public class StorageServiceImpl implements IStorageService {
 
 		PageList<TaskListItem> list = mapper.findWorkItems(args, new PageBounds(pageNum, pageSize));
 		return list;
+	}
+
+	public List<WorkItem> findWorkItemsBySn(String activityInstanceId, Integer sn) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("activityInstanceId", activityInstanceId);
+		args.put("sn", sn);
+		args.put("parentId", "null");
+
+		List<WorkItem> list = mapper.findWorkItemsByMap(args);
+		return list;
+	}
+
+	@Override
+	public Integer findNextTaskSequence(String activityInstanceId, Integer currentSn) {
+
+		Integer nextSn = mapper.findNextTaskSequence(activityInstanceId, currentSn);
+		return nextSn;
 	}
 
 	@Override
@@ -280,9 +314,11 @@ public class StorageServiceImpl implements IStorageService {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("activityInstanceId", activityInstanceId);
 		args.put("taskType", 0);
+
 		if (sn != null) {
 			args.put("sn ", sn);
 		}
+
 		if (status.length > 0) {
 			args.put("status", StringUtils.join(",", status));
 		}

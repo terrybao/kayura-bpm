@@ -137,6 +137,14 @@ public interface IOrganizeService {
 	 * @return 返回完整的{@link Actor }对象.
 	 */
 	Actor findActorByActor(Actor actor);
+	
+	/**
+	 * 通过包含部分的参与者信息，返回一个完整的参与者对象.
+	 * 
+	 * @param actor 参与者 {@link Actor} 对象.
+	 * @return 返回完整的{@link Actor }对象.
+	 */
+	List<Actor> findActorsByActors(List<Actor> actors);
 
 	/**
 	 * 查询该参与者的上级领导.

@@ -5,14 +5,18 @@
 package org.kayura.bpm.kernel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.kayura.bpm.engine.IWorkflowContext;
 import org.kayura.bpm.engine.IWorkflowContextAware;
+import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.Node;
 import org.kayura.bpm.models.Transition;
 import org.kayura.bpm.models.WfElement;
+import org.kayura.bpm.types.Actor;
 import org.kayura.utils.PropertiesUtils;
 
 /**
@@ -42,7 +46,8 @@ public class AbsNodeInstance implements IWorkflowContextAware {
 		List<Transition> toTransitions = node.getToTransitions();
 
 		WfElement process = node.getParent();
-		Properties props = PropertiesUtils.merge(process.getAttributes(), node.getAttributes(), vars);
+		Properties props = PropertiesUtils.merge(process.getAttributes(), node.getAttributes(),
+				vars);
 		for (Transition t : toTransitions) {
 			TransitionInstance ti = new TransitionInstance(t);
 			if (ti.checkExpress(props)) {
@@ -54,4 +59,22 @@ public class AbsNodeInstance implements IWorkflowContextAware {
 		return nextNodes;
 	}
 
+	public Map<Node, List<Actor>> findNextNodesActors(Properties vars) {
+
+		Map<Node, List<Actor>> nextNodes = new HashMap<Node, List<Actor>>();
+		
+		List<Node> nodes = this.findNextNodes(vars);
+		for (Node node : nodes) {
+			if (node instanceof Activity) {
+				Activity act = (Activity) node;
+				ActivityInstance ai = this.context.bind(new ActivityInstance(act));
+				List<Actor> actors = ai.findActors();
+				nextNodes.put(act, actors);
+			} else {
+				nextNodes.put(node, null);
+			}
+		}
+
+		return nextNodes;
+	}
 }

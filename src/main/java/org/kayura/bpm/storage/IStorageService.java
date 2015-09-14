@@ -1,7 +1,9 @@
 package org.kayura.bpm.storage;
 
+import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.WorkItem;
@@ -104,6 +106,21 @@ public interface IStorageService {
 	void insertActivityInstance(ActivityInstance instance);
 
 	/**
+	 * 完成一个活动实例状态.
+	 * 
+	 * @param activityInstance
+	 */
+	void updateActivityInstance(ActivityInstance activityInstance);
+	
+	/**
+	 * 
+	 * @param processInstanceId
+	 * @param status
+	 * @return
+	 */
+	Integer activityInstanceCount(String processInstanceId, Integer[] status);
+	
+	/**
 	 * 保存一个新的工作项至数据库.
 	 * 
 	 * @param workItem 工作项对象.
@@ -117,6 +134,17 @@ public interface IStorageService {
 	 * @return 返回该工作项对象.
 	 */
 	WorkItem findWorkItemByFirst(String actorId);
+	
+	List<WorkItem> findWorkItemsBySn(String activityInstanceId, Integer sn);
+	
+	/**
+	 * 查找某个环节任务中的下一个序号.
+	 * 
+	 * @param activityInstance 活动实例Id.
+	 * @param sn 当前序号值.
+	 * @return 返回下一个序号.
+	 */
+	Integer findNextTaskSequence(String activityInstance, Integer sn);
 
 	/**
 	 * 获取一个工作项.
@@ -155,6 +183,7 @@ public interface IStorageService {
 	 * @param activityInstanceId 活动实例Id.
 	 * @return 如果均已经完成返回 true, 否则返回 false.
 	 */
-	Integer taskCountByActivity(String parentId, Integer sn, Integer[] status);
+	Integer taskCountByActivity(String activityInstanceId, Integer sn, Integer[] status);
+
 
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.kayura.bpm.kernel.ActivityInstance;
+import org.kayura.bpm.kernel.InstanceStatus;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.models.Activity;
@@ -113,6 +114,17 @@ public interface StorageMapper {
 	void insertActivityInstance(ActivityInstance instance);
 
 	void updateActivityInstance(ActivityInstance instance);
+	
+	/**
+	 * 查询活动实例指定条件的计数.
+	 * 
+	 * @param args 可选参数：
+	 * <p> processInstanceId 所属的过程实例Id.
+	 * <p> preActInstanceId 前一步活动实例Id.
+	 * <p> status 活动实例的状态 {@link InstanceStatus}.
+	 * @return 返回活动实例计数.
+	 */
+	Integer activityInstanceCountByMap(Map<String, Object> args);
 
 	void deleteActivityInstance(String id);
 
@@ -121,6 +133,31 @@ public interface StorageMapper {
 	WorkItem getWorkItemById(String workItemId);
 
 	WorkItem findWorkItemByFirst(String actorId);
+	
+	/**
+	 * 查询指定组合条件的工作项集合.
+	 * 
+	 * @param args 可选参数:
+	 * <p> activityInstanceId 活动实例Id.
+	 * <p> sn 顺序号.
+	 * <p> ownerId 所有者Id.
+	 * <p> taskType 类型.
+	 * <p> depth 深度.
+	 * <p> status 状态.
+	 * <p> parentId 父级工作项Id,当值为字符 null 时查询根级任务.
+	 * @return 返回满足符合条件的工作项.
+	 */
+	List<WorkItem> findWorkItemsByMap(Map<String, Object> args);
+	
+	/**
+	 * 查询下一个任务的处理序号.
+	 * 
+	 * @param activityInstanceId 活动实例id.
+	 * @param sn 当前任务序号值.
+	 * @return 返回下一个序号，若没有下一个任务，将返回 null.
+	 */
+	Integer findNextTaskSequence(@Param("activityInstanceId") String activityInstanceId,
+			@Param("sn") Integer sn);
 
 	void insertWorkItem(WorkItem workItem);
 

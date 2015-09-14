@@ -49,7 +49,6 @@ public abstract class WorkflowEngineTest {
 		IOrganizeService organizeService = new OrganizeServiceImpl(oMapper);
 
 		context = new WorkflowContextImpl(storageService, organizeService);
-
 		runtime = new WorkflowRuntimeImpl(context);
 	}
 

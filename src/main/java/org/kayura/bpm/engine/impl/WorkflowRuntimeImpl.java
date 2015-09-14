@@ -13,10 +13,12 @@ import org.kayura.bpm.exceptions.WorkflowException;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.StartNodeInstance;
+import org.kayura.bpm.kernel.TaskManager;
 import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.kernel.WorkItem.Prioritys;
 import org.kayura.bpm.kernel.WorkItem.TaskTypes;
 import org.kayura.bpm.models.Activity;
+import org.kayura.bpm.models.Node;
 import org.kayura.bpm.organize.IOrganizeService;
 import org.kayura.bpm.storage.IStorageService;
 import org.kayura.bpm.types.Actor;
@@ -63,32 +65,38 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 			Actor creator = organizeService.findActorByActor(args.getCreator());
 
 			// 创建工作流实例.
-			ProcessInstance instance = execute(
-					new CreateProcessInstanceExecutor(args.getFlowCode(), args.getBizData(), creator));
+			ProcessInstance instance = execute(new CreateProcessInstanceExecutor(args.getFlowCode(),
+					args.getBizData(), creator));
 
 			// 取得可用的后续活动实例.
 			StartNodeInstance si = instance.getStartNodeInstance();
-			Map<Activity, List<Actor>> activityActors = si.findNextActivityActors(args.getVariables());
-			for (Activity nextAct : activityActors.keySet()) {
+			Map<Node, List<Actor>> nodeActors = si.findNextNodesActors(args.getVariables());
+			for (Node nextNode : nodeActors.keySet()) {
 
-				if (nextActivities.size() > 0 && !activityActors.keySet().contains(nextAct.getId())) {
+				if (nextActivities.size() > 0 && !nodeActors.keySet().contains(nextNode.getId())) {
 					continue;
 				}
 
-				CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(instance, nextAct);
-				ae.setCreator(creator);
+				if (nextNode instanceof Activity) {
+					Activity nextAct = (Activity) nextNode;
 
-				ActivityInstance ai = this.execute(ae);
+					CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(instance,
+							nextAct);
+					ae.setCreator(creator);
 
-				List<Actor> actors = activityActors.get(nextAct);
-				for (Actor actor : actors) {
+					ActivityInstance ai = this.execute(ae);
 
-					CreateWorkItemExecutor we = new CreateWorkItemExecutor(ai, creator, actor);
-					we.setPriority(Prioritys.Medium);
-					we.setTaskType(TaskTypes.Task);
-					we.setSn(0);
+					List<Actor> actors = nodeActors.get(nextNode);
+					for (Actor actor : actors) {
 
-					this.execute(we);
+						CreateWorkItemExecutor we = new CreateWorkItemExecutor(ai, creator, actor);
+						we.setPriority(Prioritys.Medium);
+						we.setTaskType(TaskTypes.Task);
+						we.setSn(0);
+
+						this.execute(we);
+					}
+
 				}
 			}
 
@@ -111,16 +119,12 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 	}
 
 	public TaskResult completeWorkItem(TaskArgs args) {
-		
-		// 检查参数是否满足.
 
-		// 获取任务对象.
-		
-		// 
-		
-		
-		//WorkItem workItem = this.execute(new FindWorkItemExecutor(args.getWorkItemId()));
+		IStorageService storageService = context.getStorageService();
 
-		return null;
+		WorkItem workItem = storageService.getWorkItemById(args.getWorkItemId());
+		TaskManager taskMgr = this.context.bind(new TaskManager(workItem));
+
+		return taskMgr.completed(args);
 	}
 }

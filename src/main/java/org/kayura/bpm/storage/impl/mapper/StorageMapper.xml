@@ -777,7 +777,7 @@
 		${alias}.ExecuteType
 	</sql>
 	
-	<select id="getActivityInstanceById" parameterType="string" resultMap="activityInstanceMap">
+	<select id="selectActivityInstanceById" parameterType="string" resultMap="activityInstanceMap">
 		SELECT 
 			<include refid="activityInstanceColumns">
 				<property name="alias" value="t"/>
@@ -817,6 +817,22 @@
 		)
 	</select>
 	
+	<select id="activityInstanceCountByMap" parameterType="map" resultType="int">
+		SELECT Count(1)
+		FROM bpm_activityinstance AS t
+		<where>
+			<if test="processInstanceId != null">
+				AND ( t.ProcessInstance_Id != #{processInstanceId} )
+			</if>
+			<if test="preActInstanceId != null">
+				AND ( t.PreActInstance_Id = #{preActInstanceId} )
+			</if>
+			<if test="status != null">
+				AND ( t.Status IN ( ${status} ) )
+			</if>
+		</where>
+	</select>
+	
 	<select id="updateActivityInstance" parameterType="org.kayura.bpm.kernel.ActivityInstance">
 		UPDATE Bpm_ActivityInstance
 		SET ProcessInstance_Id = #{processInstance.id},
@@ -846,7 +862,7 @@
 		<result property="completedTime" column="CompletedTime" />
 		
 		<association property="parent" column="Parent_Id" select="getWorkItemById" />
-		<association property="activityInstance" column="ActivityInstance_Id" select="getActivityInstanceById" />
+		<association property="activityInstance" column="ActivityInstance_Id" select="selectActivityInstanceById" />
 		<association property="sender" resultMap="actorMap" columnPrefix="Sender_" />
 		<association property="owner" resultMap="actorMap" columnPrefix="Owner_" />
 		<association property="handler" resultMap="actorMap" columnPrefix="Handler_" />
@@ -917,11 +933,74 @@
 			LEFT JOIN bpm_actors AS sa ON sa.Actor_Id = t.Sender_Id
 			LEFT JOIN bpm_actors AS oa ON oa.Actor_Id = t.Owner_Id
 			LEFT JOIN bpm_actors AS ha ON ha.Actor_Id = t.Handler_Id
-		WHERE ( t.Owner_Id = #{value} ) AND ( t.Status IN (0, 2) ) 
+		WHERE ( t.Owner_Id = #{value} ) AND 
+			  ( t.Status IN ( 0, 2 ) ) 
 		ORDER BY t.Status, t.TaskType, t.Priority DESC, t.CreatedTime DESC
 		LIMIT 1
 	</select>
-		
+	
+	<select id="findWorkItemsByMap" parameterType="map" resultMap="workItemMap">
+		SELECT
+			<include refid="workItemColumns">
+				<property name="alias" value="t"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="sa"/>
+				<property name="prefix" value="Sender_"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="oa"/>
+				<property name="prefix" value="Owner_"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="ha"/>
+				<property name="prefix" value="Handler_"/>
+			</include>
+		FROM 
+			bpm_workitems AS t
+			LEFT JOIN bpm_actors AS sa ON sa.Actor_Id = t.Sender_Id
+			LEFT JOIN bpm_actors AS oa ON oa.Actor_Id = t.Owner_Id
+			LEFT JOIN bpm_actors AS ha ON ha.Actor_Id = t.Handler_Id
+		<where>
+			<if test="activityInstanceId">
+				AND ( t.ActivityInstance_Id = #{activityInstanceId} )
+			</if>
+			<if test="sn != null">
+				AND ( t.SN = #{sn} )
+			</if>
+			<if test="ownerId != null">
+				AND ( t.Owner_Id = #{ownerId} )
+			</if>
+			<if test="taskType != null">
+				AND ( t.TaskType = #{taskType} )
+			</if>
+			<if test="depth != null">
+				AND ( t.Depth = #{depth} )
+			</if>
+			<if test="status != null">
+				AND ( t.Status IN ( ${status} ) )
+			</if>
+			<if test="parentId != null">
+				<choose>
+					<when test="parentId != 'null'">
+						AND ( t.Parent_Id IS NULL )
+					</when>
+					<otherwise>
+						AND ( t.Parent_Id = #{parentId} )
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+	</select>
+	
+	<select id="findNextTaskSequence" parameterType="map" resultType="int">
+		SELECT t.SN 
+		FROM bpm_workitems t 
+		WHERE ( t.ActivityInstance_Id = #{activityInstanceId} ) AND 
+			  ( t.Parent_ID IS NULL ) AND 
+			  ( t.SN > #{sn} ) 
+		ORDER BY t.SN LIMIT 1 
+	</select>
 	
 	<insert id="insertWorkItem" parameterType="org.kayura.bpm.kernel.WorkItem">
 		INSERT INTO bpm_workitems (
@@ -954,7 +1033,7 @@
 	</insert>
 	
 	<update id="updateWorkItemByMap" parameterType="map">
-		UPDATE bpm_workitems (
+		UPDATE bpm_workitems
 		<set>
 			<if test="priority != null">Priority = #{priority},</if>
 			<if test="alarmTime != null">AlarmTime = #{alarmTime},</if>
