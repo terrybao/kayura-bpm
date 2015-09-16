@@ -70,6 +70,7 @@ public class ActivityInstance extends AbsNodeInstance {
 
 	public void setActivity(Activity activity) {
 		this.activity = activity;
+		this.node = activity;
 	}
 
 	public String getDisplayName() {

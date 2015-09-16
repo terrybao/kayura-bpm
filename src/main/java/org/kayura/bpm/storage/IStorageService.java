@@ -3,7 +3,6 @@ package org.kayura.bpm.storage;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.WorkItem;
@@ -92,6 +91,15 @@ public interface IStorageService {
 	void saveOrUpdateProcessInstance(ProcessInstance instance);
 
 	/**
+	 * 查询一个工作流实例对象.
+	 * 
+	 * @param flowCode 工作流单据编号.
+	 * @param bizDataId 绑定的业务表单Id.
+	 * @return 若存在返回 实例对象，否则返回 null.
+	 */
+	ProcessInstance findProcessInstance(String flowCode, String bizDataId);
+	
+	/**
 	 * 删除一个工作流实例，并一同删除所有相关联的实例信息.
 	 * 
 	 * @param id 工作流实例Id.
@@ -111,7 +119,7 @@ public interface IStorageService {
 	 * @param activityInstance
 	 */
 	void updateActivityInstance(ActivityInstance activityInstance);
-	
+
 	/**
 	 * 
 	 * @param processInstanceId
@@ -119,7 +127,7 @@ public interface IStorageService {
 	 * @return
 	 */
 	Integer activityInstanceCount(String processInstanceId, Integer[] status);
-	
+
 	/**
 	 * 保存一个新的工作项至数据库.
 	 * 
@@ -133,10 +141,10 @@ public interface IStorageService {
 	 * @param actorId 参与者 Id.
 	 * @return 返回该工作项对象.
 	 */
-	WorkItem findWorkItemByFirst(String actorId);
-	
+	WorkItem findWorkItemByFirst(String processInstanceId, String actorId);
+
 	List<WorkItem> findWorkItemsBySn(String activityInstanceId, Integer sn);
-	
+
 	/**
 	 * 查找某个环节任务中的下一个序号.
 	 * 
@@ -184,6 +192,5 @@ public interface IStorageService {
 	 * @return 如果均已经完成返回 true, 否则返回 false.
 	 */
 	Integer taskCountByActivity(String activityInstanceId, Integer sn, Integer[] status);
-
 
 }

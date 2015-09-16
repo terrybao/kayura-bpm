@@ -9,4 +9,8 @@ public class StartResult extends Result<String> {
 	public StartResult() {
 	}
 
+	public StartResult(String message) {
+		this.addMessage(message);
+	}
+
 }

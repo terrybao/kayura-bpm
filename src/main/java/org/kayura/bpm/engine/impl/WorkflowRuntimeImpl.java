@@ -16,6 +16,7 @@ import org.kayura.bpm.kernel.StartNodeInstance;
 import org.kayura.bpm.kernel.TaskManager;
 import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.kernel.WorkItem.Prioritys;
+import org.kayura.bpm.kernel.WorkItem.TaskStatus;
 import org.kayura.bpm.kernel.WorkItem.TaskTypes;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.Node;
@@ -49,71 +50,67 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 
 	public StartResult startup(StartArgs args) {
 
-		StartResult result = new StartResult();
+		StartResult result = new StartResult("流程启动成功。");
 
-		try {
-			if (args == null) {
-				throw new WorkflowException("必须定义流程的启动参数，不允许为空。");
+		if (args == null) {
+			throw new WorkflowException("必须定义流程的启动参数，不允许为空。");
+		}
+
+		if (args.getCreator() == null) {
+			throw new WorkflowException("必须定义流程的启动者。");
+		}
+
+		IOrganizeService organizeService = this.context.getOrganizeService();
+		Map<String, List<Actor>> nextActivities = args.getNextActivities();
+		Actor creator = organizeService.findActorByActor(args.getCreator());
+
+		// 创建工作流实例.
+		ProcessInstance instance = execute(
+				new CreateProcessInstanceExecutor(args.getFlowCode(), args.getBizData(), creator));
+
+		// 取得可用的后续活动实例.
+		StartNodeInstance si = instance.getStartNodeInstance();
+		Map<Node, List<Actor>> nodeActors = si.findNextNodesActors(args.getVariables());
+		for (Node nextNode : nodeActors.keySet()) {
+
+			if (nextActivities.size() > 0 && !nodeActors.keySet().contains(nextNode.getId())) {
+				continue;
 			}
 
-			if (args.getCreator() == null) {
-				throw new WorkflowException("必须定义流程的启动者。");
-			}
+			if (nextNode instanceof Activity) {
+				Activity nextAct = (Activity) nextNode;
 
-			IOrganizeService organizeService = this.context.getOrganizeService();
-			Map<String, List<Actor>> nextActivities = args.getNextActivities();
-			Actor creator = organizeService.findActorByActor(args.getCreator());
+				CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(instance,
+						nextAct);
+				ae.setCreator(creator);
 
-			// 创建工作流实例.
-			ProcessInstance instance = execute(new CreateProcessInstanceExecutor(args.getFlowCode(),
-					args.getBizData(), creator));
+				ActivityInstance ai = this.execute(ae);
 
-			// 取得可用的后续活动实例.
-			StartNodeInstance si = instance.getStartNodeInstance();
-			Map<Node, List<Actor>> nodeActors = si.findNextNodesActors(args.getVariables());
-			for (Node nextNode : nodeActors.keySet()) {
+				List<Actor> actors = nodeActors.get(nextNode);
+				for (Actor actor : actors) {
 
-				if (nextActivities.size() > 0 && !nodeActors.keySet().contains(nextNode.getId())) {
-					continue;
+					CreateWorkItemExecutor we = new CreateWorkItemExecutor(ai, creator, actor);
+					we.setPriority(Prioritys.Medium);
+					we.setTaskType(TaskTypes.Task);
+					we.setSn(0);
+
+					this.execute(we);
 				}
 
-				if (nextNode instanceof Activity) {
-					Activity nextAct = (Activity) nextNode;
-
-					CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(instance,
-							nextAct);
-					ae.setCreator(creator);
-
-					ActivityInstance ai = this.execute(ae);
-
-					List<Actor> actors = nodeActors.get(nextNode);
-					for (Actor actor : actors) {
-
-						CreateWorkItemExecutor we = new CreateWorkItemExecutor(ai, creator, actor);
-						we.setPriority(Prioritys.Medium);
-						we.setTaskType(TaskTypes.Task);
-						we.setSn(0);
-
-						this.execute(we);
-					}
-
-				}
 			}
-
-		} catch (Exception e) {
-			result.setError("流程启动失败。原因：%s", e.getMessage());
 		}
 
 		return result;
 	}
 
-	public WorkItem findWorkItemByFirst(Actor user) {
+	public WorkItem findWorkItemByFirst(String flowCode, String bizDataId, Actor user) {
 
 		IStorageService storageService = context.getStorageService();
 		IOrganizeService organizeService = context.getOrganizeService();
 
 		Actor byActor = organizeService.findActorByActor(user);
-		WorkItem byFirst = storageService.findWorkItemByFirst(byActor.getId());
+		ProcessInstance instance = storageService.findProcessInstance(flowCode, bizDataId);
+		WorkItem byFirst = storageService.findWorkItemByFirst(instance.getId(), byActor.getId());
 
 		return byFirst;
 	}
@@ -123,6 +120,11 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 		IStorageService storageService = context.getStorageService();
 
 		WorkItem workItem = storageService.getWorkItemById(args.getWorkItemId());
+		if (workItem.getStatus() == TaskStatus.Completed
+				|| workItem.getStatus() == TaskStatus.End) {
+			return new TaskResult("该任务已经完成。");
+		}
+
 		TaskManager taskMgr = this.context.bind(new TaskManager(workItem));
 
 		return taskMgr.completed(args);

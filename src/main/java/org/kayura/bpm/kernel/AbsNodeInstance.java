@@ -24,7 +24,7 @@ import org.kayura.utils.PropertiesUtils;
  */
 public class AbsNodeInstance implements IWorkflowContextAware {
 
-	private Node node;
+	protected Node node;
 	protected IWorkflowContext context;
 
 	public AbsNodeInstance() {

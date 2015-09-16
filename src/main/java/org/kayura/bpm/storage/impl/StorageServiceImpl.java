@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.WorkItem;
+import org.kayura.bpm.kernel.WorkItem.TaskStatus;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.BizForm;
@@ -195,6 +196,17 @@ public class StorageServiceImpl implements IStorageService {
 	}
 
 	@Override
+	public ProcessInstance findProcessInstance(String flowCode, String bizDataId) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("flowCode", flowCode);
+		args.put("bizDataId", bizDataId);
+
+		List<ProcessInstance> list = mapper.findProcessInstanceByMap(args);
+		return list.size() > 0 ? list.get(0) : null;
+	}
+
+	@Override
 	public void deleteProcessInstance(String id) {
 		mapper.deleteProcessInstance(id);
 	}
@@ -231,8 +243,14 @@ public class StorageServiceImpl implements IStorageService {
 	}
 
 	@Override
-	public WorkItem findWorkItemByFirst(String actorId) {
-		WorkItem workItem = mapper.findWorkItemByFirst(actorId);
+	public WorkItem findWorkItemByFirst(String processInstanceId, String actorId) {
+
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("processInstanceId", processInstanceId);
+		args.put("actorId", actorId);
+		args.put("status", StringUtils.join(",", TaskStatus.Todo, TaskStatus.Completed));
+
+		WorkItem workItem = mapper.findWorkItemByFirst(args);
 		return workItem;
 	}
 

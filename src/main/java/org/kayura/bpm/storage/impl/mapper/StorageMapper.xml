@@ -291,8 +291,8 @@
 		<result column="ModifiedTime" property="modifiedTime" />
 		
 		<association property="parent" column="Process_Id" select="selectWorkflowProcessById" />
-		<collection property="fromTransitions" column="Node_Id" select="selectTransitionByFrom" />
-		<collection property="toTransitions" column="Node_Id" select="selectTransitionByTo" />
+		<collection property="fromTransitions" column="Node_Id" select="selectTransitionByTo" />
+		<collection property="toTransitions" column="Node_Id" select="selectTransitionByFrom" />
 		
 		<!-- 0 StartNode; 1 Activity; 2 Route; 3 EndNode; -->
 		<discriminator javaType="int" column="NodeType">
@@ -701,6 +701,39 @@
 		WHERE t.ProcessInstance_Id = #{id}
 	</select>
 	
+	<select id="findProcessInstanceByMap" parameterType="map" resultMap="processInstanceMap">
+		SELECT
+			<include refid="processInstanceColumns">
+				<property name="alias" value="t"/>
+			</include>,
+			<include refid="actorColumns">
+				<property name="alias" value="ca"/>
+				<property name="prefix" value="Creator_"/>
+			</include>
+		FROM
+			bpm_processinstance AS t
+			INNER JOIN bpm_process AS p ON p.Process_Id = t.Process_Id
+			INNER JOIN bpm_bizform AS b ON b.BizForm_Id = p.BizForm_Id
+			LEFT JOIN bpm_actors AS ca ON ca.Actor_Id = t.Creator_Id
+		<where>
+			<if test="bizflowCode != null">
+				AND ( b.Code = #{bizflowCode} )
+			</if>
+			<if test="bizFlowId != null">
+				AND ( b.BizForm_Id = #{bizFlowId} )
+			</if>
+			<if test="bizDataId != null">
+				AND ( b.BizDataId = #{bizDataId} )
+			</if>
+			<if test="processId != null">
+				AND ( p.Process_Id = #{processId} )
+			</if>
+			<if test="version != null">
+				AND ( p.Version = #{version} )
+			</if>
+		</where>
+	</select>
+	
 	<select id="processInstanceExists" parameterType="string" resultType="boolean">
 		SELECT COUNT(1) > 0
 		FROM Bpm_ProcessInstance t
@@ -737,7 +770,7 @@
 			Process_Id = #{process.id},
 			Title = #{title},
 			BizData_Id = #{bizDataId},
-			Creater_Id = #{creater.id},
+			Creator_Id = #{creator.id},
 			CreatedTime = #{createdTime},
 			CompletedTime = #{completedTime},
 			Status = #{status}
@@ -844,7 +877,7 @@
 			PreActInstance_Id = #{preActInstanceId},
 			Status = #{status},
 			ExecuteType = #{executeType}
-		WHERE ActivityInstance_Id = #{id},
+		WHERE ActivityInstance_Id = #{id}
 	</select>
 	
 	<!-- WorkItems -->
@@ -911,7 +944,7 @@
 		WHERE t.WorkItem_Id = #{value}
 	</select>
 	
-	<select id="findWorkItemByFirst" parameterType="string" resultMap="workItemMap">
+	<select id="findWorkItemByFirst" parameterType="map" resultMap="workItemMap">
 		SELECT
 			<include refid="workItemColumns">
 				<property name="alias" value="t"/>
@@ -930,11 +963,21 @@
 			</include>
 		FROM
 			bpm_workitems AS t
+			INNER JOIN bpm_activityinstance AS a ON a.ActivityInstance_Id = t.ActivityInstance_Id
 			LEFT JOIN bpm_actors AS sa ON sa.Actor_Id = t.Sender_Id
 			LEFT JOIN bpm_actors AS oa ON oa.Actor_Id = t.Owner_Id
 			LEFT JOIN bpm_actors AS ha ON ha.Actor_Id = t.Handler_Id
-		WHERE ( t.Owner_Id = #{value} ) AND 
-			  ( t.Status IN ( 0, 2 ) ) 
+		<where>
+			<if test="actorId != null">
+				AND ( t.Owner_Id = #{actorId} )
+			</if>
+			<if test="processInstanceId != null">
+				AND ( a.ProcessInstance_Id = #{processInstanceId} )
+			</if>
+			<if test="status != null">
+				AND ( t.Status IN ( ${status} ) )
+			</if>
+		</where>
 		ORDER BY t.Status, t.TaskType, t.Priority DESC, t.CreatedTime DESC
 		LIMIT 1
 	</select>

@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE workflowProcess PUBLIC "-//kayura.org//DTD Process 1.0//EN" "http://www.kayura.org/dtd/workflow-process.dtd">
-<workflowProcess code="line" name="line">
+<workflowProcess code="three_node" name="three_node">
 	<startNode code="startNode" name="开始" />
 	<endNodes>
-		<endNode code="endnode" name="endnode" />
+		<endNode code="endNode" name="endNode" />
 	</endNodes>
 	<activities>
-		<activity code="shenpi" handleType="2" name="shenpi">
+		<activity code="bumen" handleType="2" name="bumen">
 			<actors>
-				<actor actorId="xialiang" actorType="0" />
+				<actor actorId="F0F1A397-4A70-11E5-99D9-0021CCC9FA7E"
+					actorType="0" />
+			</actors>
+		</activity>
+		<activity code="jinli1" handleType="2" name="jinli1">
+			<actors>
+				<actor actorId="F0F1A397-4A70-11E5-99D9-0021CCC9FA7E"
+					actorType="0" />
+			</actors>
+		</activity>
+		<activity code="zongjili" handleType="2" name="zongjili">
+			<actors>
+				<actor actorId="F0F1A397-4A70-11E5-99D9-0021CCC9FA7E"
+					actorType="0" />
 			</actors>
 		</activity>
 	</activities>
 	<transitions>
-		<transition code="[startNode]-&gt;[shenpi]" from="startNode"
-			name="[开始]-&gt;[shenpi]" to="shenpi" />
-		<transition code="[shenpi]-&gt;[endnode]" from="shenpi"
-			name="[shenpi]-&gt;[endnode]" to="endnode" />
+		<transition code="[startNode]-&gt;[bumen]" from="startNode"
+			name="[开始]-&gt;[bumen]" to="bumen" />
+		<transition code="[bumen]-&gt;[jinli1]" from="bumen"
+			name="[bumen]-&gt;[jinli1]" to="jinli1" />
+		<transition code="[zongjili]-&gt;[zongjili]" from="zongjili"
+			name="[zongjili]-&gt;[zongjili]" to="zongjili" />
+		<transition code="[zongjili]-&gt;[endNode]" from="zongjili"
+			name="[zongjili]-&gt;[endNode]" to="endNode" />
 	</transitions>
 </workflowProcess>

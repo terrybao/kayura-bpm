@@ -10,9 +10,9 @@ import org.kayura.bpm.types.TaskResult;
 
 public interface IWorkflowRuntime extends IWorkflowContextAware {
 
-    StartResult startup(StartArgs args);
+	StartResult startup(StartArgs args);
 
-    WorkItem findWorkItemByFirst(Actor user);
+	WorkItem findWorkItemByFirst(String flowCode, String bizDataId, Actor user);
 
 	TaskResult completeWorkItem(TaskArgs args);
 }

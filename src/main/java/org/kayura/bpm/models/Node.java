@@ -27,26 +27,16 @@ public abstract class Node extends WfElement {
 
 	public void addFromTransition(Transition transition) {
 
-		List<Transition> list = new ArrayList<Transition>(fromTransitions);
-
-		for (Transition t : list) {
-			if (t.getId().equals(transition.getId())) {
-				return;
-			}
+		if (!fromTransitions.stream().anyMatch(s -> s.id == transition.id)) {
+			this.fromTransitions.add(transition);
 		}
-		this.fromTransitions.add(transition);
 	}
 
 	public void addToTransition(Transition transition) {
 
-		List<Transition> list = new ArrayList<Transition>(toTransitions);
-
-		for (Transition t : list) {
-			if (t.getId().equals(transition.getId())) {
-				return;
-			}
+		if (!toTransitions.stream().anyMatch(s -> s.id == transition.id)) {
+			this.toTransitions.add(transition);
 		}
-		this.toTransitions.add(transition);
 	}
 
 	public void removeFromTransitions() {

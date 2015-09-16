@@ -8,7 +8,7 @@ import java.io.InputStream;
 
 import org.junit.Test;
 import org.kayura.bpm.models.WorkflowProcess;
-import org.kayura.bpm.models.WorkflowProcessTest;
+import org.kayura.bpm.models.WorkflowProcessSimple;
 
 /**
  * @author liangxia@live.com
@@ -18,7 +18,7 @@ public class WorkflowProcessBuilderTest {
 	@Test
 	public void formatXmlTest() {
 
-		WorkflowProcess process = WorkflowProcessTest.createWorkflowProcess();
+		WorkflowProcess process = WorkflowProcessSimple.createBranchWorkflowProcess();
 
 		WorkflowProcessBuilder builder = new WorkflowProcessBuilder(process);
 

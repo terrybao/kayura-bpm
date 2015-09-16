@@ -49,46 +49,40 @@ public class TaskManager implements IWorkflowContextAware {
 	@Override
 	public void setContext(IWorkflowContext context) {
 		this.context = context;
-		
+
 		this.storageService = context.getStorageService();
 		this.organizeService = context.getOrganizeService();
-		
+
 		this.context.bind(this.activityInstance);
 		this.context.bind(this.processInstance);
 	}
 
 	public TaskResult completed(TaskArgs args) {
 
-		TaskResult result = new TaskResult();
-		try {
+		TaskResult result = new TaskResult("处理完成。");
 
-			// 更新参与人数据.
-			Actor handler = organizeService.findActorByActor(args.getHandler());
-			args.setHandler(handler);
+		// 更新参与人数据.
+		Actor handler = organizeService.findActorByActor(args.getHandler());
+		args.setHandler(handler);
 
-			List<Actor> copyTos = organizeService.findActorsByActors(args.getCopyTo());
-			args.setCopyTo(copyTos);
+		List<Actor> copyTos = organizeService.findActorsByActors(args.getCopyTo());
+		args.setCopyTo(copyTos);
 
-			Map<String, List<Actor>> targetActivities = args.getTargetActivities();
-			for (String key : targetActivities.keySet()) {
-				List<Actor> value = targetActivities.get(key);
-				List<Actor> actors = organizeService.findActorsByActors(value);
-				targetActivities.replace(key, actors);
-			}
-
-			// 更新任务的完成状态.
-			completedWorkItem(args);
-
-			// 创建抄送任务.
-			createCopyTo(args);
-
-			// 创建后续任务.
-			createNextActivityInstance(args);
-
-		} catch (Exception e) {
-			result.setCode(-1);
-			result.setMessage(e.getMessage());
+		Map<String, List<Actor>> targetActivities = args.getTargetActivities();
+		for (String key : targetActivities.keySet()) {
+			List<Actor> value = targetActivities.get(key);
+			List<Actor> actors = organizeService.findActorsByActors(value);
+			targetActivities.replace(key, actors);
 		}
+
+		// 更新任务的完成状态.
+		completedWorkItem(args);
+
+		// 创建抄送任务.
+		createCopyTo(args);
+
+		// 创建后续任务.
+		createNextActivityInstance(args);
 
 		return result;
 	}
@@ -106,42 +100,45 @@ public class TaskManager implements IWorkflowContextAware {
 					.findNextNodesActors(args.getVariables());
 			for (Node nextNode : nextNodeActors.keySet()) {
 
-				if (activityIds.contains(nextNode.getId())) {
+				if (activityIds.size() > 0 && !activityIds.contains(nextNode.getId())) {
+					continue;
+				}
 
-					if (nextNode.getNodeType() == NodeTypes.EndNode) {
+				if (nextNode.getNodeType() == NodeTypes.EndNode) {
 
-						Integer[] status = { InstanceStatus.Running, InstanceStatus.Hangup };
-						Integer i = storageService
-								.activityInstanceCount(this.processInstance.getId(), status);
-						if (i == 0) {
-							processInstance.completed();
-							return;
+					Integer[] status = { InstanceStatus.Running, InstanceStatus.Hangup };
+					Integer i = storageService.activityInstanceCount(this.processInstance.getId(),
+							status);
+					if (i == 0) {
+						processInstance.completed();
+						return;
+					}
+
+				} else if (nextNode.getNodeType() == NodeTypes.Activity) {
+
+					Activity nextAct = (Activity) nextNode;
+
+					CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(
+							this.processInstance, nextAct);
+					ae.setCreator(args.getHandler());
+					ActivityInstance ai = ae.execute(context);
+
+					List<Actor> actors1 = targetActivities.get(nextNode.getId());
+					List<Actor> actors2 = nextNodeActors.get(nextNode);
+					for (Actor actor : actors2) {
+
+						if (actors1 != null && actors1.size() > 0
+								&& !actors1.stream().anyMatch(s -> s.getId() == actor.getId())) {
+							continue;
 						}
 
-					} else if (nextNode.getNodeType() == NodeTypes.Activity) {
-						
-						Activity nextAct = (Activity) nextNode;
+						CreateWorkItemExecutor we = new CreateWorkItemExecutor(ai,
+								args.getHandler(), actor);
+						we.setPriority(Prioritys.Medium);
+						we.setTaskType(TaskTypes.Task);
+						we.setSn(0);
 
-						CreateActivityInstanceExecutor ae = new CreateActivityInstanceExecutor(
-								this.processInstance, nextAct);
-						ae.setCreator(args.getHandler());
-						ActivityInstance ai = ae.execute(context);
-
-						List<Actor> actors1 = targetActivities.get(nextNode.getId());
-						List<Actor> actors2 = nextNodeActors.get(nextNode);
-						for (Actor actor : actors2) {
-
-							if (actors1.stream().anyMatch(s -> s.getId() == actor.getId())) {
-
-								CreateWorkItemExecutor we = new CreateWorkItemExecutor(ai,
-										args.getHandler(), actor);
-								we.setPriority(Prioritys.Medium);
-								we.setTaskType(TaskTypes.Task);
-								we.setSn(0);
-
-								we.execute(context);
-							}
-						}
+						we.execute(context);
 					}
 				}
 			}

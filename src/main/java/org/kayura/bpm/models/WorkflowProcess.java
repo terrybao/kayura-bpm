@@ -158,10 +158,16 @@ public class WorkflowProcess extends WfElement {
 	public Transition createTransition(Node fromNode, Node toNode) {
 
 		Transition transition = new Transition(this, fromNode, toNode);
+		
+		fromNode.addToTransition(transition);
+		toNode.addFromTransition(transition);
+		
 		transition.setId(KeyUtils.newId());
 		transition.setCode(String.format("[%s]->[%s]", fromNode.getCode(), toNode.getCode()));
 		transition.setName(String.format("[%s]->[%s]", fromNode.getName(), toNode.getName()));
+		
 		this.transitions.add(transition);
+		
 		return transition;
 	}
 

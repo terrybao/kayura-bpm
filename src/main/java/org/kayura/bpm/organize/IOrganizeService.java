@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.kayura.bpm.organize.models.Company;
 import org.kayura.bpm.organize.models.Department;
-import org.kayura.bpm.organize.models.Employee;
 import org.kayura.bpm.organize.models.Position;
 import org.kayura.bpm.organize.models.Role;
 import org.kayura.bpm.types.Actor;

@@ -11,12 +11,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kayura.bpm.builder.WorkflowProcessBuilder;
-import org.kayura.bpm.engine.WorkflowProcessSimple;
 import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.models.BizForm;
 import org.kayura.bpm.models.DefineStatus;
 import org.kayura.bpm.models.WorkflowProcess;
-import org.kayura.bpm.models.WorkflowProcessTest;
+import org.kayura.bpm.models.WorkflowProcessSimple;
 import org.kayura.bpm.storage.impl.mapper.StorageMapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,47 +39,51 @@ public class StorageServiceTest {
 
 	@After
 	public void setDown() {
+		session.commit();
 		session.close();
 	}
 
 	@Test
-	public void initData() {
-		saveBizFormTest();
-		syncLineWorkflowProcess();
-	}
-
-	@Test
-	public void saveBizFormTest() {
+	public void syncLinear1WorkflowProcess() {
 		try {
 
 			BizForm bizForm = new BizForm();
 			bizForm.setId("74C741FD-1A93-4431-B85B-5111D632073B");
-			bizForm.setCode("UnitTest");
-			bizForm.setDisplayName("仅供开发调用");
+			bizForm.setCode("OneNode");
+			bizForm.setDisplayName("单环节直线流");
 			bizForm.setStatus(DefineStatus.Release);
-
 			storageService.saveOrUpdateBizForm(bizForm);
 
-			session.commit();
+			WorkflowProcess wp = WorkflowProcessSimple.createLinear1Process();
+			wp.setModifier("xialiang");
+			wp.setBizForm(bizForm);
+			wp.setStatus(DefineStatus.Release);
+			storageService.syncWorkflowProcess(wp);
+
+			WorkflowProcessBuilder builder = new WorkflowProcessBuilder(wp);
+			System.out.println(builder.exportXml());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	public void syncLineWorkflowProcess() {
+	public void syncLinear2WorkflowProcess() {
 		try {
 
-			WorkflowProcess wp = WorkflowProcessSimple.getLineProcess();
+			BizForm bizForm = new BizForm();
+			bizForm.setId("707B896E-5B52-11E5-A041-0021CCC9FA7E");
+			bizForm.setCode("ThreeNode");
+			bizForm.setDisplayName("三环节直线流");
+			bizForm.setStatus(DefineStatus.Release);
+			storageService.saveOrUpdateBizForm(bizForm);
 
-			BizForm bizForm = storageService.getBizFormById("74C741FD-1A93-4431-B85B-5111D632073B");
+			WorkflowProcess wp = WorkflowProcessSimple.createLinear2Process();
 			wp.setModifier("xialiang");
 			wp.setBizForm(bizForm);
 			wp.setStatus(DefineStatus.Release);
-
 			storageService.syncWorkflowProcess(wp);
-
-			session.commit();
 
 			WorkflowProcessBuilder builder = new WorkflowProcessBuilder(wp);
 			System.out.println(builder.exportXml());
@@ -94,34 +97,11 @@ public class StorageServiceTest {
 	public void syncWorkflowProcessTest() {
 		try {
 
-			WorkflowProcess wp = WorkflowProcessTest.createWorkflowProcess();
+			WorkflowProcess wp = WorkflowProcessSimple.createBranchWorkflowProcess();
 			storageService.syncWorkflowProcess(wp);
-
-			session.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	@Test
-	public void getWorkflowProcessTest() {
-		try {
-			WorkflowProcess wp = storageService.getWorkflowProcess("A2E467A4-8BA0-4BC3-B192-56475E1A01E0");
-
-			System.out.println(wp);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Test
-	public void getWorkItemByFirstTest() {
-		try {
-			WorkItem task = storageService.findWorkItemByFirst("4588F8DC-4DF8-11E5-9FEC-10BF48BBBEC9");
-
-			System.out.println(task);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 }
