@@ -196,10 +196,10 @@ public class StorageServiceImpl implements IStorageService {
 	}
 
 	@Override
-	public ProcessInstance findProcessInstance(String flowCode, String bizDataId) {
+	public ProcessInstance findProcessInstance(String bizFlowCode, String bizDataId) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("flowCode", flowCode);
+		args.put("bizFlowCode", bizFlowCode);
 		args.put("bizDataId", bizDataId);
 
 		List<ProcessInstance> list = mapper.findProcessInstanceByMap(args);
@@ -243,12 +243,13 @@ public class StorageServiceImpl implements IStorageService {
 	}
 
 	@Override
-	public WorkItem findWorkItemByFirst(String processInstanceId, String actorId) {
+	public WorkItem findWorkItemByFirst(String processInstanceId, String actorId,
+			Integer[] status) {
 
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("processInstanceId", processInstanceId);
 		args.put("actorId", actorId);
-		args.put("status", StringUtils.join(",", TaskStatus.Todo, TaskStatus.Completed));
+		args.put("status", StringUtils.join(",", status));
 
 		WorkItem workItem = mapper.findWorkItemByFirst(args);
 		return workItem;

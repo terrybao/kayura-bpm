@@ -48,6 +48,36 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 		return exec.execute(this.context);
 	}
 
+	private WorkItem findWorkItemByFirst(String bizFlowCode, String bizDataId, Actor user,
+			Integer[] status) {
+
+		IStorageService storageService = context.getStorageService();
+		IOrganizeService organizeService = context.getOrganizeService();
+
+		Actor byActor = organizeService.findActorByActor(user);
+		ProcessInstance instance = storageService.findProcessInstance(bizFlowCode, bizDataId);
+
+		WorkItem byFirst = storageService.findWorkItemByFirst(instance.getId(), byActor.getId(),
+				status);
+
+		return byFirst;
+	}
+
+	@Override
+	public WorkItem findWorkItemByFirst(String bizFlowCode, String bizDataId, Actor user) {
+
+		Integer[] status = { TaskStatus.Todo, TaskStatus.Completed };
+		return findWorkItemByFirst(bizFlowCode, bizDataId, user, status);
+	}
+
+	@Override
+	public WorkItem findTodoTaskByFirst(String bizFlowCode, String bizDataId, Actor user) {
+
+		Integer[] status = { TaskStatus.Todo };
+		return findWorkItemByFirst(bizFlowCode, bizDataId, user, status);
+	}
+
+	@Override
 	public StartResult startup(StartArgs args) {
 
 		StartResult result = new StartResult("流程启动成功。");
@@ -103,18 +133,13 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 		return result;
 	}
 
-	public WorkItem findWorkItemByFirst(String flowCode, String bizDataId, Actor user) {
+	@Override
+	public TaskResult claimWorkItem(TaskArgs args) {
 
-		IStorageService storageService = context.getStorageService();
-		IOrganizeService organizeService = context.getOrganizeService();
-
-		Actor byActor = organizeService.findActorByActor(user);
-		ProcessInstance instance = storageService.findProcessInstance(flowCode, bizDataId);
-		WorkItem byFirst = storageService.findWorkItemByFirst(instance.getId(), byActor.getId());
-
-		return byFirst;
+		return null;
 	}
 
+	@Override
 	public TaskResult completeWorkItem(TaskArgs args) {
 
 		IStorageService storageService = context.getStorageService();
@@ -128,5 +153,27 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 		TaskManager taskMgr = this.context.bind(new TaskManager(workItem));
 
 		return taskMgr.completed(args);
+	}
+
+	@Override
+	public TaskResult backWorkItem(TaskArgs args) {
+
+		IStorageService storageService = context.getStorageService();
+
+		WorkItem workItem = storageService.getWorkItemById(args.getWorkItemId());
+		if (workItem.getStatus() == TaskStatus.Completed
+				|| workItem.getStatus() == TaskStatus.End) {
+			return new TaskResult("该任务已经完成。");
+		}
+
+		TaskManager taskMgr = this.context.bind(new TaskManager(workItem));
+
+		return taskMgr.back(args);
+	}
+
+	@Override
+	public TaskResult reasignWorkItem(TaskArgs args) {
+
+		return null;
 	}
 }

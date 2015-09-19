@@ -716,14 +716,14 @@
 			INNER JOIN bpm_bizform AS b ON b.BizForm_Id = p.BizForm_Id
 			LEFT JOIN bpm_actors AS ca ON ca.Actor_Id = t.Creator_Id
 		<where>
-			<if test="bizflowCode != null">
-				AND ( b.Code = #{bizflowCode} )
+			<if test="bizFlowCode != null">
+				AND ( b.Code = #{bizFlowCode} )
 			</if>
 			<if test="bizFlowId != null">
 				AND ( b.BizForm_Id = #{bizFlowId} )
 			</if>
 			<if test="bizDataId != null">
-				AND ( b.BizDataId = #{bizDataId} )
+				AND ( t.BizData_Id = #{bizDataId} )
 			</if>
 			<if test="processId != null">
 				AND ( p.Process_Id = #{processId} )

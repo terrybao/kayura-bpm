@@ -93,12 +93,12 @@ public interface IStorageService {
 	/**
 	 * 查询一个工作流实例对象.
 	 * 
-	 * @param flowCode 工作流单据编号.
+	 * @param bizFlowCode 工作流单据编号.
 	 * @param bizDataId 绑定的业务表单Id.
 	 * @return 若存在返回 实例对象，否则返回 null.
 	 */
-	ProcessInstance findProcessInstance(String flowCode, String bizDataId);
-	
+	ProcessInstance findProcessInstance(String bizFlowCode, String bizDataId);
+
 	/**
 	 * 删除一个工作流实例，并一同删除所有相关联的实例信息.
 	 * 
@@ -138,11 +138,19 @@ public interface IStorageService {
 	/**
 	 * 查询参与者的第一条待办.
 	 * 
+	 * @param processInstanceId 过程实例Id.
 	 * @param actorId 参与者 Id.
+	 * @param status 指定任务状态 {@link TaskStatus}
 	 * @return 返回该工作项对象.
 	 */
-	WorkItem findWorkItemByFirst(String processInstanceId, String actorId);
+	WorkItem findWorkItemByFirst(String processInstanceId, String actorId, Integer[] status);
 
+	/**
+	 * 
+	 * @param activityInstanceId
+	 * @param sn
+	 * @return
+	 */
 	List<WorkItem> findWorkItemsBySn(String activityInstanceId, Integer sn);
 
 	/**

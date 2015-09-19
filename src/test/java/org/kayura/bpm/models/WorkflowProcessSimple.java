@@ -48,7 +48,7 @@ public class WorkflowProcessSimple {
 
 		wp.createTransition(startNode, bumen);
 		wp.createTransition(bumen, jinli);
-		wp.createTransition(zongjili, zongjili);
+		wp.createTransition(jinli, zongjili);
 		wp.createTransition(zongjili, endNode);
 
 		return wp;

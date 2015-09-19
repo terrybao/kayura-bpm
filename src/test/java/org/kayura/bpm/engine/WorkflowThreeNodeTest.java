@@ -21,7 +21,7 @@ public class WorkflowThreeNodeTest extends WorkflowEngineTest {
 
 	private String handlerId = "luirenjia";
 	private String bizFlowCode = "ThreeNode";
-	private String bizDataId = KeyUtils.newId();
+	private String bizDataId = "8AFB0FD1-4D9F-457D-B2CB-1AACD4CA32A3";
 
 	@Test
 	public void allTest() {
@@ -31,6 +31,8 @@ public class WorkflowThreeNodeTest extends WorkflowEngineTest {
 
 	@Test
 	public void startupTest() {
+
+		// 测试工作流启动.
 
 		try {
 
@@ -50,10 +52,12 @@ public class WorkflowThreeNodeTest extends WorkflowEngineTest {
 	@Test
 	public void completedWorkItemTest() {
 
+		// 测试处理工作项.
+
 		try {
 
 			Actor actor = new Actor(handlerId);
-			WorkItem item = runtime.findWorkItemByFirst(bizFlowCode, bizDataId, actor);
+			WorkItem item = runtime.findTodoTaskByFirst(bizFlowCode, bizDataId, actor);
 			while (item != null) {
 
 				TaskArgs args = new TaskArgs();
@@ -63,9 +67,9 @@ public class WorkflowThreeNodeTest extends WorkflowEngineTest {
 				TaskResult taskResult = runtime.completeWorkItem(args);
 				System.out.println("taskResult: " + taskResult);
 
-				item = runtime.findWorkItemByFirst(bizFlowCode, bizDataId, actor);
+				item = runtime.findTodoTaskByFirst(bizFlowCode, bizDataId, actor);
 			}
-
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
