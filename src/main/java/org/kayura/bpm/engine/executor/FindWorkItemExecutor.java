@@ -1,8 +1,8 @@
 package org.kayura.bpm.engine.executor;
 
-import org.kayura.bpm.engine.IWorkflowContext;
+import org.kayura.bpm.engine.WorkflowContext;
 import org.kayura.bpm.kernel.WorkItem;
-import org.kayura.bpm.storage.IStorageService;
+import org.kayura.bpm.storage.StorageService;
 
 public class FindWorkItemExecutor extends Executor<WorkItem> {
 
@@ -13,9 +13,9 @@ public class FindWorkItemExecutor extends Executor<WorkItem> {
 	}
 
 	@Override
-	public WorkItem doExecure(IWorkflowContext context) {
+	public WorkItem doExecure(WorkflowContext context) {
 
-		IStorageService storageService = context.getStorageService();
+		StorageService storageService = context.getStorageService();
 		WorkItem workItem = storageService.getWorkItemById(workItemId);		
 
 		return workItem;

@@ -4,7 +4,7 @@
  */
 package org.kayura.bpm.organize.impl;
 
-import org.kayura.bpm.organize.IOrganizeService;
+import org.kayura.bpm.organize.OrganizeService;
 import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
 import org.kayura.bpm.organize.models.Company;
 import org.kayura.bpm.organize.models.Department;
@@ -34,7 +34,7 @@ public class OrganizeServiceTest {
 
 	ObjectMapper om = new ObjectMapper();
 
-	private IOrganizeService organizeService;
+	private OrganizeService organizeService;
 	private SqlSessionFactory sqlSessionFactory;
 	private SqlSession session;
 

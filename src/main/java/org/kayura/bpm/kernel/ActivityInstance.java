@@ -13,7 +13,7 @@ import org.kayura.bpm.kernel.ActivityInstance.ExecuteTypes;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.ActivityActor.ActorTypes;
-import org.kayura.bpm.organize.IOrganizeService;
+import org.kayura.bpm.organize.OrganizeService;
 import org.kayura.bpm.types.Actor;
 import org.kayura.utils.DateUtils;
 
@@ -131,7 +131,7 @@ public class ActivityInstance extends AbsNodeInstance {
 
 	public List<Actor> findActors() {
 
-		IOrganizeService service = this.context.getOrganizeService();
+		OrganizeService service = this.context.getOrganizeService();
 		List<ActivityActor> actActors = activity.getActors();
 
 		List<Actor> actors = new ArrayList<Actor>();

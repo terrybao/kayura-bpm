@@ -11,7 +11,7 @@ import java.io.InputStream;
  */
 public class WorkflowRuntimeBuilder {
 
-	public IWorkflowRuntime build(InputStream inputStream) {
+	public WorkflowRuntime build(InputStream inputStream) {
 
 		
 		

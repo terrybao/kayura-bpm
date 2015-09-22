@@ -7,7 +7,7 @@ import org.kayura.bpm.types.StartResult;
 import org.kayura.bpm.types.TaskArgs;
 import org.kayura.bpm.types.TaskResult;
 
-public interface IWorkflowRuntime extends IWorkflowContextAware {
+public interface WorkflowRuntime extends WorkflowContextAware {
 
 	WorkItem findWorkItemByFirst(String bizFlowCode, String bizDataId, Actor user);
 

@@ -1,19 +1,19 @@
 package org.kayura.bpm.services.impl;
 
-import org.kayura.bpm.engine.IWorkflowRuntime;
-import org.kayura.bpm.services.IIntegrationService;
+import org.kayura.bpm.engine.WorkflowRuntime;
+import org.kayura.bpm.services.IntegrationService;
 import org.kayura.bpm.types.StartArgs;
 import org.kayura.bpm.types.StartResult;
 
-public class IntegrationServiceImpl implements IIntegrationService {
+public class IntegrationServiceImpl implements IntegrationService {
     
-    private IWorkflowRuntime runtime;
+    private WorkflowRuntime runtime;
     
-    public IWorkflowRuntime getRuntime() {
+    public WorkflowRuntime getRuntime() {
 	return runtime;
     }
     
-    public void setRuntime(IWorkflowRuntime runtime) {
+    public void setRuntime(WorkflowRuntime runtime) {
 	this.runtime = runtime;
     }
     

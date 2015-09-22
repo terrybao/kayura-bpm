@@ -4,11 +4,11 @@
  */
 package org.kayura.bpm.engine.executor;
 
-import org.kayura.bpm.engine.IWorkflowContext;
+import org.kayura.bpm.engine.WorkflowContext;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.InstanceStatus;
 import org.kayura.bpm.kernel.WorkItem;
-import org.kayura.bpm.storage.IStorageService;
+import org.kayura.bpm.storage.StorageService;
 import org.kayura.bpm.types.Actor;
 import org.kayura.utils.DateUtils;
 import org.kayura.utils.KeyUtils;
@@ -52,9 +52,9 @@ public class CreateWorkItemExecutor extends Executor<WorkItem> {
 	}
 
 	@Override
-	public WorkItem doExecure(IWorkflowContext context) {
+	public WorkItem doExecure(WorkflowContext context) {
 
-		IStorageService storageService = context.getStorageService();
+		StorageService storageService = context.getStorageService();
 
 		Integer depth = parent != null ? (parent.getDepth() + 1) : 1;
 

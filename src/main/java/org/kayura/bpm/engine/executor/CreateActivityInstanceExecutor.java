@@ -4,13 +4,13 @@
  */
 package org.kayura.bpm.engine.executor;
 
-import org.kayura.bpm.engine.IWorkflowContext;
+import org.kayura.bpm.engine.WorkflowContext;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ActivityInstance.ExecuteTypes;
 import org.kayura.bpm.kernel.InstanceStatus;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.models.Activity;
-import org.kayura.bpm.storage.IStorageService;
+import org.kayura.bpm.storage.StorageService;
 import org.kayura.bpm.types.Actor;
 import org.kayura.utils.DateUtils;
 import org.kayura.utils.KeyUtils;
@@ -30,9 +30,9 @@ public class CreateActivityInstanceExecutor extends Executor<ActivityInstance> {
 	}
 
 	@Override
-	public ActivityInstance doExecure(IWorkflowContext context) {
+	public ActivityInstance doExecure(WorkflowContext context) {
 
-		IStorageService storageService = context.getStorageService();
+		StorageService storageService = context.getStorageService();
 
 		ActivityInstance instance = new ActivityInstance(activity);
 		instance.setId(KeyUtils.newId());

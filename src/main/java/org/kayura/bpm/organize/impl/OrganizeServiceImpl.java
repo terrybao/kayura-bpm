@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.kayura.bpm.exceptions.WorkflowException;
-import org.kayura.bpm.organize.IOrganizeService;
+import org.kayura.bpm.organize.OrganizeService;
 import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
 import org.kayura.bpm.organize.models.Company;
 import org.kayura.bpm.organize.models.Department;
@@ -15,7 +15,7 @@ import org.kayura.bpm.organize.models.Role;
 import org.kayura.bpm.types.Actor;
 import org.kayura.utils.StringUtils;
 
-public class OrganizeServiceImpl implements IOrganizeService {
+public class OrganizeServiceImpl implements OrganizeService {
 
 	private OrganizeMapper mapper;
 

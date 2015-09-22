@@ -1,6 +1,6 @@
 package org.kayura.bpm.engine.executor;
 
-import org.kayura.bpm.engine.IWorkflowContext;
+import org.kayura.bpm.engine.WorkflowContext;
 import org.kayura.bpm.exceptions.WorkflowException;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.StartArgs;
@@ -15,7 +15,7 @@ public class StartupWorkflowExecutor extends Executor<StartResult> {
 	}
 
 	@Override
-	public StartResult doExecure(IWorkflowContext context) {
+	public StartResult doExecure(WorkflowContext context) {
 
 		StartResult result = new StartResult();
 

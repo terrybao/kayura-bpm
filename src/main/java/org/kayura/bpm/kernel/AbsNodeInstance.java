@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.kayura.bpm.engine.IWorkflowContext;
-import org.kayura.bpm.engine.IWorkflowContextAware;
+import org.kayura.bpm.engine.WorkflowContext;
+import org.kayura.bpm.engine.WorkflowContextAware;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.Node;
 import org.kayura.bpm.models.Transition;
@@ -22,10 +22,10 @@ import org.kayura.utils.PropertiesUtils;
 /**
  * @author liangxia@live.com
  */
-public class AbsNodeInstance implements IWorkflowContextAware {
+public class AbsNodeInstance implements WorkflowContextAware {
 
 	protected Node node;
-	protected IWorkflowContext context;
+	protected WorkflowContext context;
 
 	public AbsNodeInstance() {
 
@@ -36,7 +36,7 @@ public class AbsNodeInstance implements IWorkflowContextAware {
 	}
 
 	@Override
-	public void setContext(IWorkflowContext context) {
+	public void setContext(WorkflowContext context) {
 		this.context = context;
 	}
 

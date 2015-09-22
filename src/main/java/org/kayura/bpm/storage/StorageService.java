@@ -19,7 +19,7 @@ import org.kayura.type.PageParams;
  * @author liangxia@live.com
  *
  */
-public interface IStorageService {
+public interface StorageService {
 
 	// **************** 工作流表单存储接口 ***********************
 

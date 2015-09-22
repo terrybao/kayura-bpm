@@ -2,13 +2,13 @@ package org.kayura.bpm.kernel;
 
 import java.util.Date;
 
-import org.kayura.bpm.engine.IWorkflowContext;
-import org.kayura.bpm.engine.IWorkflowContextAware;
+import org.kayura.bpm.engine.WorkflowContext;
+import org.kayura.bpm.engine.WorkflowContextAware;
 import org.kayura.bpm.models.WorkflowProcess;
 import org.kayura.bpm.types.Actor;
 import org.kayura.utils.DateUtils;
 
-public class ProcessInstance implements IWorkflowContextAware {
+public class ProcessInstance implements WorkflowContextAware {
 
 	private String id;
 	private String parentId;
@@ -19,14 +19,14 @@ public class ProcessInstance implements IWorkflowContextAware {
 	private Date createdTime;
 	private Date completedTime;
 	private Integer status;
-	private IWorkflowContext context;
+	private WorkflowContext context;
 
 	public ProcessInstance() {
 
 	}
 
 	@Override
-	public void setContext(IWorkflowContext context) {
+	public void setContext(WorkflowContext context) {
 		this.context = context;
 	}
 

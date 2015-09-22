@@ -14,7 +14,7 @@ import org.kayura.bpm.types.DataStatus;
  * 
  * @author liangxia@live.com
  */
-public interface IOrganizeService {
+public interface OrganizeService {
 
 	/**
 	 * 查询符合条件的公司集合.

@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.kayura.bpm.engine.IWorkflowContext;
-import org.kayura.bpm.engine.IWorkflowContextAware;
+import org.kayura.bpm.engine.WorkflowContext;
+import org.kayura.bpm.engine.WorkflowContextAware;
 import org.kayura.bpm.engine.executor.CreateActivityInstanceExecutor;
 import org.kayura.bpm.engine.executor.CreateWorkItemExecutor;
 import org.kayura.bpm.kernel.ActivityInstance.ExecuteTypes;
@@ -21,8 +21,8 @@ import org.kayura.bpm.models.Activity.HandleTypes;
 import org.kayura.bpm.models.Node;
 import org.kayura.bpm.models.Node.NodeTypes;
 import org.kayura.bpm.models.WorkflowProcess;
-import org.kayura.bpm.organize.IOrganizeService;
-import org.kayura.bpm.storage.IStorageService;
+import org.kayura.bpm.organize.OrganizeService;
+import org.kayura.bpm.storage.StorageService;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.TaskArgs;
 import org.kayura.bpm.types.TaskResult;
@@ -31,14 +31,14 @@ import org.kayura.utils.DateUtils;
 /**
  * @author liangxia@live.com
  */
-public class TaskManager implements IWorkflowContextAware {
+public class TaskManager implements WorkflowContextAware {
 
-	private IWorkflowContext context;
+	private WorkflowContext context;
 	private WorkItem workItem;
 	private ActivityInstance activityInstance;
 	private ProcessInstance processInstance;
-	private IStorageService storageService;
-	private IOrganizeService organizeService;
+	private StorageService storageService;
+	private OrganizeService organizeService;
 
 	public TaskManager(WorkItem workItem) {
 		this.workItem = workItem;
@@ -47,7 +47,7 @@ public class TaskManager implements IWorkflowContextAware {
 	}
 
 	@Override
-	public void setContext(IWorkflowContext context) {
+	public void setContext(WorkflowContext context) {
 		this.context = context;
 
 		this.storageService = context.getStorageService();

@@ -18,7 +18,7 @@ import org.kayura.bpm.models.Route;
 import org.kayura.bpm.models.StartNode;
 import org.kayura.bpm.models.Transition;
 import org.kayura.bpm.models.WorkflowProcess;
-import org.kayura.bpm.storage.IStorageService;
+import org.kayura.bpm.storage.StorageService;
 import org.kayura.bpm.storage.impl.mapper.StorageMapper;
 import org.kayura.bpm.storage.impl.po.IdNodeType;
 import org.kayura.bpm.types.TaskListItem;
@@ -27,7 +27,7 @@ import org.kayura.type.PageList;
 import org.kayura.type.PageParams;
 import org.kayura.utils.StringUtils;
 
-public class StorageServiceImpl implements IStorageService {
+public class StorageServiceImpl implements StorageService {
 
 	private StorageMapper mapper;
 

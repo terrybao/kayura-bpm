@@ -3,8 +3,8 @@ package org.kayura.bpm.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.kayura.bpm.engine.IWorkflowContext;
-import org.kayura.bpm.engine.IWorkflowRuntime;
+import org.kayura.bpm.engine.WorkflowContext;
+import org.kayura.bpm.engine.WorkflowRuntime;
 import org.kayura.bpm.engine.executor.CreateActivityInstanceExecutor;
 import org.kayura.bpm.engine.executor.CreateProcessInstanceExecutor;
 import org.kayura.bpm.engine.executor.CreateWorkItemExecutor;
@@ -20,27 +20,27 @@ import org.kayura.bpm.kernel.WorkItem.TaskStatus;
 import org.kayura.bpm.kernel.WorkItem.TaskTypes;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.Node;
-import org.kayura.bpm.organize.IOrganizeService;
-import org.kayura.bpm.storage.IStorageService;
+import org.kayura.bpm.organize.OrganizeService;
+import org.kayura.bpm.storage.StorageService;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.StartArgs;
 import org.kayura.bpm.types.StartResult;
 import org.kayura.bpm.types.TaskArgs;
 import org.kayura.bpm.types.TaskResult;
 
-public class WorkflowRuntimeImpl implements IWorkflowRuntime {
+public class WorkflowRuntimeImpl implements WorkflowRuntime {
 
-	private IWorkflowContext context;
+	private WorkflowContext context;
 
-	public IWorkflowContext getContext() {
+	public WorkflowContext getContext() {
 		return context;
 	}
 
-	public void setContext(IWorkflowContext context) {
+	public void setContext(WorkflowContext context) {
 		this.context = context;
 	}
 
-	public WorkflowRuntimeImpl(IWorkflowContext context) {
+	public WorkflowRuntimeImpl(WorkflowContext context) {
 		this.context = context;
 	}
 
@@ -51,8 +51,8 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 	private WorkItem findWorkItemByFirst(String bizFlowCode, String bizDataId, Actor user,
 			Integer[] status) {
 
-		IStorageService storageService = context.getStorageService();
-		IOrganizeService organizeService = context.getOrganizeService();
+		StorageService storageService = context.getStorageService();
+		OrganizeService organizeService = context.getOrganizeService();
 
 		Actor byActor = organizeService.findActorByActor(user);
 		ProcessInstance instance = storageService.findProcessInstance(bizFlowCode, bizDataId);
@@ -90,7 +90,7 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 			throw new WorkflowException("必须定义流程的启动者。");
 		}
 
-		IOrganizeService organizeService = this.context.getOrganizeService();
+		OrganizeService organizeService = this.context.getOrganizeService();
 		Map<String, List<Actor>> nextActivities = args.getNextActivities();
 		Actor creator = organizeService.findActorByActor(args.getCreator());
 
@@ -142,7 +142,7 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 	@Override
 	public TaskResult completeWorkItem(TaskArgs args) {
 
-		IStorageService storageService = context.getStorageService();
+		StorageService storageService = context.getStorageService();
 
 		WorkItem workItem = storageService.getWorkItemById(args.getWorkItemId());
 		if (workItem.getStatus() == TaskStatus.Completed
@@ -158,7 +158,7 @@ public class WorkflowRuntimeImpl implements IWorkflowRuntime {
 	@Override
 	public TaskResult backWorkItem(TaskArgs args) {
 
-		IStorageService storageService = context.getStorageService();
+		StorageService storageService = context.getStorageService();
 
 		WorkItem workItem = storageService.getWorkItemById(args.getWorkItemId());
 		if (workItem.getStatus() == TaskStatus.Completed

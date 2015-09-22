@@ -1,10 +1,10 @@
 package org.kayura.bpm.engine.executor;
 
-import org.kayura.bpm.engine.IWorkflowContext;
+import org.kayura.bpm.engine.WorkflowContext;
 import org.kayura.bpm.kernel.InstanceStatus;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.models.WorkflowProcess;
-import org.kayura.bpm.storage.IStorageService;
+import org.kayura.bpm.storage.StorageService;
 import org.kayura.bpm.types.Actor;
 import org.kayura.bpm.types.BizData;
 import org.kayura.utils.DateUtils;
@@ -27,10 +27,10 @@ public class CreateProcessInstanceExecutor extends Executor<ProcessInstance> {
 	}
 
 	@Override
-	public ProcessInstance doExecure(IWorkflowContext context) {
+	public ProcessInstance doExecure(WorkflowContext context) {
 
 		WorkflowProcess workflowProcess = null;
-		IStorageService storageService = context.getStorageService();
+		StorageService storageService = context.getStorageService();
 
 		if (!StringUtils.isEmpty(workflowProcessId)) {
 			workflowProcess = storageService.getWorkflowProcess(workflowProcessId);

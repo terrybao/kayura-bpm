@@ -15,10 +15,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.kayura.bpm.engine.impl.WorkflowContextImpl;
 import org.kayura.bpm.engine.impl.WorkflowRuntimeImpl;
-import org.kayura.bpm.organize.IOrganizeService;
+import org.kayura.bpm.organize.OrganizeService;
 import org.kayura.bpm.organize.impl.OrganizeServiceImpl;
 import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
-import org.kayura.bpm.storage.IStorageService;
+import org.kayura.bpm.storage.StorageService;
 import org.kayura.bpm.storage.impl.StorageServiceImpl;
 import org.kayura.bpm.storage.impl.mapper.StorageMapper;
 
@@ -29,8 +29,8 @@ public abstract class WorkflowEngineTest {
 	
 	protected SqlSessionFactory sqlSessionFactory;
 	protected SqlSession session;
-	protected IWorkflowRuntime runtime;
-	protected IWorkflowContext context;
+	protected WorkflowRuntime runtime;
+	protected WorkflowContext context;
 
 	public WorkflowEngineTest() throws IOException {
 		InputStream inputStream = Resources.getResourceAsStream("mybatisConfig.xml");
@@ -45,8 +45,8 @@ public abstract class WorkflowEngineTest {
 		StorageMapper dMapper = session.getMapper(StorageMapper.class);
 		OrganizeMapper oMapper = session.getMapper(OrganizeMapper.class);
 
-		IStorageService storageService = new StorageServiceImpl(dMapper);
-		IOrganizeService organizeService = new OrganizeServiceImpl(oMapper);
+		StorageService storageService = new StorageServiceImpl(dMapper);
+		OrganizeService organizeService = new OrganizeServiceImpl(oMapper);
 
 		context = new WorkflowContextImpl(storageService, organizeService);
 		runtime = new WorkflowRuntimeImpl(context);
