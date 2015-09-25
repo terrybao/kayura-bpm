@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.kayura.bpm.kernel.ActivityInstance;
 import org.kayura.bpm.kernel.ProcessInstance;
 import org.kayura.bpm.kernel.WorkItem;
-import org.kayura.bpm.kernel.WorkItem.TaskStatus;
 import org.kayura.bpm.models.Activity;
 import org.kayura.bpm.models.ActivityActor;
 import org.kayura.bpm.models.BizForm;

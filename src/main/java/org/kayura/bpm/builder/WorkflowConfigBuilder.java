@@ -12,6 +12,7 @@ import org.kayura.xml.XDocument;
 /**
  * @author liangxia@live.com
  */
+@SuppressWarnings("unused")
 public class WorkflowConfigBuilder {
 
 	private XDocument document;

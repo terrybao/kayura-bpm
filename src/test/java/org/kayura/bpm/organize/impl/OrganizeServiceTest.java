@@ -4,15 +4,6 @@
  */
 package org.kayura.bpm.organize.impl;
 
-import org.kayura.bpm.organize.OrganizeService;
-import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
-import org.kayura.bpm.organize.models.Company;
-import org.kayura.bpm.organize.models.Department;
-import org.kayura.bpm.organize.models.Employee;
-import org.kayura.bpm.organize.models.Position;
-import org.kayura.bpm.organize.models.Role;
-import org.kayura.bpm.types.Actor;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -24,6 +15,13 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kayura.bpm.organize.OrganizeService;
+import org.kayura.bpm.organize.impl.mapper.OrganizeMapper;
+import org.kayura.bpm.organize.models.Company;
+import org.kayura.bpm.organize.models.Department;
+import org.kayura.bpm.organize.models.Position;
+import org.kayura.bpm.organize.models.Role;
+import org.kayura.bpm.types.Actor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

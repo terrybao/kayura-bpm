@@ -2,7 +2,6 @@ package org.kayura.bpm.engine;
 
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.types.Actor;
@@ -11,7 +10,6 @@ import org.kayura.bpm.types.StartArgs;
 import org.kayura.bpm.types.StartResult;
 import org.kayura.bpm.types.TaskArgs;
 import org.kayura.bpm.types.TaskResult;
-import org.kayura.utils.KeyUtils;
 
 public class WorkflowThreeNodeTest extends WorkflowEngineTest {
 

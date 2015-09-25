@@ -11,7 +11,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kayura.bpm.builder.WorkflowProcessBuilder;
-import org.kayura.bpm.kernel.WorkItem;
 import org.kayura.bpm.models.BizForm;
 import org.kayura.bpm.models.DefineStatus;
 import org.kayura.bpm.models.WorkflowProcess;
