@@ -122,12 +122,9 @@ public interface StorageMapper {
 	 * 查询活动实例指定条件的计数.
 	 * 
 	 * @param args 可选参数：
-	 *            <p>
-	 *            processInstanceId 所属的过程实例Id.
-	 *            <p>
-	 *            preActInstanceId 前一步活动实例Id.
-	 *            <p>
-	 *            status 活动实例的状态 {@link InstanceStatus}.
+	 * <p> processInstanceId 所属的过程实例Id.
+	 * <p> preActInstanceId 前一步活动实例Id.
+	 * <p> status 活动实例的状态 {@link InstanceStatus}.
 	 * @return 返回活动实例计数.
 	 */
 	Integer activityInstanceCountByMap(Map<String, Object> args);
@@ -142,12 +139,9 @@ public interface StorageMapper {
 	 * 可指定条件查询出符全条件的第1条记录.
 	 * 
 	 * @param args 可选条件参数：
-	 *            <p>
-	 *            processInstanceId : 过程实例Id.
-	 *            <p>
-	 *            actorId : 参与者Id.
-	 *            <p>
-	 *            status : 工作项状态 {@link TaskStatus }
+	 * <p> processInstanceId 过程实例Id.
+	 * <p> actorId 参与者Id.
+	 * <p> status 工作项状态 {@link TaskStatus }
 	 * @return
 	 */
 	WorkItem findWorkItemByFirst(Map<String, Object> args);
@@ -156,20 +150,13 @@ public interface StorageMapper {
 	 * 查询指定组合条件的工作项集合.
 	 * 
 	 * @param args 可选参数:
-	 *            <p>
-	 *            activityInstanceId 活动实例Id.
-	 *            <p>
-	 *            sn 顺序号.
-	 *            <p>
-	 *            ownerId 所有者Id.
-	 *            <p>
-	 *            taskType 类型.
-	 *            <p>
-	 *            depth 深度.
-	 *            <p>
-	 *            status 状态.
-	 *            <p>
-	 *            parentId 父级工作项Id,当值为字符 null 时查询根级任务.
+	 * <p> activityInstanceId 活动实例Id.
+	 * <p> sn 顺序号.
+	 * <p> ownerId 所有者Id.
+	 * <p> taskType 类型.
+	 * <p> depth 深度.
+	 * <p> status 状态.
+	 * <p> parentId 父级工作项Id,当值为字符 null 时查询根级任务.
 	 * @return 返回满足符合条件的工作项.
 	 */
 	List<WorkItem> findWorkItemsByMap(Map<String, Object> args);
@@ -192,11 +179,8 @@ public interface StorageMapper {
 	 * 动态更新指定列的工作项.
 	 * 
 	 * @param args 可更新列键值.
-	 *            <p>
-	 *            priority,alarmTime,sn,handlerId,comment,completedTime,status
-	 *            最少需要指定一个.
-	 *            <p>
-	 *            id 为必需参数，工作项主键值.
+	 * <p> priority,alarmTime,sn,handlerId,comment,completedTime,status 最少需要指定一个.
+	 * <p> id 为必需参数，工作项主键值.
 	 */
 	void updateWorkItemByMap(Map<String, Object> args);
 
@@ -204,18 +188,12 @@ public interface StorageMapper {
 	 * 根据条件查询出符合条件的工作项计数.
 	 * 
 	 * @param args 可选条件参数:
-	 *            <p>
-	 *            activityInstanceId 活动实例 Id
-	 *            <p>
-	 *            sn 指定的处理顺号
-	 *            <p>
-	 *            excludeId 排除掉的工作项Id
-	 *            <p>
-	 *            parentId 父级工作项Id
-	 *            <p>
-	 *            taskType 工作项类型.
-	 *            <p>
-	 *            status 工作项状态.
+	 * <p> activityInstanceId 活动实例 Id.
+	 * <p> sn 指定的处理顺号.
+	 * <p> excludeId 排除掉的工作项Id.
+	 * <p> parentId 父级工作项Id.
+	 * <p> taskType 工作项类型.
+	 * <p> status 工作项状态.
 	 * @return 返回工作项计数.
 	 */
 	Integer workItemCountByMap(Map<String, Object> args);
