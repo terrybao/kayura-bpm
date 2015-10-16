@@ -1037,12 +1037,14 @@
 	</select>
 	
 	<select id="findNextTaskSequence" parameterType="map" resultType="int">
+		<![CDATA[
 		SELECT t.SN 
 		FROM bpm_workitems t 
 		WHERE ( t.ActivityInstance_Id = #{activityInstanceId} ) AND 
 			  ( t.Parent_ID IS NULL ) AND 
 			  ( t.SN > #{sn} ) 
 		ORDER BY t.SN LIMIT 1 
+		]]>
 	</select>
 	
 	<insert id="insertWorkItem" parameterType="org.kayura.bpm.kernel.WorkItem">
