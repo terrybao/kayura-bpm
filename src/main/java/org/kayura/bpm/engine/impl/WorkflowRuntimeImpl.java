@@ -134,13 +134,13 @@ public class WorkflowRuntimeImpl implements WorkflowRuntime {
 	}
 
 	@Override
-	public TaskResult claimWorkItem(TaskArgs args) {
+	public TaskResult claimTask(TaskArgs args) {
 
 		return null;
 	}
 
 	@Override
-	public TaskResult completeWorkItem(TaskArgs args) {
+	public TaskResult completeTask(TaskArgs args) {
 
 		StorageService storageService = context.getStorageService();
 
@@ -156,7 +156,7 @@ public class WorkflowRuntimeImpl implements WorkflowRuntime {
 	}
 
 	@Override
-	public TaskResult backWorkItem(TaskArgs args) {
+	public TaskResult backTask(TaskArgs args) {
 
 		StorageService storageService = context.getStorageService();
 
@@ -172,7 +172,7 @@ public class WorkflowRuntimeImpl implements WorkflowRuntime {
 	}
 
 	@Override
-	public TaskResult reasignWorkItem(TaskArgs args) {
+	public TaskResult reasignTask(TaskArgs args) {
 
 		return null;
 	}

@@ -62,7 +62,7 @@ public class WorkflowOneNodeTest extends WorkflowEngineTest {
 			args.setHandler(actor);
 			args.setWorkItemId(item.getId());
 
-			TaskResult taskResult = runtime.completeWorkItem(args);
+			TaskResult taskResult = runtime.completeTask(args);
 
 			System.out.println(taskResult);
 
