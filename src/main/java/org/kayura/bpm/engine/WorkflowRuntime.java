@@ -21,20 +21,20 @@ public interface WorkflowRuntime extends WorkflowContextAware {
 	/**
 	 * 完成一个工作项.
 	 */
-	TaskResult completeWorkItem(TaskArgs args);
+	TaskResult completeTask(TaskArgs args);
 
 	/**
 	 * 退回一个工作项.
 	 */
-	TaskResult backWorkItem(TaskArgs args);
+	TaskResult backTask(TaskArgs args);
 
 	/**
 	 * 指派一个工作项给他人.
 	 */
-	TaskResult reasignWorkItem(TaskArgs args);
+	TaskResult reasignTask(TaskArgs args);
 
 	/**
 	 * 签收一个工作项.
 	 */
-	TaskResult claimWorkItem(TaskArgs args);
+	TaskResult claimTask(TaskArgs args);
 }
